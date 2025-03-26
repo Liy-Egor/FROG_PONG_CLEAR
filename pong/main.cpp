@@ -413,7 +413,7 @@ void ShowRacketAndBall()
 void ShowPlatform()
 {
 
-    platform.height = 90;
+    platform.height = 150;
     platform.width = 100;
     platform.x = window.width*0.8;
     platform.y = window.height*0.9;
@@ -424,10 +424,10 @@ void ShowPlatform()
 
 void Collision()
 {
-    if (racket.x >= platform.x && racket.x <= platform.x + platform.width && racket.y <= platform.y + platform.height && racket.y >= platform.y)
+    if (racket.x >= platform.x && racket.x <= platform.x + platform.width && racket.y + racket.height <= platform.y + platform.height && racket.y + racket.height >= platform.y)
     {
-        racket.y = min(platform.y, racket.y - racket.height);
-       // racket.y = racket.y - racket.height - 1;
+        //racket.y = min(platform.y, racket.y - racket.height);
+        racket.y = racket.y - racket.height;
     }
 
 
