@@ -424,9 +424,9 @@ void ShowPlatform()
 
 void Collision()
 {
-    if (platform.x <= racket.x && racket.x <= platform.x + platform.width && racket.y <= platform.y - platform.height)
+    if (racket.x >= platform.x && racket.x <= platform.x + platform.width && racket.y <= platform.y + platform.height && racket.y >= platform.y)
     {
-        racket.y = min(platform.y - racket.height, racket.y);
+        racket.y = min(platform.y, racket.y - racket.height);
        // racket.y = racket.y - racket.height - 1;
     }
 
@@ -620,7 +620,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         ShowPlatform();
         ShowScore();//рисуем очик и жизни
         BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);//копируем буфер в окно
-        Sleep(500);//ждем 16 милисекунд (1/количество кадров в секунду)
+        Sleep(16);//ждем 16 милисекунд (1/количество кадров в секунду)
 
         ProcessInput();//опрос клавиатуры
         ProcessDash();//рывок
