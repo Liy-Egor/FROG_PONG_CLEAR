@@ -414,30 +414,20 @@ void ShowPlatform()
 {
 
     platform.height = 90;
-    platform.width = 300;
-    platform.x = window.width / 2;
+    platform.width = 100;
+    platform.x = window.width*0.8;
     platform.y = window.height*0.9;
     platform.loadBitmapWithNativeSize("racket_enemy.bmp");
     platform.show();
 
 }
 
-void BlockCollision()
+void Collision()
 {
-    bool collisionHandled = false;
-    if (racket.x <= ((platform.x + platform.width && platform.y) && (platform.x + platform.width && platform.y + platform.height)) ||
-        racket.x >= ((platform.x && platform.y) && (platform.x && platform.y + platform.height)))
+    if (platform.x <= racket.x && racket.x <= platform.x + platform.width && racket.y <= platform.y - platform.height)
     {
-        collisionHandled = true;
-        racket.x -= 100;
-    }
-
-    if (racket.y <= ((platform.x && platform.y + platform.height) && (platform.x + platform.width && platform.y + platform.height)) ||
-        racket.y >= ((platform.x && platform.y) && (platform.x + platform.width && platform.y)))
-        
-    {
-        collisionHandled = true;
-        racket.y -= 100;
+        racket.y = min(platform.y - racket.height, racket.y);
+       // racket.y = racket.y - racket.height - 1;
     }
 
 
@@ -559,6 +549,7 @@ float gravity = 30;
 float jump = 0;
 float maxjump = 20;
 
+
 void ProcessHero()
 {
 
@@ -629,11 +620,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         ShowPlatform();
         ShowScore();//рисуем очик и жизни
         BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);//копируем буфер в окно
-        Sleep(16);//ждем 16 милисекунд (1/количество кадров в секунду)
+        Sleep(500);//ждем 16 милисекунд (1/количество кадров в секунду)
 
         ProcessInput();//опрос клавиатуры
         ProcessDash();//рывок
         ProcessHero();//прыжок 
+        Collision();
         LimitRacket();//проверяем, чтобы ракетка не убежала за экран
         ProcessBall();//перемещаем шарик
         spawnEnemy();
