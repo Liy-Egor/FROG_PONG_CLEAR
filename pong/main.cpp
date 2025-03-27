@@ -6,14 +6,11 @@
 #include "math.h"
 #include "ctime"
 #include "vector"
+using namespace std;
 int currenttime = 0;
 void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool alpha = false);
 
 POINT mouse;
-struct {
-    int score, balls;//количество набранных очков и оставшихся "жизней"
-    bool action = false;//состояние - ожидание (игрок должен нажать пробел) или игра
-} game;
 
 struct {
     HWND hWnd;//хэндл окна
@@ -22,27 +19,7 @@ struct {
 } window;
 
 HBITMAP hBack;// хэндл для фонового изображения
-
-HBITMAP ballBitmap;
-
 // секция данных игры  
-HBITMAP frogHbm;
-float frogWidth;
-float frogHeight;
-int oldtime = 0;
-
-
-const int slots_count = 6;
-
-void loadFrog()
-{
-    frogHbm = (HBITMAP)LoadImageA(NULL, "frog.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    BITMAP bm;
-    GetObject(frogHbm, (int)sizeof bm, &bm);
-    frogWidth = bm.bmWidth;
-    frogHeight = bm.bmHeight;
-}
-
 
 struct sprite {
     float x, y, width, height, rad, dx, dy, speed, time;
@@ -64,142 +41,28 @@ struct sprite {
 };
 sprite racket;//ракетка игрока
 
-struct enemy {
-
-    sprite enemy_sprite;
-    std::vector<sprite> bullet;
-    int bullettime = 0;
-    bool dead = true;
-    int spawnTime = 0;
-    int HPfrog = 3;           //rand()% 3-5
-
-    void showBullet()
-    {
-        for (int i = 0; i < bullet.size(); i++)
-        {
-            ShowBitmap(window.context, bullet[i].x - bullet[i].rad, bullet[i].y - bullet[i].rad, 2 * bullet[i].rad, 2 * bullet[i].rad, bullet[i].hBitmap, true);
-        }
-    }
-
-    void processBullet()
-    {
-        if (currenttime > bullettime + 5000)
-        {
-            //for (int i = 0; i < bullet.size(); i++)
-            {
-                sprite b;
-                b.height = 40;
-                b.width = 40;
-                b.speed = rand() % (20 - 1) + 4;
-                b.x = enemy_sprite.x;
-                b.y = enemy_sprite.y;
-                b.dx = racket.x - b.x;
-                b.dy = racket.y - b.y;
-
-                float dvector = sqrt(b.dx * b.dx + b.dy * b.dy);
-                b.dx = b.dx / dvector;
-                b.dy = b.dy / dvector;
-                b.rad = 20;
-                b.hBitmap = ballBitmap;
-
-                //game.action = true;
-
-                bullet.push_back(b);
-                bullettime = currenttime;
-            }
-        }
-
-        for (int i = 0; i < bullet.size(); i++)
-        {
-            float margin = 0;
-
-            if ((bullet[i].x > window.width - margin) || (bullet[i].x < margin) ||
-                (bullet[i].y < margin))
-            {
-                bullet[i].speed = 0;
-            }
-
-            bullet[i].x += bullet[i].dx * bullet[i].speed;
-            bullet[i].y += bullet[i].dy * bullet[i].speed;
-        }
-
-        for (int i = 0; i < bullet.size(); i++)
-        {
-            if (bullet[i].speed < .1)
-            {
-                bullet.erase(bullet.begin() + i);
-            }
-        }
-    }
-};
-
-
-int location_number = 0;
-
-struct portal_
+enum class obj
 {
-    int x;
-    int y;
-    int w;
-    int h;
-    int destination;
-    bool active;
+    loc1,
+    loc2
 };
 
-struct location
-{
-
-    std::vector<portal_> portal;
-
-
-    HBITMAP back;
+struct Objects{
+    obj name;
+    sprite textureSprite;
 };
 
-location map[10];
-enemy frog[slots_count];
+int currentLocation = 0;
+struct Location_ {
+    HBITMAP hBack;
+    int LeftPort;
+    int RightPort;
+    vector<Objects> locationTexture;
+    
+};
+Location_ location[5];
+
 sprite platform;
-sprite ball;//шарик
-//лягушка
-
-std::vector<sprite> bullet;
-
-
-void spawnEnemy()
-{
-    for (int i = 0;i < slots_count;i++)
-    {
-        if (frog[i].dead)
-        {
-
-            if (currenttime > frog[i].spawnTime + 1000)
-            {
-                sprite f;
-
-                f.x = (window.width / slots_count) * i;
-                f.y = 0;
-                f.width = frogWidth;
-                f.height = frogHeight;
-                f.hBitmap = frogHbm;
-
-                enemy e;
-                e.enemy_sprite = f;
-                e.dead = false;
-                e.HPfrog = rand() % 3 + 1;
-                frog[i] = e;
-
-
-            }
-            break;
-
-        }
-    }
-
-
-}
-
-
-
-
 
 //cекция кода
 
@@ -208,74 +71,48 @@ void loadBitmap(const char* filename, HBITMAP& hbm)
     hbm = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 }
 
-void ProcessMapsSwap()
-{
-    auto portaL_count = map[location_number].portal.size();
-    for (int i = 0; i < portaL_count; i++)
-    {
-        if (map[location_number].portal[i].x < racket.x and
-            map[location_number].portal[i].y < racket.y and
-            map[location_number].portal[i].y + map[location_number].portal[i].h > racket.y and
-            map[location_number].portal[i].x + map[location_number].portal[i].w > racket.x)
-        {
-            location_number = map[location_number].portal[i].destination;
-            racket.x = window.width / 4.;
-            racket.y = window.height - (window.height - racket.y);
-            return;
-        }
 
-    }
-}
 
 void InitGame()
 {
-    for (int i = 0;i < slots_count;i++)
-    {
-        frog[i].dead = true;
-    }
-    //в этой секции загружаем спрайты с помощью функций gdi
-    //пути относительные - файлы должны лежать рядом с .exe 
-    //результат работы LoadImageA сохраняет в хэндлах битмапов, рисование спрайтов будет произовдиться с помощью этих хэндлов
-    //ball.hBitmap = (HBITMAP)LoadImageA(NULL, "ball.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     racket.hBitmap = (HBITMAP)LoadImageA(NULL, "racket.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-
-    //enemy.hBitmap = (HBITMAP)LoadImageA(NULL, "racket_enemy.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    //frog.hBitmap = (HBITMAP)LoadImageA(NULL, "frog.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    //frog.loadBitmapWithNativeSize("frog.bmp");
-    loadFrog();
-
-
     hBack = (HBITMAP)LoadImageA(NULL, "back.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-
     //------------------------------------------------------
-
     racket.width = 30;
     racket.height = 30;
-    racket.speed = 30;//скорость перемещения ракетки
-    racket.x = window.width / 2.;//ракетка посередине окна
-    racket.y = window.height - racket.height;//чуть выше низа экрана - на высоту ракетки
-
-    //enemy.x = racket.x;//х координату оппонета ставим в ту же точку что и игрока
-
-    loadBitmap("ball.bmp", ballBitmap);
-
-    game.score = 0;
-    game.balls = 9;
+    racket.speed = 30;
+    racket.x = window.width / 2.;
+    racket.y = window.height - racket.height;
 
 
-    map[0].back = (HBITMAP)LoadImageA(NULL, "background_0.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    map[0].portal.push_back({ 0,window.height - window.height / 4,window.width / 50, window.height / 4,1,true });
+    location[0].hBack = (HBITMAP)LoadImageA(NULL, "background_0.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    location[0].RightPort = 1;
+    location[0].LeftPort = -1;
 
-    map[1].back = (HBITMAP)LoadImageA(NULL, "background_1.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    map[1].portal.push_back({ window.width - window.width / 50,window.height - window.height / 4,window.width / 50, window.height / 4,0,true });
-    /*if (location_number == 1)
-    {
-        racket.x = window.width - (window.width / 50) - racket.width;
-        racket.y = window.height - racket.height;
-    }*/
+    Objects platform1;
+    platform1.name = obj::loc1;
+    platform1.textureSprite.hBitmap = (HBITMAP)LoadImageA(NULL, "racket_enemy.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    platform1.textureSprite.x = window.width * 0.8;
+    platform1.textureSprite.y = window.height * 0.9;
+    platform1.textureSprite.width = 350;
+    platform1.textureSprite.height = 50;
+
+    location[0].locationTexture.push_back(platform1);
 
 
+    location[1].hBack = (HBITMAP)LoadImageA(NULL, "background_1.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    location[1].RightPort = -1;
+    location[1].LeftPort = 0;
 
+    Objects platform2;
+    platform2.name = obj::loc2;
+    platform2.textureSprite.hBitmap = (HBITMAP)LoadImageA(NULL, "racket_enemy.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    platform2.textureSprite.x = window.width * 0.8;
+    platform2.textureSprite.y = window.height * 0.9;
+    platform2.textureSprite.width = 350;
+    platform2.textureSprite.height = 50;
+
+    location[1].locationTexture.push_back(platform2);
 
 }
 
@@ -284,28 +121,6 @@ void ProcessSound(const char* name)//проигрывание аудиофайла в формате .wav, фай
     PlaySound(TEXT(name), NULL, SND_FILENAME | SND_ASYNC);//переменная name содежрит имя файла. флаг ASYNC позволяет проигрывать звук паралельно с исполнением программы
 }
 
-void ShowScore()
-{
-    //поиграем шрифтами и цветами
-    SetTextColor(window.context, RGB(165, 180, 130));
-    SetBkColor(window.context, RGB(0, 0, 0));
-    SetBkMode(window.context, TRANSPARENT);
-    auto hFont = CreateFont(70, 0, 0, 0, FW_BOLD, 0, 0, 0, 0, 0, 0, 2, 0, "CALIBRI");
-    auto hTmp = (HFONT)SelectObject(window.context, hFont);
-
-    char txt[32];//буфер для текста
-    _itoa_s(bullet.size(), txt, 10);//преобразование числовой переменной в текст. текст окажется в переменной txt
-    TextOutA(window.context, 10, 10, "Score", 5);
-    TextOutA(window.context, 200, 10, (LPCSTR)txt, strlen(txt));
-
-    //    _itoa_s(game.balls, txt, 10);
-      //  TextOutA(window.context, 10, 100, "Balls", 5);
-       // TextOutA(window.context, 200, 100, (LPCSTR)txt, strlen(txt));
-
-    DeleteObject(hFont);
-}
-
-
 float clickTimeOut = 100;
 float clickTime = 0;
 
@@ -313,8 +128,6 @@ void ProcessInput()
 {
     if (GetAsyncKeyState(VK_LEFT)) racket.x -= racket.speed;
     if (GetAsyncKeyState(VK_RIGHT)) racket.x += racket.speed;
-    //if (GetAsyncKeyState(VK_UP)) racket.y -= racket.speed;
-    //if (GetAsyncKeyState(VK_DOWN)) racket.y += racket.speed;
     clickTime = timeGetTime();
 
     if (GetAsyncKeyState(VK_LBUTTON) && clickTime > clickTimeOut)
@@ -330,17 +143,41 @@ void ProcessInput()
         b.dx = b.dx / dvector;
         b.dy = b.dy / dvector;
         b.rad = 20;
-        b.hBitmap = ballBitmap;
+        
 
-        game.action = true;
-
-        bullet.push_back(b);
+       
 
         ProcessSound("bounce1.wav");
 
         clickTimeOut = clickTime + 1000;
 
 
+    }
+
+    if (racket.x < 0)
+    {
+        if (location[currentLocation].LeftPort >= 0)
+        {
+            racket.x = window.width - racket.width;
+            currentLocation = location[currentLocation].LeftPort;
+        }
+        else
+        {
+            racket.x = 0;
+        }
+    }
+
+    if (racket.x > window.width - racket.width)
+    {
+        if (location[currentLocation].RightPort >= 0)
+        {
+            racket.x = 0;
+            currentLocation = location[currentLocation].RightPort;
+        }
+        else
+        {
+            racket.x = window.width - racket.width;
+        }
     }
 }
 
@@ -378,49 +215,22 @@ void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool
 
 void ShowRacketAndBall()
 {
-    ShowBitmap(window.context, 0, 0, window.width, window.height, map[location_number].back);//задний фон
+    ShowBitmap(window.context, 0, 0, window.width, window.height, location[currentLocation].hBack);//задний фон
     ShowBitmap(window.context, racket.x - racket.width / 2., racket.y, racket.width, racket.height, racket.hBitmap);// ракетка игрока
 
 
-
-
-
-    for (int i = 0; i < slots_count; i++)
-    {
-        if (!frog[i].dead)
-        {
-            frog[i].enemy_sprite.show();
-            frog[i].processBullet();
-            frog[i].showBullet();
-        }
-
-    }
-
-
-    for (int i = 0; i < bullet.size(); i++)
-    {
-        ShowBitmap(window.context, bullet[i].x - bullet[i].rad, bullet[i].y - bullet[i].rad, 2 * bullet[i].rad, 2 * bullet[i].rad, bullet[i].hBitmap, true);// шарик
-    }
-
-    for (int i = 0; i < 20; i++)
-    {
-        //    ShowBitmap(window.context, ball[i].x - ball[i].rad, ball[i].y - ball[i].rad, 2 * ball[i].rad, 2 * ball[i].rad, ball[i].hBitmap, true);// шарик
-    }
-
-
 }
 
-void ShowPlatform()
+void ShowTexture()
 {
-
-    platform.height = 150;
-    platform.width = 100;
-    platform.x = window.width*0.8;
-    platform.y = window.height*0.9;
-    platform.loadBitmapWithNativeSize("racket_enemy.bmp");
-    platform.show();
+    for (const auto& i : location[currentLocation].locationTexture)
+    {
+        ShowBitmap(window.context, i.textureSprite.x, i.textureSprite.y, i.textureSprite.width, i.textureSprite.height, i.textureSprite.hBitmap);
+    }
 
 }
+
+
 
 void Collision()
 {
@@ -442,92 +252,6 @@ void LimitRacket()
     racket.x = min(racket.x, window.width - racket.width / 2.);//аналогично для правого угла
 }
 
-
-
-void ProcessBall()
-{
-    if (game.action)
-    {
-
-        for (int i = 0; i < bullet.size(); i++)
-        {
-            float margin = 0;
-
-            if ((bullet[i].x > window.width - margin) || (bullet[i].x < margin) ||
-                (bullet[i].y < margin))
-            {
-                bullet[i].speed = 0;
-            }
-
-            //если игра в активном режиме - перемещаем шарик
-            bullet[i].x += bullet[i].dx * bullet[i].speed;
-            bullet[i].y += bullet[i].dy * bullet[i].speed;
-        }
-
-        for (int j = 0; j < slots_count; j++)
-        {
-            for (int i = 0; i < bullet.size(); i++)
-            {
-                if (!bullet.empty())
-                {
-                    if (!frog[j].dead)
-                    {
-
-                        if (bullet[i].x < frog[j].enemy_sprite.x + frog[j].enemy_sprite.width and
-                            bullet[i].y < frog[j].enemy_sprite.y + frog[j].enemy_sprite.height and
-                            bullet[i].x > frog[j].enemy_sprite.x and
-                            bullet[i].y > frog[j].enemy_sprite.y)
-                        {
-                            bullet.erase(bullet.begin() + i);
-
-                            frog[j].HPfrog -= 1;
-                            if (frog[j].HPfrog < 0)
-                            {
-                                frog[j].dead = true;
-                                frog[j].spawnTime = currenttime;
-                            }
-
-                            i--;
-                            if (i < 0) break;
-
-                        }
-                    }
-                }
-                else
-                {
-                    break;
-                }
-            }
-
-        }
-
-
-        for (int i = 0; i < bullet.size(); i++)
-        {
-            if (bullet[i].speed < .1)
-            {
-                bullet.erase(bullet.begin() + i);
-            }
-        }
-    }
-    else
-    {
-        for (int i = 0; i < bullet.size(); i++)
-        {
-            if (bullet[i].speed < .1)
-            {
-                bullet[i].x = racket.x;
-            }
-        }
-    }
-    if (game.action)
-    {
-        //std::vector<int> b = (ball[i])
-        {
-            //    ball[i].time
-        }
-    }
-}
 
 void InitWindow()
 {
@@ -567,8 +291,6 @@ void ProcessHero()
     jump *= .9;
     jump = max(jump, 0);
 
-    //doubleJump = false;
-
 }
 
 const float dashDistance = 150;
@@ -605,31 +327,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     InitWindow();//здесь инициализируем все что нужно для рисования в окне
     InitGame();//здесь инициализируем переменные игры
 
-    //mciSendString(TEXT("play ..\\Debug\\music1.mp3 repeat"), NULL, 0, NULL);
-    //ShowCursor(NULL);
-    oldtime = timeGetTime();
-
 
     while (!GetAsyncKeyState(VK_ESCAPE))
     {
         currenttime = timeGetTime();
         GetCursorPos(&mouse);
         ScreenToClient(window.hWnd, &mouse);
-
         ShowRacketAndBall();//рисуем фон, ракетку и шарик
-        ShowPlatform();
-        ShowScore();//рисуем очик и жизни
+        ShowTexture();
         BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);//копируем буфер в окно
         Sleep(16);//ждем 16 милисекунд (1/количество кадров в секунду)
-
         ProcessInput();//опрос клавиатуры
         ProcessDash();//рывок
         ProcessHero();//прыжок 
         Collision();
         LimitRacket();//проверяем, чтобы ракетка не убежала за экран
-        ProcessBall();//перемещаем шарик
-        spawnEnemy();
-        ProcessMapsSwap();
+       
         // ProcessRoom();//обрабатываем отскоки от стен и каретки, попадание шарика в картетку
 
 
