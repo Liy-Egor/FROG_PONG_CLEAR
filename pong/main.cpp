@@ -50,6 +50,7 @@ enum class obj
 struct Objects{
     obj name;
     sprite textureSprite;
+
 };
 
 int currentLocation = 0;
@@ -107,13 +108,12 @@ void InitGame()
     Objects platform2;
     platform2.name = obj::loc2;
     platform2.textureSprite.hBitmap = (HBITMAP)LoadImageA(NULL, "racket_enemy.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    platform2.textureSprite.x = window.width * 0.8;
+    platform2.textureSprite.x = window.width / 4;
     platform2.textureSprite.y = window.height * 0.9;
     platform2.textureSprite.width = 350;
     platform2.textureSprite.height = 50;
 
     location[1].locationTexture.push_back(platform2);
-
 }
 
 void ProcessSound(const char* name)//проигрывание аудиофайла в формате .wav, файл должен лежать в той же папке где и программа
@@ -234,13 +234,18 @@ void ShowTexture()
 
 void Collision()
 {
-    if (racket.x >= platform.x && racket.x <= platform.x + platform.width && racket.y + racket.height <= platform.y + platform.height && racket.y + racket.height >= platform.y)
-    {
-        //racket.y = min(platform.y, racket.y - racket.height);
-        racket.y = racket.y - racket.height;
-    }
+    
 
+    //if (racket.x >= location[currentLocation].locationTexture[currentLocation].textureSprite.x && 
+    //    racket.x <= location[currentLocation].locationTexture[currentLocation].textureSprite.x + platform.width && 
+    //    racket.y + racket.height <= location[currentLocation].locationTexture[currentLocation].textureSprite.y + platform.height &&
+    //    racket.y + racket.height >= location[currentLocation].locationTexture[currentLocation].textureSprite.y)
+    //{
+    //    //racket.y = min(platform.y, racket.y - racket.height);
+    //    racket.y = racket.y - racket.height;
+    //}
 
+    
 }
 
 
@@ -270,6 +275,7 @@ void InitWindow()
 }
 
 float gravity = 30;
+
 float jump = 0;
 float maxjump = 20;
 
@@ -281,7 +287,6 @@ void ProcessHero()
     if (GetAsyncKeyState(VK_SPACE) && racket.y > (window.height - racket.height - 1))
     {
 
-
         jump += 90;
     }
 
@@ -289,7 +294,7 @@ void ProcessHero()
     racket.y = min(window.height - racket.height, racket.y);
 
     jump *= .9;
-    jump = max(jump, 0);
+    //jump = max(jump, 0);
 
 }
 
