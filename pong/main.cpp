@@ -40,15 +40,12 @@ struct sprite {
     }
 };
 sprite racket;//ракетка игрока
+sprite healing;
 
-enum class obj
-{
-    loc1,
-    loc2
-};
+
 
 struct Objects{
-    obj name;
+   
     sprite textureSprite;
 
 };
@@ -59,13 +56,23 @@ struct Location_ {
     int LeftPort;
     int RightPort;
     vector<Objects> locationTexture;
+    vector<sprite> locationObjects;
     
 };
 Location_ location[5];
 
 sprite platform;
 
-//cекция кода
+struct player_
+{
+
+    HBITMAP hHealthFull, hHealthEmpty;
+    int health_width = 40;
+    int max_lives = 5;
+    int current_lives = 3;
+};
+
+player_ player;
 
 void loadBitmap(const char* filename, HBITMAP& hbm)
 {
@@ -76,7 +83,10 @@ void loadBitmap(const char* filename, HBITMAP& hbm)
 
 void InitGame()
 {
+    player.hHealthFull = (HBITMAP)LoadImageA(NULL, "racket.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    player.hHealthEmpty = (HBITMAP)LoadImageA(NULL, "ball.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     racket.hBitmap = (HBITMAP)LoadImageA(NULL, "racket.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    healing.hBitmap = (HBITMAP)LoadImageA(NULL, "racket.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     hBack = (HBITMAP)LoadImageA(NULL, "back.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     //------------------------------------------------------
     racket.width = 30;
@@ -90,8 +100,14 @@ void InitGame()
     location[0].RightPort = 1;
     location[0].LeftPort = -1;
 
+    healing.width = 40;
+    healing.height = 40;
+    healing.x = 700;
+    healing.y = 400;
+    location[0].locationObjects.push_back(healing);
+
     Objects platform1;
-    platform1.name = obj::loc1;
+    
     platform1.textureSprite.hBitmap = (HBITMAP)LoadImageA(NULL, "racket_enemy.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     platform1.textureSprite.x = window.width * 0.8;
     platform1.textureSprite.y = window.height * 0.9;
@@ -106,7 +122,7 @@ void InitGame()
     location[1].LeftPort = 0;
 
     Objects platform2;
-    platform2.name = obj::loc2;
+   
     platform2.textureSprite.hBitmap = (HBITMAP)LoadImageA(NULL, "racket_enemy.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     platform2.textureSprite.x = window.width / 4;
     platform2.textureSprite.y = window.height * 0.9;
@@ -221,6 +237,27 @@ void ShowRacketAndBall()
 
 }
 
+void DrawHealth() {
+    int margin = 10;
+    int startX = window.width - 50;
+    int startY = 10;
+
+    for (int i = 0; i < player.max_lives; i++) {
+
+        HBITMAP currentHealth = (i < player.current_lives) ? player.hHealthFull : player.hHealthEmpty;
+
+
+        ShowBitmap(
+            window.context,
+            startX - (i * (player.health_width + margin)),
+            startY,
+            player.health_width,
+            player.health_width,
+            currentHealth
+        );
+    }
+}
+
 void ShowTexture()
 {
     for (const auto& i : location[currentLocation].locationTexture)
@@ -228,6 +265,17 @@ void ShowTexture()
         ShowBitmap(window.context, i.textureSprite.x, i.textureSprite.y, i.textureSprite.width, i.textureSprite.height, i.textureSprite.hBitmap);
     }
 
+}
+
+void ShowObjects()
+{
+    for (const auto& i : location[currentLocation].locationObjects)
+    {
+
+        ShowBitmap(window.context, i.x, i.y, i.width, i.height, i.hBitmap);
+
+
+    }
 }
 
 
@@ -336,12 +384,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     while (!GetAsyncKeyState(VK_ESCAPE))
     {
         currenttime = timeGetTime();
+        
+        BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);//копируем буфер в окно
+        Sleep(16);//ждем 16 милисекунд (1/количество кадров в секунду)
         GetCursorPos(&mouse);
         ScreenToClient(window.hWnd, &mouse);
         ShowRacketAndBall();//рисуем фон, ракетку и шарик
         ShowTexture();
-        BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);//копируем буфер в окно
-        Sleep(16);//ждем 16 милисекунд (1/количество кадров в секунду)
+        DrawHealth();
         ProcessInput();//опрос клавиатуры
         ProcessDash();//рывок
         ProcessHero();//прыжок 
