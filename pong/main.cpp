@@ -28,10 +28,7 @@ struct sprite {
     void loadBitmapWithNativeSize(const char* filename)
     {
         hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-        BITMAP bm;
-        GetObject(hBitmap, (int)sizeof bm, &bm);
-        width = bm.bmWidth;
-        height = bm.bmHeight;
+        
     }
 
     void show()
@@ -48,11 +45,12 @@ struct Objects{
    
     sprite textureSprite;
 
-    Objects(float p_x, float p_y, float p_width, float p_height) {
+    Objects(float p_x, float p_y, float p_width, float p_height, const char* filename) {
         this->textureSprite.x = p_x;
         this->textureSprite.y = p_y;
-        textureSprite.width = p_width;
-        textureSprite.height = p_height;
+        this->textureSprite.width = p_width;
+        this->textureSprite.height = p_height;
+        this->textureSprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
         //location[loc].locationTexture.push_back(this);
     }
 
@@ -69,7 +67,7 @@ struct Location_ {
 };
 Location_ location[5];
 
-sprite platform;
+
 
 struct player_
 {
@@ -81,12 +79,6 @@ struct player_
 };
 
 player_ player;
-
-void loadBitmap(const char* filename, HBITMAP& hbm)
-{
-    hbm = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-}
-
 
 
 void InitGame()
@@ -115,31 +107,18 @@ void InitGame()
     location[0].locationObjects.push_back(healing);
 
     
-   // platform1.textureSprite.hBitmap = (HBITMAP)LoadImageA(NULL, "racket_enemy.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    Objects platform1(0.8, 0.85, 0.15, 0.05);
-    platform1.textureSprite.loadBitmapWithNativeSize("racket_enemy.bmp");
-    /*platform1.textureSprite.x =  0.8;
-    platform1.textureSprite.y =  0.85;
-    platform1.textureSprite.width = 0.15;
-    platform1.textureSprite.height = 0.05;*/
-
-    location[0].locationTexture.push_back(platform1);
+    location[0].locationTexture.emplace_back(0.8, 0.85, 0.15, 0.05,"racket_enemy.bmp");
+    //platform1.textureSprite.loadBitmapWithNativeSize("racket_enemy.bmp");
+    //location[0].locationTexture.push_back(platform1);
 
 
     location[1].hBack = (HBITMAP)LoadImageA(NULL, "background_1.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     location[1].RightPort = -1;
     location[1].LeftPort = 0;
 
-    Objects platform2(0.08, 0.9, 0.15, 0.05);
-   
-   // platform2.textureSprite.hBitmap = (HBITMAP)LoadImageA(NULL, "racket_enemy.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    platform2.textureSprite.loadBitmapWithNativeSize("racket_enemy.bmp");
-    /*platform2.textureSprite.x =  0.08;
-    platform2.textureSprite.y =  0.9;
-    platform2.textureSprite.width = 0.15;
-    platform2.textureSprite.height = 0.05;*/
-
-    location[1].locationTexture.push_back(platform2);
+    location[1].locationTexture.emplace_back(0.08, 0.9, 0.15, 0.05, "racket_enemy.bmp");
+   // platform2.textureSprite.loadBitmapWithNativeSize("racket_enemy.bmp");
+    //location[1].locationTexture.push_back(platform2);
 }
 
 void ProcessSound(const char* name)//проигрывание аудиофайла в формате .wav, файл должен лежать в той же папке где и программа
@@ -270,11 +249,7 @@ void DrawHealth() {
 
 void ShowTexture()
 {
-    /*for (const auto& i : location[currentLocation].locationTexture)
-    {
-        ShowBitmap(window.context, i.textureSprite.x, i.textureSprite.y, i.textureSprite.width, i.textureSprite.height, i.textureSprite.hBitmap);
-    }*/
-
+   
     for (int i = 0; i < location[currentLocation].locationTexture.size();i++) {
         location[currentLocation].locationTexture[i].textureSprite.show();
     }
