@@ -427,7 +427,7 @@ void Collision()
     if (racket.x >= platform.x && racket.x <= platform.x + platform.width && racket.y + racket.height <= platform.y + platform.height && racket.y + racket.height >= platform.y)
     {
         //racket.y = min(platform.y, racket.y - racket.height);
-        racket.y = racket.y - racket.height;
+        racket.y = platform.y - racket.height;
     }
 
 
