@@ -1,4 +1,4 @@
-//linker::system::subsystem  - Windows(/ SUBSYSTEM:WINDOWS)
+п»ї//linker::system::subsystem  - Windows(/ SUBSYSTEM:WINDOWS)
 //configuration::advanced::character set - not set
 //linker::input::additional dependensies Msimg32.lib; Winmm.lib
 
@@ -13,17 +13,22 @@ void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool
 POINT mouse;
 
 struct {
-    HWND hWnd;//хэндл окна
-    HDC device_context, context;// два контекста устройства (для буферизации)
-    int width, height;//сюда сохраним размеры окна которое создаст программа
+    int score, balls;
+    bool action = false;
+} game;
+
+struct {
+    HWND hWnd;//С…СЌРЅРґР» РѕРєРЅР°
+    HDC device_context, context;// РґРІР° РєРѕРЅС‚РµРєСЃС‚Р° СѓСЃС‚СЂРѕР№СЃС‚РІР° (РґР»СЏ Р±СѓС„РµСЂРёР·Р°С†РёРё)
+    int width, height;//СЃСЋРґР° СЃРѕС…СЂР°РЅРёРј СЂР°Р·РјРµСЂС‹ РѕРєРЅР° РєРѕС‚РѕСЂРѕРµ СЃРѕР·РґР°СЃС‚ РїСЂРѕРіСЂР°РјРјР°
 } window;
 
-HBITMAP hBack;// хэндл для фонового изображения
-// секция данных игры  
+HBITMAP hBack;// С…СЌРЅРґР» РґР»СЏ С„РѕРЅРѕРІРѕРіРѕ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
+// СЃРµРєС†РёСЏ РґР°РЅРЅС‹С… РёРіСЂС‹  
 
 struct sprite {
     float x, y, width, height, rad, dx, dy, speed, time;
-    HBITMAP hBitmap;//хэндл к спрайту шарика 
+    HBITMAP hBitmap;//С…СЌРЅРґР» Рє СЃРїСЂР°Р№С‚Сѓ С€Р°СЂРёРєР° 
 
     void loadBitmapWithNativeSize(const char* filename)
     {
@@ -36,10 +41,136 @@ struct sprite {
         ShowBitmap(window.context, x* window.width, y * window.height, width * window.width, height * window.height, hBitmap, false);
     }
 };
-sprite racket;//ракетка игрока
+sprite racket;//СЂР°РєРµС‚РєР° РёРіСЂРѕРєР°
 sprite healing;
 
+HBITMAP ballBitmap;
+HBITMAP frogHbm;
+float frogWidth;
+float frogHeight;
+int oldtime = 0;
 
+
+const int slots_count = 6;
+
+void loadFrog()
+{
+    frogHbm = (HBITMAP)LoadImageA(NULL, "frog.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    BITMAP bm;
+    GetObject(frogHbm, (int)sizeof bm, &bm);
+    frogWidth = bm.bmWidth;
+    frogHeight = bm.bmHeight;
+}
+
+struct enemy {
+
+    sprite enemy_sprite;
+    std::vector<sprite> bullet;
+    int bullettime = 0;
+    bool dead = true;
+    int spawnTime = 0;
+    int HPfrog = 3;           //rand()% 3-5
+
+    void showBullet()
+    {
+        for (int i = 0; i < bullet.size(); i++)
+        {
+            ShowBitmap(window.context, bullet[i].x - bullet[i].rad, bullet[i].y - bullet[i].rad, 2 * bullet[i].rad, 2 * bullet[i].rad, bullet[i].hBitmap, true);
+        }
+    }
+
+    void processBullet()
+    {
+        if (currenttime > bullettime + 5000)
+        {
+            //for (int i = 0; i < bullet.size(); i++)
+            {
+                sprite b;
+                b.height = 40;
+                b.width = 40;
+                b.speed = rand() % (20 - 1) + 4;
+                b.x = enemy_sprite.x;
+                b.y = enemy_sprite.y;
+                b.dx = racket.x - b.x;
+                b.dy = racket.y - b.y;
+
+                float dvector = sqrt(b.dx * b.dx + b.dy * b.dy);
+                b.dx = b.dx / dvector;
+                b.dy = b.dy / dvector;
+                b.rad = 20;
+                b.hBitmap = ballBitmap;
+
+                //game.action = true;
+
+                bullet.push_back(b);
+                bullettime = currenttime;
+            }
+        }
+
+        for (int i = 0; i < bullet.size(); i++)
+        {
+            float margin = 0;
+
+            if ((bullet[i].x > window.width - margin) || (bullet[i].x < margin) ||
+                (bullet[i].y < margin))
+            {
+                bullet[i].speed = 0;
+            }
+
+            bullet[i].x += bullet[i].dx * bullet[i].speed;
+            bullet[i].y += bullet[i].dy * bullet[i].speed;
+        }
+
+        for (int i = 0; i < bullet.size(); i++)
+        {
+            if (bullet[i].speed < .1)
+            {
+                bullet.erase(bullet.begin() + i);
+            }
+        }
+    }
+};
+enemy frog[slots_count];
+sprite ball;
+vector<sprite> bullet;
+//void spawnEnemy()
+//{
+//    for (int i = 0;i < slots_count;i++)
+//    {
+//        if (frog[i].dead)
+//        {
+//
+//            if (currenttime > frog[i].spawnTime + 1000)
+//            {
+//                sprite f;
+//
+//                f.x = (window.width / slots_count) * i;
+//                f.y = 0;
+//                f.width = frogWidth;
+//                f.height = frogHeight;
+//                f.hBitmap = frogHbm;
+//
+//                enemy e;
+//                e.enemy_sprite = f;
+//                e.dead = false;
+//                e.HPfrog = rand() % 3 + 1;
+//                frog[i] = e;
+//
+//
+//            }
+//            break;
+//
+//        }
+//    }
+//
+//
+//}
+
+
+void loadBitmap(const char* filename, HBITMAP& hbm)
+{
+    hbm = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+}
 
 struct Objects{
    
@@ -83,8 +214,8 @@ player_ player;
 
 void InitGame()
 {
-    player.hHealthFull = (HBITMAP)LoadImageA(NULL, "racket.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    player.hHealthEmpty = (HBITMAP)LoadImageA(NULL, "ball.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    player.hHealthFull = (HBITMAP)LoadImageA(NULL, "health_full.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    player.hHealthEmpty = (HBITMAP)LoadImageA(NULL, "health_empty.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     racket.hBitmap = (HBITMAP)LoadImageA(NULL, "racket.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     healing.hBitmap = (HBITMAP)LoadImageA(NULL, "racket.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     hBack = (HBITMAP)LoadImageA(NULL, "back.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
@@ -95,6 +226,9 @@ void InitGame()
     racket.x = window.width / 2.;
     racket.y = window.height - racket.height;
 
+    loadFrog();
+    loadBitmap("ball.bmp", ballBitmap);
+    
 
     location[0].hBack = (HBITMAP)LoadImageA(NULL, "background_0.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     location[0].RightPort = 1;
@@ -121,14 +255,40 @@ void InitGame()
     //location[1].locationTexture.push_back(platform2);
 }
 
-void ProcessSound(const char* name)//проигрывание аудиофайла в формате .wav, файл должен лежать в той же папке где и программа
+void ProcessSound(const char* name)//РїСЂРѕРёРіСЂС‹РІР°РЅРёРµ Р°СѓРґРёРѕС„Р°Р№Р»Р° РІ С„РѕСЂРјР°С‚Рµ .wav, С„Р°Р№Р» РґРѕР»Р¶РµРЅ Р»РµР¶Р°С‚СЊ РІ С‚РѕР№ Р¶Рµ РїР°РїРєРµ РіРґРµ Рё РїСЂРѕРіСЂР°РјРјР°
 {
-    PlaySound(TEXT(name), NULL, SND_FILENAME | SND_ASYNC);//переменная name содежрит имя файла. флаг ASYNC позволяет проигрывать звук паралельно с исполнением программы
+    PlaySound(TEXT(name), NULL, SND_FILENAME | SND_ASYNC);//РїРµСЂРµРјРµРЅРЅР°СЏ name СЃРѕРґРµР¶СЂРёС‚ РёРјСЏ С„Р°Р№Р»Р°. С„Р»Р°Рі ASYNC РїРѕР·РІРѕР»СЏРµС‚ РїСЂРѕРёРіСЂС‹РІР°С‚СЊ Р·РІСѓРє РїР°СЂР°Р»РµР»СЊРЅРѕ СЃ РёСЃРїРѕР»РЅРµРЅРёРµРј РїСЂРѕРіСЂР°РјРјС‹
 }
 
 float clickTimeOut = 100;
 float clickTime = 0;
 
+float gravity = 30;
+
+float jump = 0;
+
+float maxjump = 10;
+
+void ProcessHero()
+{
+
+
+    if (GetAsyncKeyState(VK_SPACE) && racket.y > (window.height - racket.height - 1))
+        if (GetAsyncKeyState(VK_SPACE) && (racket.y > (window.height - racket.height - 1)))
+        {
+
+            jump += 90;
+        }
+
+    racket.y += gravity - jump;
+    racket.y = min(window.height - racket.height, racket.y);
+
+    //inJump = true;
+    jump *= .9;
+    //jump = max(jump, 0);
+    jump = max(jump, 0);
+
+}
 void ProcessInput()
 {
     if (GetAsyncKeyState(VK_LEFT)) racket.x -= racket.speed;
@@ -148,9 +308,11 @@ void ProcessInput()
         b.dx = b.dx / dvector;
         b.dy = b.dy / dvector;
         b.rad = 20;
-        
+        b.hBitmap = ballBitmap;
 
-       
+        game.action = true;
+
+        bullet.push_back(b);
 
         ProcessSound("bounce1.wav");
 
@@ -159,6 +321,7 @@ void ProcessInput()
 
     }
 
+    
     if (racket.x < 0)
     {
         if (location[currentLocation].LeftPort >= 0)
@@ -192,26 +355,26 @@ void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool
     HDC hMemDC;
     BITMAP bm;
 
-    hMemDC = CreateCompatibleDC(hDC); // Создаем контекст памяти, совместимый с контекстом отображения
-    hOldbm = (HBITMAP)SelectObject(hMemDC, hBitmapBall);// Выбираем изображение bitmap в контекст памяти
+    hMemDC = CreateCompatibleDC(hDC); // РЎРѕР·РґР°РµРј РєРѕРЅС‚РµРєСЃС‚ РїР°РјСЏС‚Рё, СЃРѕРІРјРµСЃС‚РёРјС‹Р№ СЃ РєРѕРЅС‚РµРєСЃС‚РѕРј РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ
+    hOldbm = (HBITMAP)SelectObject(hMemDC, hBitmapBall);// Р’С‹Р±РёСЂР°РµРј РёР·РѕР±СЂР°Р¶РµРЅРёРµ bitmap РІ РєРѕРЅС‚РµРєСЃС‚ РїР°РјСЏС‚Рё
 
-    if (hOldbm) // Если не было ошибок, продолжаем работу
+    if (hOldbm) // Р•СЃР»Рё РЅРµ Р±С‹Р»Рѕ РѕС€РёР±РѕРє, РїСЂРѕРґРѕР»Р¶Р°РµРј СЂР°Р±РѕС‚Сѓ
     {
-        GetObject(hBitmapBall, sizeof(BITMAP), (LPSTR)&bm); // Определяем размеры изображения
+        GetObject(hBitmapBall, sizeof(BITMAP), (LPSTR)&bm); // РћРїСЂРµРґРµР»СЏРµРј СЂР°Р·РјРµСЂС‹ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ
 
         if (alpha)
         {
-            TransparentBlt(window.context, x, y, x1, y1, hMemDC, 0, 0, x1, y1, RGB(0, 0, 0));//все пиксели черного цвета будут интепретированы как прозрачные
+            TransparentBlt(window.context, x, y, x1, y1, hMemDC, 0, 0, x1, y1, RGB(0, 0, 0));//РІСЃРµ РїРёРєСЃРµР»Рё С‡РµСЂРЅРѕРіРѕ С†РІРµС‚Р° Р±СѓРґСѓС‚ РёРЅС‚РµРїСЂРµС‚РёСЂРѕРІР°РЅС‹ РєР°Рє РїСЂРѕР·СЂР°С‡РЅС‹Рµ
         }
         else
         {
-            StretchBlt(hDC, x, y, x1, y1, hMemDC, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY); // Рисуем изображение bitmap
+            StretchBlt(hDC, x, y, x1, y1, hMemDC, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY); // Р РёСЃСѓРµРј РёР·РѕР±СЂР°Р¶РµРЅРёРµ bitmap
         }
 
-        SelectObject(hMemDC, hOldbm);// Восстанавливаем контекст памяти
+        SelectObject(hMemDC, hOldbm);// Р’РѕСЃСЃС‚Р°РЅР°РІР»РёРІР°РµРј РєРѕРЅС‚РµРєСЃС‚ РїР°РјСЏС‚Рё
     }
 
-    DeleteDC(hMemDC); // Удаляем контекст памяти
+    DeleteDC(hMemDC); // РЈРґР°Р»СЏРµРј РєРѕРЅС‚РµРєСЃС‚ РїР°РјСЏС‚Рё
 }
 
 
@@ -220,8 +383,25 @@ void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool
 
 void ShowRacketAndBall()
 {
-    ShowBitmap(window.context, 0, 0, window.width, window.height, location[currentLocation].hBack);//задний фон
-    ShowBitmap(window.context, racket.x - racket.width / 2., racket.y, racket.width, racket.height, racket.hBitmap);// ракетка игрока
+    ShowBitmap(window.context, 0, 0, window.width, window.height, location[currentLocation].hBack);//Р·Р°РґРЅРёР№ С„РѕРЅ
+    ShowBitmap(window.context, racket.x - racket.width / 2., racket.y, racket.width, racket.height, racket.hBitmap);// СЂР°РєРµС‚РєР° РёРіСЂРѕРєР°
+
+    for (int i = 0; i < slots_count; i++)
+    {
+        if (!frog[i].dead)
+        {
+            //frog[i].enemy_sprite.show();
+            frog[i].processBullet();
+            frog[i].showBullet();
+        }
+
+    }
+
+
+    for (int i = 0; i < bullet.size(); i++)
+    {
+        ShowBitmap(window.context, bullet[i].x - bullet[i].rad, bullet[i].y - bullet[i].rad, 2 * bullet[i].rad, 2 * bullet[i].rad, bullet[i].hBitmap, true);// ГёГ Г°ГЁГЄ
+    }
 
 
 }
@@ -270,18 +450,34 @@ void ShowObjects()
 
 void Collision()
 {
-    
+    for (int i = 0; i < location[currentLocation].locationTexture.size(); i++) {
 
-    //if (racket.x >= location[currentLocation].locationTexture[currentLocation].textureSprite.x && 
-    //    racket.x <= location[currentLocation].locationTexture[currentLocation].textureSprite.x + platform.width && 
-    //    racket.y + racket.height <= location[currentLocation].locationTexture[currentLocation].textureSprite.y + platform.height &&
-    //    racket.y + racket.height >= location[currentLocation].locationTexture[currentLocation].textureSprite.y)
-    //{
-    //    //racket.y = min(platform.y, racket.y - racket.height);
-    //    racket.y = racket.y - racket.height;
-    //}
+        auto platform = location[currentLocation].locationTexture[i].textureSprite;
 
-    
+        if ((racket.x >= location[currentLocation].locationTexture[i].textureSprite.x * window.width &&
+            racket.x <= location[currentLocation].locationTexture[i].textureSprite.x * window.width + location[currentLocation].locationTexture[i].textureSprite.width) ||
+            (racket.y <= location[currentLocation].locationTexture[i].textureSprite.y * window.height + location[currentLocation].locationTexture[i].textureSprite.height &&
+                racket.y + racket.height >= location[currentLocation].locationTexture[i].textureSprite.y * window.height)) {
+            if ((racket.x + racket.width >= platform.x * window.width &&
+                racket.x <= platform.x * window.width + platform.width * window.width) &&
+                (racket.y <= platform.y * window.height + platform.height * window.height &&
+                    racket.y + racket.height >= platform.y * window.height)) {
+
+                //racket.y = min(platform.y, racket.y - racket.height);
+                racket.y = location[currentLocation].locationTexture[i].textureSprite.y * window.height + location[currentLocation].locationTexture[i].textureSprite.height;
+
+                racket.y = min(platform.y * window.height - racket.height, window.height - racket.height);
+                jump *= .9;
+                jump = max(jump, 0);
+                //inJump = false;
+            }
+            else {
+                racket.y = min(window.height - racket.height, racket.y);
+            }
+            //racket.y -=gravity;
+
+        }
+    }
 }
 
 
@@ -289,8 +485,8 @@ void Collision()
 
 void LimitRacket()
 {
-    racket.x = max(racket.x, racket.width / 2.);//если коодината левого угла ракетки меньше нуля, присвоим ей ноль
-    racket.x = min(racket.x, window.width - racket.width / 2.);//аналогично для правого угла
+    racket.x = max(racket.x, racket.width / 2.);//РµСЃР»Рё РєРѕРѕРґРёРЅР°С‚Р° Р»РµРІРѕРіРѕ СѓРіР»Р° СЂР°РєРµС‚РєРё РјРµРЅСЊС€Рµ РЅСѓР»СЏ, РїСЂРёСЃРІРѕРёРј РµР№ РЅРѕР»СЊ
+    racket.x = min(racket.x, window.width - racket.width / 2.);//Р°РЅР°Р»РѕРіРёС‡РЅРѕ РґР»СЏ РїСЂР°РІРѕРіРѕ СѓРіР»Р°
 }
 
 
@@ -301,44 +497,108 @@ void InitWindow()
 
     RECT r;
     GetClientRect(window.hWnd, &r);
-    window.device_context = GetDC(window.hWnd);//из хэндла окна достаем хэндл контекста устройства для рисования
-    window.width = r.right - r.left;//определяем размеры и сохраняем
+    window.device_context = GetDC(window.hWnd);//РёР· С…СЌРЅРґР»Р° РѕРєРЅР° РґРѕСЃС‚Р°РµРј С…СЌРЅРґР» РєРѕРЅС‚РµРєСЃС‚Р° СѓСЃС‚СЂРѕР№СЃС‚РІР° РґР»СЏ СЂРёСЃРѕРІР°РЅРёСЏ
+    window.width = r.right - r.left;//РѕРїСЂРµРґРµР»СЏРµРј СЂР°Р·РјРµСЂС‹ Рё СЃРѕС…СЂР°РЅСЏРµРј
     window.height = r.bottom - r.top;
-    window.context = CreateCompatibleDC(window.device_context);//второй буфер
-    SelectObject(window.context, CreateCompatibleBitmap(window.device_context, window.width, window.height));//привязываем окно к контексту
+    window.context = CreateCompatibleDC(window.device_context);//РІС‚РѕСЂРѕР№ Р±СѓС„РµСЂ
+    SelectObject(window.context, CreateCompatibleBitmap(window.device_context, window.width, window.height));//РїСЂРёРІСЏР·С‹РІР°РµРј РѕРєРЅРѕ Рє РєРѕРЅС‚РµРєСЃС‚Сѓ
     GetClientRect(window.hWnd, &r);
 
 }
 
-float gravity = 30;
-
-float jump = 0;
-float maxjump = 20;
-
-
-void ProcessHero()
+void ProcessBall()
 {
-
-
-    if (GetAsyncKeyState(VK_SPACE) && racket.y > (window.height - racket.height - 1))
+    if (game.action)
     {
 
-        jump += 90;
+        for (int i = 0; i < bullet.size(); i++)
+        {
+            float margin = 0;
+
+            if ((bullet[i].x > window.width - margin) || (bullet[i].x < margin) ||
+                (bullet[i].y < margin))
+            {
+                bullet[i].speed = 0;
+            }
+
+            
+            bullet[i].x += bullet[i].dx * bullet[i].speed;
+            bullet[i].y += bullet[i].dy * bullet[i].speed;
+        }
+
+        for (int j = 0; j < slots_count; j++)
+        {
+            for (int i = 0; i < bullet.size(); i++)
+            {
+                if (!bullet.empty())
+                {
+                    if (!frog[j].dead)
+                    {
+
+                        if (bullet[i].x < frog[j].enemy_sprite.x + frog[j].enemy_sprite.width and
+                            bullet[i].y < frog[j].enemy_sprite.y + frog[j].enemy_sprite.height and
+                            bullet[i].x > frog[j].enemy_sprite.x and
+                            bullet[i].y > frog[j].enemy_sprite.y)
+                        {
+                            bullet.erase(bullet.begin() + i);
+
+                            frog[j].HPfrog -= 1;
+                            if (frog[j].HPfrog < 0)
+                            {
+                                frog[j].dead = true;
+                                frog[j].spawnTime = currenttime;
+                            }
+
+                            i--;
+                            if (i < 0) break;
+
+                        }
+                    }
+                }
+                else
+                {
+                    break;
+                }
+            }
+
+        }
+
+
+        for (int i = 0; i < bullet.size(); i++)
+        {
+            if (bullet[i].speed < .1)
+            {
+                bullet.erase(bullet.begin() + i);
+            }
+        }
     }
-
-    racket.y += gravity - jump;
-    racket.y = min(window.height - racket.height, racket.y);
-
-    jump *= .9;
-    //jump = max(jump, 0);
-
+    else
+    {
+        for (int i = 0; i < bullet.size(); i++)
+        {
+            if (bullet[i].speed < .1)
+            {
+                bullet[i].x = racket.x;
+            }
+        }
+    }
+    if (game.action)
+    {
+        //std::vector<int> b = (ball[i])
+        {
+            //    ball[i].time
+        }
+    }
 }
+
+
+
 
 const float dashDistance = 150;
 float dash = 0;
 bool wasShiftPressed = false;
 
-void ProcessDash() //рывок
+void ProcessDash() //СЂС‹РІРѕРє
 {
     bool isShiftPressed = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
     if (isShiftPressed && !wasShiftPressed)
@@ -365,30 +625,34 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_ int nCmdShow)
 {
 
-    InitWindow();//здесь инициализируем все что нужно для рисования в окне
-    InitGame();//здесь инициализируем переменные игры
-
+    InitWindow();//Р·РґРµСЃСЊ РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј РІСЃРµ С‡С‚Рѕ РЅСѓР¶РЅРѕ РґР»СЏ СЂРёСЃРѕРІР°РЅРёСЏ РІ РѕРєРЅРµ
+    InitGame();//Р·РґРµСЃСЊ РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј РїРµСЂРµРјРµРЅРЅС‹Рµ РёРіСЂС‹
+    //ShowCursor(FALSE);
 
     while (!GetAsyncKeyState(VK_ESCAPE))
     {
         currenttime = timeGetTime();
         
-        BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);//копируем буфер в окно
-        Sleep(16);//ждем 16 милисекунд (1/количество кадров в секунду)
         GetCursorPos(&mouse);
         ScreenToClient(window.hWnd, &mouse);
-        ShowRacketAndBall();//рисуем фон, ракетку и шарик
+        int sz = 5;
+        Ellipse(window.context, mouse.x - sz, mouse.y - sz, mouse.x + sz, mouse.y + sz);
+
+        ShowRacketAndBall();//СЂРёСЃСѓРµРј С„РѕРЅ, СЂР°РєРµС‚РєСѓ Рё С€Р°СЂРёРє
         ShowTexture();
         DrawHealth();
-        ProcessInput();//опрос клавиатуры
-        ProcessDash();//рывок
-        ProcessHero();//прыжок 
+        ProcessInput();//РѕРїСЂРѕСЃ РєР»Р°РІРёР°С‚СѓСЂС‹
+        ProcessDash();//СЂС‹РІРѕРє
+        ProcessHero();//РїСЂС‹Р¶РѕРє 
+        ProcessBall();
+        //spawnEnemy();
+        BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);//РєРѕРїРёСЂСѓРµРј Р±СѓС„РµСЂ РІ РѕРєРЅРѕ
+        Sleep(16);//Р¶РґРµРј 16 РјРёР»РёСЃРµРєСѓРЅРґ (1/РєРѕР»РёС‡РµСЃС‚РІРѕ РєР°РґСЂРѕРІ РІ СЃРµРєСѓРЅРґСѓ)
+        
+        
         Collision();
-        LimitRacket();//проверяем, чтобы ракетка не убежала за экран
+        LimitRacket();//РїСЂРѕРІРµСЂСЏРµРј, С‡С‚РѕР±С‹ СЂР°РєРµС‚РєР° РЅРµ СѓР±РµР¶Р°Р»Р° Р·Р° СЌРєСЂР°РЅ
        
-        // ProcessRoom();//обрабатываем отскоки от стен и каретки, попадание шарика в картетку
-
-
     }
 
 }
