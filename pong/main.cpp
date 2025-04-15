@@ -40,6 +40,11 @@ struct sprite {
     {
         ShowBitmap(window.context, x* window.width, y * window.height, width * window.width, height * window.height, hBitmap, false);
     }
+
+    void show_h() {
+        ShowBitmap(window.context, x , y, window.width * width, window.height *height, hBitmap);
+    }
+
 };
 sprite racket;//ракетка игрока
 sprite healing;
@@ -75,7 +80,7 @@ struct enemy {
     {
         for (int i = 0; i < bullet.size(); i++)
         {
-            ShowBitmap(window.context, bullet[i].x - bullet[i].rad, bullet[i].y - bullet[i].rad, 2 * bullet[i].rad, 2 * bullet[i].rad, bullet[i].hBitmap, true);
+            ShowBitmap(window.context, bullet[i].x - bullet[i].rad, bullet[i].y - bullet[i].rad, 2 * bullet[i].rad, 2 * bullet[i].rad, bullet[i].hBitmap);
         }
     }
 
@@ -216,15 +221,16 @@ void InitGame()
 {
     player.hHealthFull = (HBITMAP)LoadImageA(NULL, "health_full.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     player.hHealthEmpty = (HBITMAP)LoadImageA(NULL, "health_empty.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    racket.hBitmap = (HBITMAP)LoadImageA(NULL, "racket.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    //racket.hBitmap = (HBITMAP)LoadImageA(NULL, "racket.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    racket.loadBitmapWithNativeSize("racket.bmp");
     healing.hBitmap = (HBITMAP)LoadImageA(NULL, "racket.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     hBack = (HBITMAP)LoadImageA(NULL, "back.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     //------------------------------------------------------
-    racket.width = 30;
-    racket.height = 30;
+    racket.height =  0.021;
+    racket.width = 0.012;
+    racket.x = 1;
+    racket.y = window.height - racket.height * window.height - 1;
     racket.speed = 30;
-    racket.x = window.width / 2.;
-    racket.y = window.height - racket.height;
 
     loadFrog();
     loadBitmap("ball.bmp", ballBitmap);
@@ -274,7 +280,6 @@ void ProcessHero()
 
 
     if (GetAsyncKeyState(VK_SPACE) && racket.y > (window.height - racket.height - 1))
-        if (GetAsyncKeyState(VK_SPACE) && (racket.y > (window.height - racket.height - 1)))
         {
 
             jump += 90;
@@ -384,7 +389,10 @@ void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool
 void ShowRacketAndBall()
 {
     ShowBitmap(window.context, 0, 0, window.width, window.height, location[currentLocation].hBack);//задний фон
-    ShowBitmap(window.context, racket.x - racket.width / 2., racket.y, racket.width, racket.height, racket.hBitmap);// ракетка игрока
+    //ShowBitmap(window.context, racket.x - racket.width / 2., racket.y, racket.width, racket.height, racket.hBitmap);// ракетка игрока
+    //racket.show();
+
+    racket.show_h();
 
     for (int i = 0; i < slots_count; i++)
     {
@@ -454,19 +462,16 @@ void Collision()
 
         auto platform = location[currentLocation].locationTexture[i].textureSprite;
 
-        if ((racket.x >= location[currentLocation].locationTexture[i].textureSprite.x * window.width &&
-            racket.x <= location[currentLocation].locationTexture[i].textureSprite.x * window.width + location[currentLocation].locationTexture[i].textureSprite.width) ||
-            (racket.y <= location[currentLocation].locationTexture[i].textureSprite.y * window.height + location[currentLocation].locationTexture[i].textureSprite.height &&
-                racket.y + racket.height >= location[currentLocation].locationTexture[i].textureSprite.y * window.height)) {
-            if ((racket.x + racket.width >= platform.x * window.width &&
-                racket.x <= platform.x * window.width + platform.width * window.width) &&
+        
+            if ((racket.x + racket.width * window.width >= platform.x * window.width &&
+                racket.x <= platform.x * window.width  + platform.width * window.width) &&
                 (racket.y <= platform.y * window.height + platform.height * window.height &&
-                    racket.y + racket.height >= platform.y * window.height)) {
+                    racket.y + racket.height * window.height >= platform.y * window.height)) {
 
                 //racket.y = min(platform.y, racket.y - racket.height);
-                racket.y = location[currentLocation].locationTexture[i].textureSprite.y * window.height + location[currentLocation].locationTexture[i].textureSprite.height;
+                racket.y = platform.y * window.height + platform.height;
 
-                racket.y = min(platform.y * window.height - racket.height, window.height - racket.height);
+                racket.y = min(platform.y * window.height - racket.height * window.height, window.height - (racket.height * window.height));
                 jump *= .9;
                 jump = max(jump, 0);
                 //inJump = false;
@@ -476,7 +481,7 @@ void Collision()
             }
             //racket.y -=gravity;
 
-        }
+        //}
     }
 }
 
