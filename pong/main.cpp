@@ -38,15 +38,15 @@ struct sprite {
 
     void show()
     {
-        ShowBitmap(window.context, x* window.width, y * window.height, width * window.width, height * window.height, hBitmap, false);
+        ShowBitmap(window.context, x, y , width , height , hBitmap, false);
     }
 
     void show_h() {
-        ShowBitmap(window.context, x , y, window.width * width, window.height *height, hBitmap);
+        ShowBitmap(window.context, x  , y , width * window.width, height * window.height, hBitmap);
     }
 
 };
-sprite racket;//ракетка игрока
+
 sprite healing;
 
 HBITMAP ballBitmap;
@@ -67,10 +67,107 @@ void loadFrog()
     frogHeight = bm.bmHeight;
 }
 
+//void spawnEnemy()
+//{
+//    for (int i = 0;i < slots_count;i++)
+//    {
+//        if (frog[i].dead)
+//        {
+//
+//            if (currenttime > frog[i].spawnTime + 1000)
+//            {
+//                sprite f;
+//
+//                f.x = (window.width / slots_count) * i;
+//                f.y = 0;
+//                f.width = frogWidth;
+//                f.height = frogHeight;
+//                f.hBitmap = frogHbm;
+//
+//                enemy e;
+//                e.enemy_sprite = f;
+//                e.dead = false;
+//                e.HPfrog = rand() % 3 + 1;
+//                frog[i] = e;
+//
+//
+//            }
+//            break;
+//
+//        }
+//    }
+//
+//
+//}
+
+
+void loadBitmap(const char* filename, HBITMAP& hbm)
+{
+    hbm = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+}
+
+struct Objects // структура текстур
+{
+   
+    sprite textureSprite;
+
+    Objects(float p_x, float p_y, float p_width, float p_height, const char* filename) {
+        this->textureSprite.x = p_x * window.width;
+        this->textureSprite.y = p_y * window.height;
+        this->textureSprite.width = p_width * window.width;
+        this->textureSprite.height = p_height * window.height;
+        this->textureSprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+        //location[loc].locationTexture.push_back(this);
+    }
+
+};
+
+struct player_ //структура игрока
+{
+    sprite racket;//игрок
+    HBITMAP hHealthFull, hHealthEmpty;
+    int health_width;
+    int max_lives;
+    int current_lives;
+
+    player_(int p_health, int p_max_lives, int p_current_lives, const char* filename, const char* filename2)
+    {
+        this->health_width = p_health;
+        this->max_lives = p_max_lives;
+        this->current_lives = p_current_lives;
+        this->hHealthFull= (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+        this->hHealthEmpty = (HBITMAP)LoadImageA(NULL, filename2, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    }
+
+    player_(float p_x, float p_y, float p_width, float p_height, const char* filename)
+    {
+        this->racket.x = p_x * 1200;
+        this->racket.y = p_y ;
+        this->racket.width = p_width * window.width;
+        this->racket.height = p_height * window.height;
+        this->racket.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    }
+    
+};
+player_ player{ 0.5, 500, 0.021, 0.012, "racket.bmp" };
+player_ health{40, 5, 3, "health_full.bmp", "health_empty.bmp"};
+
+int currentLocation = 0;
+struct Location_ {
+    HBITMAP hBack;
+    int LeftPort;
+    int RightPort;
+    vector<Objects> locationTexture;
+    vector<sprite> locationObjects;
+    
+    
+};
+Location_ location[5];
+
 struct enemy {
 
     sprite enemy_sprite;
-    std::vector<sprite> bullet;
+    vector<sprite> bullet;
     int bullettime = 0;
     bool dead = true;
     int spawnTime = 0;
@@ -96,8 +193,8 @@ struct enemy {
                 b.speed = rand() % (20 - 1) + 4;
                 b.x = enemy_sprite.x;
                 b.y = enemy_sprite.y;
-                b.dx = racket.x - b.x;
-                b.dy = racket.y - b.y;
+                b.dx = player.racket.x - b.x;
+                b.dy = player.racket.y - b.y;
 
                 float dvector = sqrt(b.dx * b.dx + b.dy * b.dy);
                 b.dx = b.dx / dvector;
@@ -138,99 +235,17 @@ struct enemy {
 enemy frog[slots_count];
 sprite ball;
 vector<sprite> bullet;
-//void spawnEnemy()
-//{
-//    for (int i = 0;i < slots_count;i++)
-//    {
-//        if (frog[i].dead)
-//        {
-//
-//            if (currenttime > frog[i].spawnTime + 1000)
-//            {
-//                sprite f;
-//
-//                f.x = (window.width / slots_count) * i;
-//                f.y = 0;
-//                f.width = frogWidth;
-//                f.height = frogHeight;
-//                f.hBitmap = frogHbm;
-//
-//                enemy e;
-//                e.enemy_sprite = f;
-//                e.dead = false;
-//                e.HPfrog = rand() % 3 + 1;
-//                frog[i] = e;
-//
-//
-//            }
-//            break;
-//
-//        }
-//    }
-//
-//
-//}
-
-
-void loadBitmap(const char* filename, HBITMAP& hbm)
-{
-    hbm = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-}
-
-struct Objects{
-   
-    sprite textureSprite;
-
-    Objects(float p_x, float p_y, float p_width, float p_height, const char* filename) {
-        this->textureSprite.x = p_x;
-        this->textureSprite.y = p_y;
-        this->textureSprite.width = p_width;
-        this->textureSprite.height = p_height;
-        this->textureSprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-        //location[loc].locationTexture.push_back(this);
-    }
-
-};
-
-int currentLocation = 0;
-struct Location_ {
-    HBITMAP hBack;
-    int LeftPort;
-    int RightPort;
-    vector<Objects> locationTexture;
-    vector<sprite> locationObjects;
-    
-};
-Location_ location[5];
-
-
-
-struct player_
-{
-
-    HBITMAP hHealthFull, hHealthEmpty;
-    int health_width = 40;
-    int max_lives = 5;
-    int current_lives = 3;
-};
-
-player_ player;
-
 
 void InitGame()
 {
-    player.hHealthFull = (HBITMAP)LoadImageA(NULL, "health_full.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    player.hHealthEmpty = (HBITMAP)LoadImageA(NULL, "health_empty.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    //racket.hBitmap = (HBITMAP)LoadImageA(NULL, "racket.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    racket.loadBitmapWithNativeSize("racket.bmp");
+    
+   
     healing.hBitmap = (HBITMAP)LoadImageA(NULL, "racket.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     hBack = (HBITMAP)LoadImageA(NULL, "back.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     //------------------------------------------------------
-    racket.height =  0.021;
-    racket.width = 0.012;
-    racket.x = 1;
-    racket.y = window.height - racket.height * window.height - 1;
-    racket.speed = 30;
+
+   
+    player.racket.speed = 30;
 
     loadFrog();
     loadBitmap("ball.bmp", ballBitmap);
@@ -269,7 +284,7 @@ void ProcessSound(const char* name)//проигрывание аудиофайл
 float clickTimeOut = 100;
 float clickTime = 0;
 
-float gravity = 30;
+float gravity = 0;
 
 float jump = 0;
 
@@ -279,14 +294,14 @@ void ProcessHero()
 {
 
 
-    if (GetAsyncKeyState(VK_SPACE) && racket.y > (window.height - racket.height - 1))
+    if (GetAsyncKeyState(VK_SPACE) && player.racket.y > (window.height - player.racket.height - 1))
         {
 
             jump += 90;
         }
 
-    racket.y += gravity - jump;
-    racket.y = min(window.height - racket.height, racket.y);
+    player.racket.y += gravity - jump;
+    player.racket.y = min(window.height - player.racket.height, player.racket.y);
 
     //inJump = true;
     jump *= .9;
@@ -296,16 +311,16 @@ void ProcessHero()
 }
 void ProcessInput()
 {
-    if (GetAsyncKeyState(VK_LEFT)) racket.x -= racket.speed;
-    if (GetAsyncKeyState(VK_RIGHT)) racket.x += racket.speed;
+    if (GetAsyncKeyState(VK_LEFT)) player.racket.x -= player.racket.speed;
+    if (GetAsyncKeyState(VK_RIGHT)) player.racket.x += player.racket.speed;
     clickTime = timeGetTime();
 
     if (GetAsyncKeyState(VK_LBUTTON) && clickTime > clickTimeOut)
     {
         sprite b;
         b.speed = 10;
-        b.x = racket.x;
-        b.y = racket.y;
+        b.x = player.racket.x;
+        b.y = player.racket.y;
 
         b.dx = mouse.x - b.x;
         b.dy = mouse.y - b.y;
@@ -327,29 +342,29 @@ void ProcessInput()
     }
 
     
-    if (racket.x < 0)
+    if (player.racket.x < 0)
     {
         if (location[currentLocation].LeftPort >= 0)
         {
-            racket.x = window.width - racket.width;
+            player.racket.x = window.width - player.racket.width;
             currentLocation = location[currentLocation].LeftPort;
         }
         else
         {
-            racket.x = 0;
+            player.racket.x = 0;
         }
     }
 
-    if (racket.x > window.width - racket.width)
+    if (player.racket.x > window.width - player.racket.width)
     {
         if (location[currentLocation].RightPort >= 0)
         {
-            racket.x = 0;
+            player.racket.x = 0;
             currentLocation = location[currentLocation].RightPort;
         }
         else
         {
-            racket.x = window.width - racket.width;
+            player.racket.x = window.width - player.racket.width;
         }
     }
 }
@@ -392,7 +407,7 @@ void ShowRacketAndBall()
     //ShowBitmap(window.context, racket.x - racket.width / 2., racket.y, racket.width, racket.height, racket.hBitmap);// ракетка игрока
     //racket.show();
 
-    racket.show_h();
+    player.racket.show();
 
     for (int i = 0; i < slots_count; i++)
     {
@@ -419,17 +434,17 @@ void DrawHealth() {
     int startX = window.width - 50;
     int startY = 10;
 
-    for (int i = 0; i < player.max_lives; i++) {
+    for (int i = 0; i < health.max_lives; i++) {
 
-        HBITMAP currentHealth = (i < player.current_lives) ? player.hHealthFull : player.hHealthEmpty;
+        HBITMAP currentHealth = (i < health.current_lives) ? health.hHealthFull : health.hHealthEmpty;
 
 
         ShowBitmap(
             window.context,
-            startX - (i * (player.health_width + margin)),
+            startX - (i * (health.health_width + margin)),
             startY,
-            player.health_width,
-            player.health_width,
+            health.health_width,
+            health.health_width,
             currentHealth
         );
     }
@@ -463,21 +478,21 @@ void Collision()
         auto platform = location[currentLocation].locationTexture[i].textureSprite;
 
         
-            if ((racket.x + racket.width * window.width >= platform.x * window.width &&
-                racket.x <= platform.x * window.width  + platform.width * window.width) &&
-                (racket.y <= platform.y * window.height + platform.height * window.height &&
-                    racket.y + racket.height * window.height >= platform.y * window.height)) {
+            if ((player.racket.x + player.racket.width  >= platform.x  &&
+                player.racket.x <= platform.x  + platform.width) &&
+                (player.racket.y <= platform.y + platform.height  &&
+                    player.racket.y + player.racket.height  >= platform.y )) {
 
                 //racket.y = min(platform.y, racket.y - racket.height);
-                racket.y = platform.y * window.height + platform.height;
+                player.racket.y = platform.y  + platform.height;
 
-                racket.y = min(platform.y * window.height - racket.height * window.height, window.height - (racket.height * window.height));
+                player.racket.y = min(platform.y  - player.racket.height, window.height - (player.racket.height ));
                 jump *= .9;
                 jump = max(jump, 0);
                 //inJump = false;
             }
             else {
-                racket.y = min(window.height - racket.height, racket.y);
+                player.racket.y = min(window.height - player.racket.height, player.racket.y);
             }
             //racket.y -=gravity;
 
@@ -490,8 +505,8 @@ void Collision()
 
 void LimitRacket()
 {
-    racket.x = max(racket.x, racket.width / 2.);//если коодината левого угла ракетки меньше нуля, присвоим ей ноль
-    racket.x = min(racket.x, window.width - racket.width / 2.);//аналогично для правого угла
+    player.racket.x = max(player.racket.x, player.racket.width / 2.);//если коодината левого угла ракетки меньше нуля, присвоим ей ноль
+    player.racket.x = min(player.racket.x, window.width - player.racket.width / 2.);//аналогично для правого угла
 }
 
 
@@ -583,7 +598,7 @@ void ProcessBall()
         {
             if (bullet[i].speed < .1)
             {
-                bullet[i].x = racket.x;
+                bullet[i].x = player.racket.x;
             }
         }
     }
@@ -611,11 +626,11 @@ void ProcessDash() //рывок
         wasShiftPressed = true;
         if (GetAsyncKeyState(VK_LEFT) & 0x8000)
         {
-            racket.x -= dashDistance;
+            player.racket.x -= dashDistance;
         }
         else if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
         {
-            racket.x += dashDistance;
+            player.racket.x += dashDistance;
         }
     }
     else if (!isShiftPressed)
@@ -631,8 +646,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
 
     InitWindow();//здесь инициализируем все что нужно для рисования в окне
+
     InitGame();//здесь инициализируем переменные игры
     //ShowCursor(FALSE);
+
 
     while (!GetAsyncKeyState(VK_ESCAPE))
     {
