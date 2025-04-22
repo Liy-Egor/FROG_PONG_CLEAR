@@ -8,8 +8,9 @@
 #include "vector"
 using namespace std;
 int currenttime = 0;
-void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool alpha = false);
+void InitWindow();
 
+void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool alpha = false);
 POINT mouse;
 
 struct {
@@ -42,7 +43,7 @@ struct sprite {
     }
 
     void show_h() {
-        ShowBitmap(window.context, x  , y , width * window.width, height * window.height, hBitmap);
+        ShowBitmap(window.context, x  , y , width, height, hBitmap);
     }
 
 };
@@ -141,15 +142,18 @@ struct player_ //структура игрока
 
     player_(float p_x, float p_y, float p_width, float p_height, const char* filename)
     {
-        this->racket.x = p_x * 1200;
-        this->racket.y = p_y ;
-        this->racket.width = p_width * window.width;
+        this->racket.x = p_x * window.width;
+        this->racket.y = p_y * window.height;
+        this->racket.width = p_width * window.width ;
         this->racket.height = p_height * window.height;
         this->racket.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     }
     
 };
-player_ player{ 0.5, 500, 0.021, 0.012, "racket.bmp" };
+
+//player_ player(0, 0.25,0.1, 30, "racket.bmp");
+player_ *player;
+
 player_ health{40, 5, 3, "health_full.bmp", "health_empty.bmp"};
 
 int currentLocation = 0;
@@ -193,8 +197,8 @@ struct enemy {
                 b.speed = rand() % (20 - 1) + 4;
                 b.x = enemy_sprite.x;
                 b.y = enemy_sprite.y;
-                b.dx = player.racket.x - b.x;
-                b.dy = player.racket.y - b.y;
+                b.dx = player->racket.x - b.x;
+                b.dy = player->racket.y - b.y;
 
                 float dvector = sqrt(b.dx * b.dx + b.dy * b.dy);
                 b.dx = b.dx / dvector;
@@ -238,14 +242,16 @@ vector<sprite> bullet;
 
 void InitGame()
 {
-    
-   
+    player = new player_(0.2, 0.25, 0.012, 0.021, "racket.bmp");
+    //player_* p = new player_;
+    //player.racket.width = 30; 
+    //player.racket.height = 30;
     healing.hBitmap = (HBITMAP)LoadImageA(NULL, "racket.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     hBack = (HBITMAP)LoadImageA(NULL, "back.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     //------------------------------------------------------
 
    
-    player.racket.speed = 30;
+    player->racket.speed = 30;
 
     loadFrog();
     loadBitmap("ball.bmp", ballBitmap);
@@ -284,7 +290,7 @@ void ProcessSound(const char* name)//проигрывание аудиофайл
 float clickTimeOut = 100;
 float clickTime = 0;
 
-float gravity = 0;
+float gravity = 30;
 
 float jump = 0;
 
@@ -294,14 +300,14 @@ void ProcessHero()
 {
 
 
-    if (GetAsyncKeyState(VK_SPACE) && player.racket.y > (window.height - player.racket.height - 1))
+    if (GetAsyncKeyState(VK_SPACE) && player->racket.y > (window.height - player->racket.height - 1))
         {
 
             jump += 90;
         }
 
-    player.racket.y += gravity - jump;
-    player.racket.y = min(window.height - player.racket.height, player.racket.y);
+    player->racket.y += gravity - jump;
+    player->racket.y = min(window.height - player->racket.height, player->racket.y);
 
     //inJump = true;
     jump *= .9;
@@ -311,16 +317,16 @@ void ProcessHero()
 }
 void ProcessInput()
 {
-    if (GetAsyncKeyState(VK_LEFT)) player.racket.x -= player.racket.speed;
-    if (GetAsyncKeyState(VK_RIGHT)) player.racket.x += player.racket.speed;
+    if (GetAsyncKeyState(VK_LEFT)) player->racket.x -= player->racket.speed;
+    if (GetAsyncKeyState(VK_RIGHT)) player->racket.x += player->racket.speed;
     clickTime = timeGetTime();
 
     if (GetAsyncKeyState(VK_LBUTTON) && clickTime > clickTimeOut)
     {
         sprite b;
         b.speed = 10;
-        b.x = player.racket.x;
-        b.y = player.racket.y;
+        b.x = player->racket.x;
+        b.y = player->racket.y;
 
         b.dx = mouse.x - b.x;
         b.dy = mouse.y - b.y;
@@ -342,29 +348,29 @@ void ProcessInput()
     }
 
     
-    if (player.racket.x < 0)
+    if (player->racket.x < 0)
     {
         if (location[currentLocation].LeftPort >= 0)
         {
-            player.racket.x = window.width - player.racket.width;
+            player->racket.x = window.width - player->racket.width;
             currentLocation = location[currentLocation].LeftPort;
         }
         else
         {
-            player.racket.x = 0;
+            player->racket.x = 0;
         }
     }
 
-    if (player.racket.x > window.width - player.racket.width)
+    if (player->racket.x > window.width - player->racket.width)
     {
         if (location[currentLocation].RightPort >= 0)
         {
-            player.racket.x = 0;
+            player->racket.x = 0;
             currentLocation = location[currentLocation].RightPort;
         }
         else
         {
-            player.racket.x = window.width - player.racket.width;
+            player->racket.x = window.width - player->racket.width;
         }
     }
 }
@@ -404,10 +410,10 @@ void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool
 void ShowRacketAndBall()
 {
     ShowBitmap(window.context, 0, 0, window.width, window.height, location[currentLocation].hBack);//задний фон
-    //ShowBitmap(window.context, racket.x - racket.width / 2., racket.y, racket.width, racket.height, racket.hBitmap);// ракетка игрока
+   // ShowBitmap(window.context, player.racket.x - player.racket.width / 2., player.racket.y, player.racket.width, player.racket.height, player.racket.hBitmap);// ракетка игрока
     //racket.show();
 
-    player.racket.show();
+    player->racket.show_h();
 
     for (int i = 0; i < slots_count; i++)
     {
@@ -478,21 +484,21 @@ void Collision()
         auto platform = location[currentLocation].locationTexture[i].textureSprite;
 
         
-            if ((player.racket.x + player.racket.width  >= platform.x  &&
-                player.racket.x <= platform.x  + platform.width) &&
-                (player.racket.y <= platform.y + platform.height  &&
-                    player.racket.y + player.racket.height  >= platform.y )) {
+            if ((player->racket.x + player->racket.width  >= platform.x  &&
+                player->racket.x <= platform.x  + platform.width) &&
+                (player->racket.y <= platform.y + platform.height  &&
+                    player->racket.y + player->racket.height  >= platform.y )) {
 
                 //racket.y = min(platform.y, racket.y - racket.height);
-                player.racket.y = platform.y  + platform.height;
+                player->racket.y = platform.y  + platform.height;
 
-                player.racket.y = min(platform.y  - player.racket.height, window.height - (player.racket.height ));
+                player->racket.y = min(platform.y  - player->racket.height, window.height - (player->racket.height ));
                 jump *= .9;
                 jump = max(jump, 0);
                 //inJump = false;
             }
             else {
-                player.racket.y = min(window.height - player.racket.height, player.racket.y);
+                player->racket.y = min(window.height - player->racket.height, player->racket.y);
             }
             //racket.y -=gravity;
 
@@ -505,8 +511,8 @@ void Collision()
 
 void LimitRacket()
 {
-    player.racket.x = max(player.racket.x, player.racket.width / 2.);//если коодината левого угла ракетки меньше нуля, присвоим ей ноль
-    player.racket.x = min(player.racket.x, window.width - player.racket.width / 2.);//аналогично для правого угла
+    player->racket.x = max(player->racket.x, player->racket.width / 2.);//если коодината левого угла ракетки меньше нуля, присвоим ей ноль
+    player->racket.x = min(player->racket.x, window.width - player->racket.width / 2.);//аналогично для правого угла
 }
 
 
@@ -598,7 +604,7 @@ void ProcessBall()
         {
             if (bullet[i].speed < .1)
             {
-                bullet[i].x = player.racket.x;
+                bullet[i].x = player->racket.x;
             }
         }
     }
@@ -626,11 +632,11 @@ void ProcessDash() //рывок
         wasShiftPressed = true;
         if (GetAsyncKeyState(VK_LEFT) & 0x8000)
         {
-            player.racket.x -= dashDistance;
+            player->racket.x -= dashDistance;
         }
         else if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
         {
-            player.racket.x += dashDistance;
+            player->racket.x += dashDistance;
         }
     }
     else if (!isShiftPressed)
