@@ -141,6 +141,7 @@
     <Image Include="..\Debug\racket.bmp" />
     <Image Include="..\Debug\racket_enemy.bmp" />
     <Image Include="..\Debug\spike.bmp" />
+    <Image Include="..\Debug\walls.bmp" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\Debug\bounce.wav" />

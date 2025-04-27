@@ -6,9 +6,11 @@
 #include "math.h"
 #include "ctime"
 #include "vector"
+#include <thread>
+#include <iostream>
 using namespace std;
 int currenttime = 0;
-void InitWindow();
+
 
 void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool alpha = false);
 POINT mouse;
@@ -29,6 +31,7 @@ HBITMAP hBack;// хэндл для фонового изображения
 
 struct sprite {
     float x, y, width, height, rad, dx, dy, speed, time;
+    bool vect_right = true, vect_left = false;
     HBITMAP hBitmap;//хэндл к спрайту шарика 
 
     void loadBitmapWithNativeSize(const char* filename)
@@ -42,13 +45,8 @@ struct sprite {
         ShowBitmap(window.context, x, y , width , height , hBitmap, false);
     }
 
-    void show_h() {
-        ShowBitmap(window.context, x  , y , width, height, hBitmap);
-    }
 
 };
-
-sprite healing;
 
 HBITMAP ballBitmap;
 HBITMAP frogHbm;
@@ -107,21 +105,42 @@ void loadBitmap(const char* filename, HBITMAP& hbm)
     hbm = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 }
 
-struct Objects // структура текстур
+struct Texture // структура платформ
 {
    
     sprite textureSprite;
+   
 
-    Objects(float p_x, float p_y, float p_width, float p_height, const char* filename) {
+    Texture(float p_x, float p_y, float p_width, float p_height, const char* filename) {
         this->textureSprite.x = p_x * window.width;
         this->textureSprite.y = p_y * window.height;
         this->textureSprite.width = p_width * window.width;
         this->textureSprite.height = p_height * window.height;
         this->textureSprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-        //location[loc].locationTexture.push_back(this);
+        
     }
 
 };
+
+struct Objects // структура игровых обьектов
+{
+
+    
+    sprite objectsSprite;
+    string type;
+
+    Objects(float p_x, float p_y, float p_width, float p_height, const char* filename, const char* objTipe) {
+        this->objectsSprite.x = p_x * window.width;
+        this->objectsSprite.y = p_y * window.height;
+        this->objectsSprite.width = p_width * window.width;
+        this->objectsSprite.height = p_height * window.height;
+        this->objectsSprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+        this->type = objTipe;
+
+    }
+
+};
+
 
 struct player_ //структура игрока
 {
@@ -150,8 +169,6 @@ struct player_ //структура игрока
     }
     
 };
-
-//player_ player(0, 0.25,0.1, 30, "racket.bmp");
 player_ *player;
 
 player_ health{40, 5, 3, "health_full.bmp", "health_empty.bmp"};
@@ -161,10 +178,9 @@ struct Location_ {
     HBITMAP hBack;
     int LeftPort;
     int RightPort;
-    vector<Objects> locationTexture;
-    vector<sprite> locationObjects;
-    
-    
+    vector<Texture> locationTexture;
+    vector<Texture> walls;
+    vector<Objects> locationObjects;
 };
 Location_ location[5];
 
@@ -243,43 +259,25 @@ vector<sprite> bullet;
 void InitGame()
 {
     player = new player_(0.2, 0.25, 0.012, 0.021, "racket.bmp");
-    //player_* p = new player_;
-    //player.racket.width = 30; 
-    //player.racket.height = 30;
-    healing.hBitmap = (HBITMAP)LoadImageA(NULL, "racket.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    hBack = (HBITMAP)LoadImageA(NULL, "back.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    //------------------------------------------------------
-
-   
     player->racket.speed = 30;
-
+    //------------------------------------------------------
     loadFrog();
     loadBitmap("ball.bmp", ballBitmap);
-    
-
-    location[0].hBack = (HBITMAP)LoadImageA(NULL, "background_0.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    //-----------------------------location0______________
+    loadBitmap("background_0.bmp", location[0].hBack);
     location[0].RightPort = 1;
     location[0].LeftPort = -1;
-
-    healing.width = 40;
-    healing.height = 40;
-    healing.x = 700;
-    healing.y = 400;
-    location[0].locationObjects.push_back(healing);
-
-    
-    location[0].locationTexture.emplace_back(0.8, 0.85, 0.15, 0.05,"racket_enemy.bmp");
-    //platform1.textureSprite.loadBitmapWithNativeSize("racket_enemy.bmp");
-    //location[0].locationTexture.push_back(platform1);
-
-
-    location[1].hBack = (HBITMAP)LoadImageA(NULL, "background_1.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    location[0].locationObjects.emplace_back(0.5, 0.5, 0.012, 0.021, "ball.bmp", "healing");
+    location[0].locationObjects.emplace_back(0.5, 0.98, 0.012, 0.021, "spike.bmp", "spike");
+    location[0].locationTexture.emplace_back(0.8, 0.85, 0.15, 0.05, "racket_enemy.bmp");
+    location[0].locationTexture.emplace_back(0.4, 0.85, 0.15, 0.05, "racket_enemy.bmp");
+    location[0].locationTexture.emplace_back(0.6, 0.95, 0.15, 0.05, "racket_enemy.bmp");
+    location[0].walls.emplace_back(0.1, 0.8, 0.15, 0.05, "walls.bmp");
+    //___________________________location1________________
+    loadBitmap("background_1.bmp", location[1].hBack);
     location[1].RightPort = -1;
     location[1].LeftPort = 0;
-
-    location[1].locationTexture.emplace_back(0.08, 0.9, 0.15, 0.05, "racket_enemy.bmp");
-   // platform2.textureSprite.loadBitmapWithNativeSize("racket_enemy.bmp");
-    //location[1].locationTexture.push_back(platform2);
+    location[1].locationTexture.emplace_back(0.08, 0.9, 0.15, 0.05, "racket_enemy.bmp");//платформа 2
 }
 
 void ProcessSound(const char* name)//проигрывание аудиофайла в формате .wav, файл должен лежать в той же папке где и программа
@@ -290,31 +288,8 @@ void ProcessSound(const char* name)//проигрывание аудиофайл
 float clickTimeOut = 100;
 float clickTime = 0;
 
-float gravity = 30;
-
-float jump = 0;
-
-float maxjump = 10;
-
-void ProcessHero()
-{
 
 
-    if (GetAsyncKeyState(VK_SPACE) && player->racket.y > (window.height - player->racket.height - 1))
-        {
-
-            jump += 90;
-        }
-
-    player->racket.y += gravity - jump;
-    player->racket.y = min(window.height - player->racket.height, player->racket.y);
-
-    //inJump = true;
-    jump *= .9;
-    //jump = max(jump, 0);
-    jump = max(jump, 0);
-
-}
 void ProcessInput()
 {
     if (GetAsyncKeyState(VK_LEFT)) player->racket.x -= player->racket.speed;
@@ -410,10 +385,7 @@ void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool
 void ShowRacketAndBall()
 {
     ShowBitmap(window.context, 0, 0, window.width, window.height, location[currentLocation].hBack);//задний фон
-   // ShowBitmap(window.context, player.racket.x - player.racket.width / 2., player.racket.y, player.racket.width, player.racket.height, player.racket.hBitmap);// ракетка игрока
-    //racket.show();
-
-    player->racket.show_h();
+    player->racket.show();
 
     for (int i = 0; i < slots_count; i++)
     {
@@ -462,49 +434,213 @@ void ShowTexture()
     for (int i = 0; i < location[currentLocation].locationTexture.size();i++) {
         location[currentLocation].locationTexture[i].textureSprite.show();
     }
+    for (int i = 0; i < location[currentLocation].walls.size();i++) {
+        location[currentLocation].walls[i].textureSprite.show();
+    }
 }
 
 void ShowObjects()
 {
-    for (const auto& i : location[currentLocation].locationObjects)
-    {
-
-        ShowBitmap(window.context, i.x, i.y, i.width, i.height, i.hBitmap);
-
-
+    for (int i = 0; i < location[currentLocation].locationObjects.size();i++) {
+        location[currentLocation].locationObjects[i].objectsSprite.show();
     }
+}
+
+float gravity = 30;
+float jump = 0;
+float maxjump = 10;
+bool inJump = false;
+
+
+void ProcessHero() //jump
+{
+    if (GetAsyncKeyState(VK_SPACE) && inJump == false)
+    {
+        inJump = true; 
+        jump += 90;
+    }
+
+    player->racket.y += gravity - jump;
+    player->racket.y = min(window.height - player->racket.height, player->racket.y);
+
+    jump *= .9;
+    jump = max(jump, 0);
+
 }
 
 
 
-void Collision()
+const int dashDistance = 20;
+bool wasShiftPressed = false;
+HANDLE hTimer;
+bool dash_allow = true;
+
+void TweenDash(int idx)
+{
+    WaitForSingleObject(hTimer, INFINITE);
+
+    if (dash_allow == true)
+        if (player->racket.vect_right == true)
+        {
+            player->racket.x += idx;
+        }
+        else
+        {
+            player->racket.x -= idx;
+        }
+
+
+}
+
+void ProcessDash()
+{
+    bool isShiftPressed = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
+    if (isShiftPressed && !wasShiftPressed)
+    {
+        wasShiftPressed = true;
+
+        hTimer = CreateWaitableTimer(NULL, false, NULL);
+        LARGE_INTEGER dTime;
+        for (int i = 0; i < dashDistance; i++)
+        {
+
+            thread t(TweenDash, i); 
+            t.detach();
+
+        }
+        dTime.QuadPart = -10000 * 7;
+        SetWaitableTimer(hTimer, &dTime, 7, NULL, NULL, false);
+
+    }
+    else if (!isShiftPressed)
+    {
+        wasShiftPressed = false;
+        dash_allow = true;
+    }
+
+
+}
+
+
+void Collision(sprite racket_obj, sprite wall_obj)
+{
+
+    
+    int centr_x = racket_obj.x;
+    int centr_y = racket_obj.y + racket_obj.height / 2;
+
+    float r_dx = centr_x - (centr_x + player->racket.width / 2);
+    float r_dy = centr_y - centr_y - (player->racket.height / 2);
+    int R = sqrt(pow(r_dx, 2) + pow(r_dy, 2));
+
+
+    for (int i = 0; i <= 360; i++)
+    {
+       
+        int Pixel_x = R * cos(i) + centr_x;
+        int Pixel_y = R * sin(i) + centr_y;
+
+
+       
+        if (Pixel_x > wall_obj.x &&
+            Pixel_x < (wall_obj.x + wall_obj.width) &&
+            Pixel_y > wall_obj.y &&
+            Pixel_y < (wall_obj.y + wall_obj.height)
+            )
+        {
+           
+            int top = centr_y - wall_obj.y;
+            int down = (wall_obj.y + wall_obj.height) - centr_y;
+            int left = centr_x - wall_obj.x;
+            int right = (wall_obj.x + wall_obj.width) - centr_x;
+
+            int minX = min(left, right);
+            int minY = min(top, down);
+
+            if (minX < minY)
+            {
+                if (left < right)
+                {
+                    player->racket.x = (wall_obj.x) - player->racket.width + 13;
+                }
+                else
+                {
+
+                    player->racket.x = ((wall_obj.x + wall_obj.width)) + player->racket.width - 13;
+                }
+                dash_allow = false;
+            }
+            else
+            {
+                if (down < top)
+                {
+                    player->racket.y = ((wall_obj.y + wall_obj.height)) + player->racket.height / 10;
+                    jump *= .4;
+                }
+                else
+                {
+                    player->racket.y = wall_obj.y - player->racket.height; 
+                    inJump = false;
+                }
+            }
+        }
+        else 
+        {
+            if (player->racket.y + player->racket.height == window.height) 
+            {
+                inJump = false;
+            }
+        }
+
+    }
+
+}
+
+
+void CollisionGroup() 
 {
     for (int i = 0; i < location[currentLocation].locationTexture.size(); i++) {
-
         auto platform = location[currentLocation].locationTexture[i].textureSprite;
-
-        
-            if ((player->racket.x + player->racket.width  >= platform.x  &&
-                player->racket.x <= platform.x  + platform.width) &&
-                (player->racket.y <= platform.y + platform.height  &&
-                    player->racket.y + player->racket.height  >= platform.y )) {
-
-                //racket.y = min(platform.y, racket.y - racket.height);
-                player->racket.y = platform.y  + platform.height;
-
-                player->racket.y = min(platform.y  - player->racket.height, window.height - (player->racket.height ));
-                jump *= .9;
-                jump = max(jump, 0);
-                //inJump = false;
-            }
-            else {
-                player->racket.y = min(window.height - player->racket.height, player->racket.y);
-            }
-            //racket.y -=gravity;
-
-        //}
+        Collision(player->racket, platform); 
     }
+    for (int i = 0; i < location[currentLocation].walls.size(); i++) {
+        auto walls = location[currentLocation].walls[i].textureSprite;
+        Collision(player->racket, walls);
+    }
+
+
+    static int lastDamageTime = 0;
+    bool spikeCollision = false;
+    for (int i = 0; i < location[currentLocation].locationObjects.size(); ++i)
+    {
+        Objects& obj = location[currentLocation].locationObjects[i];
+        if (obj.type == "spike")
+        {
+            if (player->racket.x + player->racket.width >= obj.objectsSprite.x &&
+                player->racket.x <= obj.objectsSprite.x + obj.objectsSprite.width &&
+                player->racket.y + player->racket.height >= obj.objectsSprite.y &&
+                player->racket.y <= obj.objectsSprite.y + obj.objectsSprite.height)
+            {
+
+                spikeCollision = true;
+                break;
+            }
+        }
+        
+    }
+    if (spikeCollision && currenttime > lastDamageTime + 1000) {
+        health.current_lives--;
+        lastDamageTime = currenttime;
+    }
+    if (health.current_lives <= 0) {
+        MessageBox(window.hWnd, "Game Over!", "Info", MB_OK);
+        exit(0);
+    }
+        
+   
 }
+
+
 
 
 
@@ -618,33 +754,6 @@ void ProcessBall()
 }
 
 
-
-
-const float dashDistance = 150;
-float dash = 0;
-bool wasShiftPressed = false;
-
-void ProcessDash() //рывок
-{
-    bool isShiftPressed = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
-    if (isShiftPressed && !wasShiftPressed)
-    {
-        wasShiftPressed = true;
-        if (GetAsyncKeyState(VK_LEFT) & 0x8000)
-        {
-            player->racket.x -= dashDistance;
-        }
-        else if (GetAsyncKeyState(VK_RIGHT) & 0x8000)
-        {
-            player->racket.x += dashDistance;
-        }
-    }
-    else if (!isShiftPressed)
-    {
-        wasShiftPressed = false;
-    }
-}
-
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
     _In_ LPWSTR lpCmdLine,
@@ -668,6 +777,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         ShowRacketAndBall();//рисуем фон, ракетку и шарик
         ShowTexture();
+        ShowObjects();
         DrawHealth();
         ProcessInput();//опрос клавиатуры
         ProcessDash();//рывок
@@ -678,7 +788,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         Sleep(16);//ждем 16 милисекунд (1/количество кадров в секунду)
         
         
-        Collision();
+        CollisionGroup();
         LimitRacket();//проверяем, чтобы ракетка не убежала за экран
        
     }
