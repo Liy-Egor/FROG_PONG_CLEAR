@@ -263,7 +263,7 @@ void InitGame()
     //-------------------------------------------------------
     loadFrog();
     loadBitmap("ball.bmp", ballBitmap);
-    //-----------------------------location0______________
+    //-----------------------------location0_______________
     loadBitmap("background_0.bmp", location[0].hBack);
     location[0].RightPort = 1;
     location[0].LeftPort = -1;
