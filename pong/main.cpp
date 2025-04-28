@@ -105,6 +105,7 @@ void loadBitmap(const char* filename, HBITMAP& hbm)
     hbm = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 }
 
+
 struct Texture // структура платформ
 {
    
@@ -174,10 +175,25 @@ player_ *player;
 player_ health{40, 5, 3, "health_full.bmp", "health_empty.bmp"};
 
 int currentLocation = 0;
+struct portal_ {
+    sprite spr;
+    int destination;
+    portal_(float p_x, float p_y, float p_width, float p_height, int p_destination ,const char* filename)
+    {
+        this->spr.x = p_x * window.width;
+        this->spr.y = p_y * window.height;
+        this->spr.width = p_width * window.width;
+        this->spr.height = p_height * window.height;
+        this->destination = p_destination;
+        this->spr.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    }
+};
+
 struct Location_ {
     HBITMAP hBack;
     int LeftPort;
     int RightPort;
+    vector<portal_>portal;
     vector<Texture> locationTexture;
     vector<Texture> walls;
     vector<Objects> locationObjects;
@@ -267,17 +283,18 @@ void InitGame()
     loadBitmap("background_0.bmp", location[0].hBack);
     location[0].RightPort = 1;
     location[0].LeftPort = -1;
-    location[0].locationObjects.emplace_back(0.5, 0.5, 0.012, 0.021, "ball.bmp", "healing");
+    location[0].locationObjects.emplace_back(0.3, 0.98, 0.012, 0.021, "ball.bmp", "healing");
     location[0].locationObjects.emplace_back(0.5, 0.98, 0.012, 0.021, "spike.bmp", "spike");
     location[0].locationTexture.emplace_back(0.8, 0.85, 0.15, 0.05, "racket_enemy.bmp");
     location[0].locationTexture.emplace_back(0.4, 0.85, 0.15, 0.05, "racket_enemy.bmp");
     location[0].locationTexture.emplace_back(0.6, 0.95, 0.15, 0.05, "racket_enemy.bmp");
     location[0].walls.emplace_back(0.1, 0.8, 0.15, 0.05, "walls.bmp");
+    location[0].portal.emplace_back(0.98, 0.05, 0.021, 0.9, 1, "racket.bmp");
     //___________________________location1________________
     loadBitmap("background_1.bmp", location[1].hBack);
     location[1].RightPort = -1;
     location[1].LeftPort = 0;
-    location[1].locationTexture.emplace_back(0.08, 0.9, 0.15, 0.05, "racket_enemy.bmp");//платформа 2
+    location[1].locationTexture.emplace_back(0.08, 0.9, 0.15, 0.05, "racket_enemy.bmp");
 }
 
 void ProcessSound(const char* name)//проигрывание аудиофайла в формате .wav, файл должен лежать в той же папке где и программа
@@ -288,7 +305,14 @@ void ProcessSound(const char* name)//проигрывание аудиофайл
 float clickTimeOut = 100;
 float clickTime = 0;
 
-
+bool CheckCollision(float x1, float y1, float w1, float h1,
+    float x2, float y2, float w2, float h2)
+{
+    return x1 < x2 + w2 &&
+        x1 + w1 > x2 &&
+        y1 < y2 + h2 &&
+        y1 + h1 > y2;
+}
 
 void ProcessInput()
 {
@@ -323,29 +347,14 @@ void ProcessInput()
     }
 
     
-    if (player->racket.x < 0)
+    for (auto& i : location[currentLocation].portal)
     {
-        if (location[currentLocation].LeftPort >= 0)
+        i.spr.show();
+       
+        if (CheckCollision(player->racket.x, player->racket.y, player->racket.width, player->racket.height, i.spr.x, i.spr.y, i.spr.width, i.spr.height))
         {
-            player->racket.x = window.width - player->racket.width;
-            currentLocation = location[currentLocation].LeftPort;
-        }
-        else
-        {
+            currentLocation = i.destination;
             player->racket.x = 0;
-        }
-    }
-
-    if (player->racket.x > window.width - player->racket.width)
-    {
-        if (location[currentLocation].RightPort >= 0)
-        {
-            player->racket.x = 0;
-            currentLocation = location[currentLocation].RightPort;
-        }
-        else
-        {
-            player->racket.x = window.width - player->racket.width;
         }
     }
 }
@@ -623,6 +632,18 @@ void CollisionGroup()
             {
 
                 spikeCollision = true;
+                break;
+            }
+        }
+        if (obj.type == "healing")
+        {
+            if (player->racket.x + player->racket.width >= obj.objectsSprite.x &&
+                player->racket.x <= obj.objectsSprite.x + obj.objectsSprite.width &&
+                player->racket.y + player->racket.height >= obj.objectsSprite.y &&
+                player->racket.y <= obj.objectsSprite.y + obj.objectsSprite.height)
+            {
+                location[currentLocation].locationObjects.erase(location[currentLocation].locationObjects.begin());
+                health.current_lives++;
                 break;
             }
         }
