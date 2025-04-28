@@ -26,7 +26,7 @@ struct {
     int width, height;//сюда сохраним размеры окна которое создаст программа
 } window;
 
-HBITMAP hBack;// хэндл для фонового изображения
+   // HBITMAP hBack;// хэндл для фонового изображения????????????????
 // секция данных игры  
 
 struct sprite {
@@ -87,7 +87,7 @@ void loadFrog()
 //                e.enemy_sprite = f;
 //                e.dead = false;
 //                e.HPfrog = rand() % 3 + 1;
-//                frog[i] = e;
+//                frog[i] = e.;
 //
 //
 //            }
@@ -109,15 +109,15 @@ void loadBitmap(const char* filename, HBITMAP& hbm)
 struct Texture // структура платформ
 {
    
-    sprite textureSprite;
+    sprite Sprite;
    
 
     Texture(float p_x, float p_y, float p_width, float p_height, const char* filename) {
-        this->textureSprite.x = p_x * window.width;
-        this->textureSprite.y = p_y * window.height;
-        this->textureSprite.width = p_width * window.width;
-        this->textureSprite.height = p_height * window.height;
-        this->textureSprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+        this->Sprite.x = p_x * window.width;
+        this->Sprite.y = p_y * window.height;
+        this->Sprite.width = p_width * window.width;
+        this->Sprite.height = p_height * window.height;
+        this->Sprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
         
     }
 
@@ -127,15 +127,15 @@ struct Objects // структура игровых обьектов
 {
 
     
-    sprite objectsSprite;
+    sprite Sprite;
     string type;
 
     Objects(float p_x, float p_y, float p_width, float p_height, const char* filename, const char* objTipe) {
-        this->objectsSprite.x = p_x * window.width;
-        this->objectsSprite.y = p_y * window.height;
-        this->objectsSprite.width = p_width * window.width;
-        this->objectsSprite.height = p_height * window.height;
-        this->objectsSprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+        this->Sprite.x = p_x * window.width;
+        this->Sprite.y = p_y * window.height;
+        this->Sprite.width = p_width * window.width;
+        this->Sprite.height = p_height * window.height;
+        this->Sprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
         this->type = objTipe;
 
     }
@@ -207,7 +207,15 @@ struct enemy {
     int bullettime = 0;
     bool dead = true;
     int spawnTime = 0;
-    int HPfrog = 3;           //rand()% 3-5
+    int HPfrog = 3;   
+    HBITMAP ballBitmap;
+    //HBITMAP frogHbm;
+    float frogWidth;
+    float frogHeight;
+    int oldtime = 0;
+
+
+    const int slots_count = 6;//rand()% 3-5
 
     void showBullet()
     {
@@ -222,7 +230,7 @@ struct enemy {
         if (currenttime > bullettime + 5000)
         {
             //for (int i = 0; i < bullet.size(); i++)
-            {
+            
                 sprite b;
                 b.height = 40;
                 b.width = 40;
@@ -242,7 +250,7 @@ struct enemy {
 
                 bullet.push_back(b);
                 bullettime = currenttime;
-            }
+            
         }
 
         for (int i = 0; i < bullet.size(); i++)
@@ -401,7 +409,7 @@ void ShowRacketAndBall()
         if (!frog[i].dead)
         {
             //frog[i].enemy_sprite.show();
-            frog[i].processBullet();
+            //frog[i].processBullet();
             frog[i].showBullet();
         }
 
@@ -441,17 +449,17 @@ void ShowTexture()
 {
    
     for (int i = 0; i < location[currentLocation].locationTexture.size();i++) {
-        location[currentLocation].locationTexture[i].textureSprite.show();
+        location[currentLocation].locationTexture[i].Sprite.show();
     }
     for (int i = 0; i < location[currentLocation].walls.size();i++) {
-        location[currentLocation].walls[i].textureSprite.show();
+        location[currentLocation].walls[i].Sprite.show();
     }
 }
 
 void ShowObjects()
 {
     for (int i = 0; i < location[currentLocation].locationObjects.size();i++) {
-        location[currentLocation].locationObjects[i].objectsSprite.show();
+        location[currentLocation].locationObjects[i].Sprite.show();
     }
 }
 
@@ -528,6 +536,56 @@ void ProcessDash()
     }
 
 
+}
+void CollisionWalls()
+{
+    //SetPixel(window.context, racket.x - racket.width / 2, racket.y, RGB(255, 255, 255));
+    for (int i = 0; i < location[currentLocation].walls.size(); i++) {
+
+        auto walls = location[currentLocation].walls[i].Sprite;
+
+        if ((player->racket.x + player->racket.width >= walls.x &&
+            player->racket.x <= walls.x + walls.width) &&
+            (player->racket.y <= walls.y + walls.height &&
+                player->racket.y + player->racket.height >= walls.y)) {
+
+            float UP = abs((player->racket.y + player->racket.height) - walls.y);
+            float DOWN = abs(player->racket.y - (walls.y + walls.height));
+            float LEFT = abs((player->racket.x + player->racket.width) - walls.x);
+            float RIGHT = abs(player->racket.x - (walls.x + walls.width));
+            float overY = min(UP, DOWN);
+            float overX = min(LEFT, RIGHT);
+
+            if (overX < overY) {
+
+                if (LEFT < RIGHT) {
+                    player->racket.x = walls.x - player->racket.width;
+                }
+                else {
+                    player->racket.x = walls.x + walls.width;
+                }
+
+            }
+            else {
+
+                if (UP < DOWN) {
+                    player->racket.y = walls.y  - player->racket.height;
+                }
+                else {
+                    player->racket.y = walls.y * window.height + walls.height * window.height;
+                }
+            }
+            {
+
+            }
+            //racket.y = min(platform.y, racket.y - racket.height);
+            //racket.y = min(walls.y * window.height - racket.height, window.height - racket.height);
+            jump *= .9;
+            jump = max(jump, 0);
+            inJump = false;
+        }
+
+    }
 }
 
 
@@ -609,11 +667,11 @@ void Collision(sprite racket_obj, sprite wall_obj)
 void CollisionGroup() 
 {
     for (int i = 0; i < location[currentLocation].locationTexture.size(); i++) {
-        auto platform = location[currentLocation].locationTexture[i].textureSprite;
+        auto platform = location[currentLocation].locationTexture[i].Sprite;
         Collision(player->racket, platform); 
     }
     for (int i = 0; i < location[currentLocation].walls.size(); i++) {
-        auto walls = location[currentLocation].walls[i].textureSprite;
+        auto walls = location[currentLocation].walls[i].Sprite;
         Collision(player->racket, walls);
     }
 
@@ -625,10 +683,10 @@ void CollisionGroup()
         Objects& obj = location[currentLocation].locationObjects[i];
         if (obj.type == "spike")
         {
-            if (player->racket.x + player->racket.width >= obj.objectsSprite.x &&
-                player->racket.x <= obj.objectsSprite.x + obj.objectsSprite.width &&
-                player->racket.y + player->racket.height >= obj.objectsSprite.y &&
-                player->racket.y <= obj.objectsSprite.y + obj.objectsSprite.height)
+            if (player->racket.x + player->racket.width >= obj.Sprite.x &&
+                player->racket.x <= obj.Sprite.x + obj.Sprite.width &&
+                player->racket.y + player->racket.height >= obj.Sprite.y &&
+                player->racket.y <= obj.Sprite.y + obj.Sprite.height)
             {
 
                 spikeCollision = true;
@@ -637,10 +695,10 @@ void CollisionGroup()
         }
         if (obj.type == "healing")
         {
-            if (player->racket.x + player->racket.width >= obj.objectsSprite.x &&
-                player->racket.x <= obj.objectsSprite.x + obj.objectsSprite.width &&
-                player->racket.y + player->racket.height >= obj.objectsSprite.y &&
-                player->racket.y <= obj.objectsSprite.y + obj.objectsSprite.height)
+            if (player->racket.x + player->racket.width >= obj.Sprite.x &&
+                player->racket.x <= obj.Sprite.x + obj.Sprite.width &&
+                player->racket.y + player->racket.height >= obj.Sprite.y &&
+                player->racket.y <= obj.Sprite.y + obj.Sprite.height)
             {
                 location[currentLocation].locationObjects.erase(location[currentLocation].locationObjects.begin());
                 health.current_lives++;
