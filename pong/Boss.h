@@ -1,18 +1,18 @@
+#pragma once
 #include "windows.h"
 #include "math.h"
 #include "ctime"
 #include "vector"
 #include <thread>
 #include <iostream>
-#include "paint.h"
-#include "logick.h"
-
 using namespace std;
 int currenttime = 0;
 
-
-//void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool alpha = false);
 POINT mouse;
+
+void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool alpha = false);
+
+
 
 struct {
     int score, balls;
@@ -25,7 +25,7 @@ struct {
     int width, height;//сюда сохраним размеры окна которое создаст программа
 } window;
 
-HBITMAP hBack;// хэндл для фонового изображения
+// HBITMAP hBack;// хэндл для фонового изображения????????????????
 // секция данных игры  
 
 struct sprite {
@@ -47,68 +47,18 @@ struct sprite {
 
 };
 
-
-HBITMAP ballBitmap;
-HBITMAP frogHbm;
-float frogWidth;
-float frogHeight;
-int oldtime = 0;
-
-
-const int slots_count = 6;
-
-void loadFrog()
-{
-    frogHbm = (HBITMAP)LoadImageA(NULL, "frog.bmp", IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    BITMAP bm;
-    GetObject(frogHbm, (int)sizeof bm, &bm);
-    frogWidth = bm.bmWidth;
-    frogHeight = bm.bmHeight;
-}
-//void spawnEnemy()
-//{
-//    for (int i = 0;i < slots_count;i++)
-//    {
-//        if (frog[i].dead)
-//        {
-//
-//            if (currenttime > frog[i].spawnTime + 1000)
-//            {
-//                sprite f;
-//
-//                f.x = (window.width / slots_count) * i;
-//                f.y = 0;
-//                f.width = frogWidth;
-//                f.height = frogHeight;
-//                f.hBitmap = frogHbm;
-//
-//                enemy e;
-//                e.enemy_sprite = f;
-//                e.dead = false;
-//                e.HPfrog = rand() % 3 + 1;
-//                frog[i] = e;
-//
-//
-//            }
-//            break;
-//
-//        }
-//    }
-//
-//
-//}
 struct Texture // структура платформ
 {
 
-    sprite textureSprite;
+    sprite Sprite;
 
 
     Texture(float p_x, float p_y, float p_width, float p_height, const char* filename) {
-        this->textureSprite.x = p_x * window.width;
-        this->textureSprite.y = p_y * window.height;
-        this->textureSprite.width = p_width * window.width;
-        this->textureSprite.height = p_height * window.height;
-        this->textureSprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+        this->Sprite.x = p_x * window.width;
+        this->Sprite.y = p_y * window.height;
+        this->Sprite.width = p_width * window.width;
+        this->Sprite.height = p_height * window.height;
+        this->Sprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 
     }
 
@@ -118,15 +68,15 @@ struct Objects // структура игровых обьектов
 {
 
 
-    sprite objectsSprite;
+    sprite Sprite;
     string type;
 
     Objects(float p_x, float p_y, float p_width, float p_height, const char* filename, const char* objTipe) {
-        this->objectsSprite.x = p_x * window.width;
-        this->objectsSprite.y = p_y * window.height;
-        this->objectsSprite.width = p_width * window.width;
-        this->objectsSprite.height = p_height * window.height;
-        this->objectsSprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+        this->Sprite.x = p_x * window.width;
+        this->Sprite.y = p_y * window.height;
+        this->Sprite.width = p_width * window.width;
+        this->Sprite.height = p_height * window.height;
+        this->Sprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
         this->type = objTipe;
 
     }
@@ -140,6 +90,7 @@ struct player_ //структура игрока
     int health_width;
     int max_lives;
     int current_lives;
+    int currentLocation = 0;
 
     player_(int p_health, int p_max_lives, int p_current_lives, const char* filename, const char* filename2)
     {
@@ -161,11 +112,6 @@ struct player_ //структура игрока
 
 };
 
-player_* player;
-
-player_ health{ 40, 5, 3, "health_full.bmp", "health_empty.bmp" };
-
-int currentLocation = 0;
 
 struct portal_ {
     sprite spr;
@@ -192,75 +138,8 @@ struct Location_ {
 };
 Location_ location[5];
 
-struct enemy {
+player_* player;
 
-    sprite enemy_sprite;
-    vector<sprite> bullet;
-    int bullettime = 0;
-    bool dead = true;
-    int spawnTime = 0;
-    int HPfrog = 3;           //rand()% 3-5
+player_ health{ 40, 5, 3, "health_full.bmp", "health_empty.bmp" };
 
-    void showBullet()
-    {
-        for (int i = 0; i < bullet.size(); i++)
-        {
-            ShowBitmap(window.context, bullet[i].x - bullet[i].rad, bullet[i].y - bullet[i].rad, 2 * bullet[i].rad, 2 * bullet[i].rad, bullet[i].hBitmap);
-        }
-    }
-
-    void processBullet()
-    {
-        if (currenttime > bullettime + 5000)
-        {
-            //for (int i = 0; i < bullet.size(); i++)
-            {
-                sprite b;
-                b.height = 40;
-                b.width = 40;
-                b.speed = rand() % (20 - 1) + 4;
-                b.x = enemy_sprite.x;
-                b.y = enemy_sprite.y;
-                b.dx = player->racket.x - b.x;
-                b.dy = player->racket.y - b.y;
-
-                float dvector = sqrt(b.dx * b.dx + b.dy * b.dy);
-                b.dx = b.dx / dvector;
-                b.dy = b.dy / dvector;
-                b.rad = 20;
-                b.hBitmap = ballBitmap;
-
-                //game.action = true;
-
-                bullet.push_back(b);
-                bullettime = currenttime;
-            }
-        }
-
-        for (int i = 0; i < bullet.size(); i++)
-        {
-            float margin = 0;
-
-            if ((bullet[i].x > window.width - margin) || (bullet[i].x < margin) ||
-                (bullet[i].y < margin))
-            {
-                bullet[i].speed = 0;
-            }
-
-            bullet[i].x += bullet[i].dx * bullet[i].speed;
-            bullet[i].y += bullet[i].dy * bullet[i].speed;
-        }
-
-        for (int i = 0; i < bullet.size(); i++)
-        {
-            if (bullet[i].speed < .1)
-            {
-                bullet.erase(bullet.begin() + i);
-            }
-        }
-    }
-};
-enemy frog[slots_count];
-sprite ball;
-vector<sprite> bullet;
 
