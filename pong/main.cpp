@@ -1,10 +1,6 @@
-﻿#include "Boss.h"
+﻿#include "Structures.h"
 #include "paint.h"
 #include "logick.h"
-
-
-
-
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -28,21 +24,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         Ellipse(window.context, mouse.x - sz, mouse.y - sz, mouse.x + sz, mouse.y + sz);
 
         ShowRacketAndBall();//рисуем фон, ракетку и шарик
-        //ShowTexture();
-        //ShowObjects();
-        //DrawHealth();
-        //ProcessInput();//опрос клавиатуры
-        //ProcessDash();//рывок
-        //ProcessHero();//прыжок 
-        //ProcessBall();
-        //spawnEnemy();
+        ShowTexture();
+        ShowObjects();
+        DrawHealth();
+        ProcessInput();//опрос клавиатуры
+        ProcessPortal();
+        ProcessHero();//прыжок 
+        ProcessDash();//рывок
         BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);//копируем буфер в окно
         Sleep(16);//ждем 16 милисекунд (1/количество кадров в секунду)
-
-
-        /*CollisionGroup();
-        LimitRacket();*///проверяем, чтобы ракетка не убежала за экран
-
+        CollisionGroup();
     }
 
 }

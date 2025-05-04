@@ -149,7 +149,7 @@
     <Media Include="..\Debug\music.mp3" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Boss.h" />
+    <ClInclude Include="Structures.h" />
     <ClInclude Include="logick.h" />
     <ClInclude Include="paint.h" />
   </ItemGroup>

@@ -31,7 +31,7 @@ struct {
 struct sprite {
     float x, y, width, height, rad, dx, dy, speed, time;
     bool vect_right = true, vect_left = false;
-    HBITMAP hBitmap;//хэндл к спрайту шарика 
+    HBITMAP hBitmap;
 
     void loadBitmapWithNativeSize(const char* filename)
     {
@@ -44,6 +44,18 @@ struct sprite {
         ShowBitmap(window.context, x, y, width, height, hBitmap, false);
     }
 
+    void showBack()
+    {
+        ShowBitmap(window.context, 0, 0, window.width, window.height, hBitmap, false);
+    }
+
+    void showHealth(int i, int h_w)
+    {
+        int margin = 10;
+        int startX = window.width - 50;
+        int startY = 10;
+        ShowBitmap(window.context, startX - (i * (h_w + margin)), startY, h_w, h_w, hBitmap, false);
+    }
 
 };
 
@@ -86,19 +98,27 @@ struct Objects // структура игровых обьектов
 struct player_ //структура игрока
 {
     sprite racket;//игрок
-    HBITMAP hHealthFull, hHealthEmpty;
+    sprite hHealthFull, hHealthEmpty;
     int health_width;
     int max_lives;
     int current_lives;
     int currentLocation = 0;
+    bool inJump = false;
+    float jump = 30;
+    float gravity = 30;
+    float maxjump = 10;
+    const int dashDistance = 20;
+    bool wasShiftPressed = false;
+    
+    bool dash_allow = true;
 
     player_(int p_health, int p_max_lives, int p_current_lives, const char* filename, const char* filename2)
     {
         this->health_width = p_health;
         this->max_lives = p_max_lives;
         this->current_lives = p_current_lives;
-        this->hHealthFull = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-        this->hHealthEmpty = (HBITMAP)LoadImageA(NULL, filename2, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+        this->hHealthFull.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+        this->hHealthEmpty.hBitmap = (HBITMAP)LoadImageA(NULL, filename2, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     }
 
     player_(float p_x, float p_y, float p_width, float p_height, const char* filename)
@@ -112,8 +132,8 @@ struct player_ //структура игрока
 
 };
 
-
-struct portal_ {
+struct portal_ 
+{
     sprite spr;
     int destination;
     portal_(float p_x, float p_y, float p_width, float p_height, int p_destination, const char* filename)
@@ -127,15 +147,16 @@ struct portal_ {
     }
 };
 
-struct Location_ {
-    HBITMAP hBack;
-    int LeftPort;
-    int RightPort;
+struct Location_
+{
+    sprite hBack;
     vector<portal_>portal;
     vector<Texture> locationTexture;
     vector<Texture> walls;
     vector<Objects> locationObjects;
+    
 };
+
 Location_ location[5];
 
 player_* player;

@@ -1,10 +1,6 @@
 #pragma once
-#include "Boss.h"
+#include "Structures.h"
 
-void loadBitmap(const char* filename, HBITMAP& hbm)
-{
-    hbm = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-}
 
 
 void InitWindow()
@@ -22,34 +18,6 @@ void InitWindow()
     GetClientRect(window.hWnd, &r);
 
 }
-
-
-void ShowRacketAndBall()
-{
-    ShowBitmap(window.context, 0, 0, window.width, window.height, location[player->currentLocation].hBack);//задний фон
-    player->racket.show();
-
-    //for (int i = 0; i < slots_count; i++)
-    //{
-    //    if (!frog[i].dead)
-    //    {
-    //        //frog[i].enemy_sprite.show();
-    //        //frog[i].processBullet();
-    //        frog[i].showBullet();
-    //    }
-
-    //}
-
-
-    //for (int i = 0; i < bullet.size(); i++)
-    //{
-    //    ShowBitmap(window.context, bullet[i].x - bullet[i].rad, bullet[i].y - bullet[i].rad, 2 * bullet[i].rad, 2 * bullet[i].rad, bullet[i].hBitmap, true);// ?????
-    //}
-
-
-}
-
-
 
 void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool alpha)
 {
@@ -77,4 +45,42 @@ void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool
     }
 
     DeleteDC(hMemDC); // Удаляем контекст памяти
+}
+
+void ShowRacketAndBall()
+{
+    
+    location[player->currentLocation].hBack.showBack();
+    player->racket.show();
+}
+
+void ShowTexture()
+{
+
+    for (int i = 0; i < location[player->currentLocation].locationTexture.size();i++) {
+        location[player->currentLocation].locationTexture[i].Sprite.show();
+    }
+    for (int i = 0; i < location[player->currentLocation].walls.size();i++) {
+        location[player->currentLocation].walls[i].Sprite.show();
+    }
+}
+
+void ShowObjects()
+{
+    for (int i = 0; i < location[player->currentLocation].locationObjects.size();i++) {
+        location[player->currentLocation].locationObjects[i].Sprite.show();
+    }
+}
+
+void DrawHealth()
+{
+   
+    for (int i = 0; i < health.max_lives; i++)
+    {
+        if (i < health.current_lives)
+        {
+            health.hHealthFull.showHealth(i, health.health_width);
+        }
+        else health.hHealthEmpty.showHealth(i, health.health_width);
+    }
 }
