@@ -7,15 +7,24 @@ void InitGame()
     player->racket.speed = 30;
     //-----------------------------location0_______________
     location[0].hBack.loadBitmapWithNativeSize("background_0.bmp");
+    location[0].portal.emplace_back(0.96, 0.89, 0.021, 0.09, 1, "racket.bmp");//портал в локацию 1
+    location[0].walls.emplace_back(0, 0, 0.02, 0.99, "walls.bmp");//левая стена
+    location[0].walls.emplace_back(0.98, 0, 0.02, 0.99, "walls.bmp");//правая стена
+    location[0].walls.emplace_back(0, 0.98, 0.999, 0.02, "walls.bmp");//пол
+    location[0].walls.emplace_back(0, 0, 0.999, 0.02, "walls.bmp");//потолок
     location[0].locationObjects.emplace_back(0.3, 0.98, 0.012, 0.021, "ball.bmp", "healing");
     location[0].locationObjects.emplace_back(0.5, 0.98, 0.012, 0.021, "spike.bmp", "spike");
     location[0].locationTexture.emplace_back(0.8, 0.85, 0.15, 0.05, "racket_enemy.bmp");
     location[0].locationTexture.emplace_back(0.4, 0.85, 0.15, 0.05, "racket_enemy.bmp");
     location[0].locationTexture.emplace_back(0.6, 0.95, 0.15, 0.05, "racket_enemy.bmp");
     location[0].walls.emplace_back(0.1, 0.8, 0.15, 0.05, "walls.bmp");
-    location[0].portal.emplace_back(0.98, 0.05, 0.021, 0.9, 1, "racket.bmp");
     //___________________________location1________________
     location[1].hBack.loadBitmapWithNativeSize("background_1.bmp");
+    location[1].portal.emplace_back(0.02, 0.89, 0.021, 0.09, 0, "racket.bmp");//портал в локацию 0
+    location[1].walls.emplace_back(0, 0, 0.02, 0.99, "walls.bmp");//левая стена
+    location[1].walls.emplace_back(0.98, 0, 0.02, 0.99, "walls.bmp");//правая стена
+    location[1].walls.emplace_back(0, 0.98, 0.999, 0.02, "walls.bmp");//пол
+    location[1].walls.emplace_back(0, 0, 0.999, 0.02, "walls.bmp");//потолок
     location[1].locationTexture.emplace_back(0.08, 0.9, 0.15, 0.05, "racket_enemy.bmp");
 }
 
@@ -63,7 +72,12 @@ void ProcessPortal()
         if (CheckCollision(player->racket.x, player->racket.y, player->racket.width, player->racket.height, i.spr.x, i.spr.y, i.spr.width, i.spr.height))
         {
             player->currentLocation = i.destination;
-            player->racket.x = 0;
+            if (i.destination % 2 == 0)
+            {
+                player->racket.x = 1500;
+            }
+            else player->racket.x = 100;
+            
         }
     }
 }
