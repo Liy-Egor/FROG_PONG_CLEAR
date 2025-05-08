@@ -49,9 +49,92 @@ void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool
 
 void ShowRacketAndBall()
 {
-    
     location[player->currentLocation].hBack.showBack();
     player->racket.show();
+
+
+    player->tdx = player->racket.x;
+    player->tdy = player->racket.y;
+    player->racket.dy = player->gravity - player->jump;
+    player->racket.dx = player->tdx - player->racket.x;
+    float ddx = player->racket.dx;
+    float ddy = player->racket.dy;
+
+    float lenght = sqrt(pow(ddx, 2) + pow(ddy, 2));
+
+    for (float i = 0; i < lenght * 2; i++) {
+
+        float s = i / lenght;
+        float pixel_x = player->racket.x + ddx * s;
+        float pixel_y = player->racket.y + ddy * s;
+
+        for (int j = 0; j < location[player->currentLocation].walls.size(); j++)
+        {
+            auto walls = location[player->currentLocation].walls[j].Sprite;
+
+            SetPixel(window.context, pixel_x, pixel_y, RGB(255, 255, 255));
+
+            if ((pixel_x >= walls.x &&
+                pixel_x <= walls.x + walls.width) &&
+                (pixel_y >= walls.y  &&
+                    pixel_y <= walls.y + walls.height))
+                
+            {
+
+                float col = i;
+
+
+                auto walls = location[player->currentLocation].walls[j].Sprite;
+
+                float top = pixel_y - walls.y;
+                float down = (walls.y + walls.height) - pixel_y;
+                float left = pixel_x - walls.x;
+                float right = (walls.x + walls.width) - pixel_x;
+
+                float minX = min(left, right);
+                float minY = min(top, down);
+                player->inJump = false;
+
+                if (minX < minY)
+                {
+
+                    if (left < right)
+                    {
+                        player->racket.x = walls.x -  player->racket.speed; // ???????? ????? ?????
+
+                    }
+                    else
+                    {
+                        player->racket.x = (walls.x + walls.width)  + player->racket.speed;  // ???????? ????? ??????
+
+                    }
+                    // dash_allow = false; // ?? ???? ?????? ????? (????? ????????? ?????????? ? ?????????)
+
+                }
+                else
+                {
+
+                    if (down < top)
+                    {
+                        player->racket.y = (walls.y  + walls.height) + player->racket.height + 100; // ?????? ????? ?? ???????
+                        //player.jump *= .4;
+                    }
+                    else
+                    {
+
+                        player->racket.y = min(walls.y - player->racket.height - player->gravity, player->racket.y); // ???????? ????? ?? ?????????
+                        player->inJump = false; // ???? ?????????? ?? ?????? (????? ????????? ?????????? ? ?????????)
+
+                    }
+
+                }
+
+            }
+
+        }
+
+    }
+
 }
 
 void ShowTexture()

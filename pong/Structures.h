@@ -103,10 +103,12 @@ struct player_ //структура игрока
     int max_lives;
     int current_lives;
     int currentLocation = 0;
-    bool inJump = false;
-    float jump = 30;
     float gravity = 30;
+    float jump = 0;
     float maxjump = 10;
+    bool inJump = false;
+    float tdx;
+    float tdy;
     const int dashDistance = 20;
     bool wasShiftPressed = false;
     

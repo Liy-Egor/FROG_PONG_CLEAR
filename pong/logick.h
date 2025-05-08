@@ -3,7 +3,7 @@
 
 void InitGame()
 {
-    player = new player_(0.2, 0.25, 0.012, 0.021, "racket.bmp");
+    player = new player_(0.2, 0.25, 0.023, 0.032, "racket.bmp");
     player->racket.speed = 30;
     //-----------------------------location0_______________
     location[0].hBack.loadBitmapWithNativeSize("background_0.bmp");
@@ -39,18 +39,28 @@ void ProcessInput()
 {
     
     player->racket.dx = player->racket.x; // и Дельта для вектора движения если игрок стоит на месте
-    if (GetAsyncKeyState(VK_LEFT)) player->racket.x -= player->racket.speed, player->racket.dx = player->racket.x - player->racket.speed; // и Дельта для вектора движения в следующем кадре по -x
-    if (GetAsyncKeyState(VK_RIGHT)) player->racket.x += player->racket.speed, player->racket.dx = player->racket.x + player->racket.speed; // и Дельта для вектора движения в следующем кадре по +x
+    player->tdx = player->racket.x;
+    if (GetAsyncKeyState(VK_LEFT)) 
+    {
+        player->racket.x -= player->racket.speed;
+        player->tdx = player->racket.x - player->racket.speed;
+        
+    }
+
+    if (GetAsyncKeyState(VK_RIGHT)) 
+    {
+        player->racket.x += player->racket.speed,
+            player->tdx = player->racket.x + player->racket.speed;
+    }
     if (GetAsyncKeyState(VK_SPACE) && player->inJump == false)
     {
+
+        player->jump = 100;
         player->inJump = true;
-        player->jump = 90;
     }
-    clickTime = timeGetTime();
-
-    
-
-   
+    player->racket.y += player->gravity - player->jump;
+    float s = .9;
+    player->jump *= s;
 }
 
 bool CheckCollision(float x1, float y1, float w1, float h1,
