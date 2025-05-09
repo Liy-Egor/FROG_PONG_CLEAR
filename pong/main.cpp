@@ -23,16 +23,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         int sz = 5;
         Ellipse(window.context, mouse.x - sz, mouse.y - sz, mouse.x + sz, mouse.y + sz);
 
+        ProcessInput();//опрос клавиатуры
         ShowRacketAndBall();//рисуем фон, ракетку и шарик
         ShowTexture();
         ShowObjects();
         DrawHealth();
-        ProcessInput();//опрос клавиатуры
         ProcessPortal();
         //ProcessHero();//прыжок 
         ProcessDash();//рывок
         BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);//копируем буфер в окно
-        Sleep(16);//ждем 16 милисекунд (1/количество кадров в секунду)
+        Sleep(1000);//ждем 16 милисекунд (1/количество кадров в секунду)
         //CollisionGroup();
     }
 

@@ -4,20 +4,21 @@
 void InitGame()
 {
     player = new player_(0.2, 0.25, 0.023, 0.032, "racket.bmp");
-    player->racket.speed = 30;
+    player->racket.speed = 100;
     //-----------------------------location0_______________
     location[0].hBack.loadBitmapWithNativeSize("background_0.bmp");
     location[0].portal.emplace_back(0.96, 0.89, 0.021, 0.09, 1, "racket.bmp");//портал в локацию 1
-    location[0].walls.emplace_back(0, 0, 0.02, 0.99, "walls.bmp");//левая стена
+    location[0].walls.emplace_back(0.5, 0, 0.02, 0.99, "walls.bmp");//левая стена
     location[0].walls.emplace_back(0.98, 0, 0.02, 0.99, "walls.bmp");//правая стена
-    location[0].walls.emplace_back(0, 0.98, 0.999, 0.02, "walls.bmp");//пол
+    //location[0].walls.emplace_back(0, 0.98, 0.999, 0.02, "walls.bmp");//пол
     location[0].walls.emplace_back(0, 0, 0.999, 0.02, "walls.bmp");//потолок
     location[0].locationObjects.emplace_back(0.3, 0.98, 0.012, 0.021, "ball.bmp", "healing");
     location[0].locationObjects.emplace_back(0.5, 0.98, 0.012, 0.021, "spike.bmp", "spike");
     location[0].locationTexture.emplace_back(0.8, 0.85, 0.15, 0.05, "racket_enemy.bmp");
     location[0].locationTexture.emplace_back(0.4, 0.85, 0.15, 0.05, "racket_enemy.bmp");
-    location[0].locationTexture.emplace_back(0.6, 0.95, 0.15, 0.05, "racket_enemy.bmp");
+    //location[0].locationTexture.emplace_back(0.6, 0.95, 0.15, 0.05, "racket_enemy.bmp");
     location[0].walls.emplace_back(0.1, 0.8, 0.15, 0.05, "walls.bmp");
+    location[0].walls.emplace_back(0.6, 0.95, 0.15, 0.05, "walls.bmp");
     //___________________________location1________________
     location[1].hBack.loadBitmapWithNativeSize("background_1.bmp");
     location[1].portal.emplace_back(0.02, 0.89, 0.021, 0.09, 0, "racket.bmp");//портал в локацию 0
@@ -35,6 +36,8 @@ void ProcessSound(const char* name)//проигрывание аудиофайла в формате .wav, фай
 
 float clickTimeOut = 100;
 float clickTime = 0;
+//tdx = player->racket.x;
+//player->tdy = player->racket.y;
 void ProcessInput()
 {
     
@@ -50,7 +53,7 @@ void ProcessInput()
     if (GetAsyncKeyState(VK_RIGHT)) 
     {
         player->racket.x += player->racket.speed,
-            player->tdx = player->racket.x + player->racket.speed;
+        player->tdx = player->racket.x + player->racket.speed;
     }
     if (GetAsyncKeyState(VK_SPACE) && player->inJump == false)
     {
@@ -61,6 +64,7 @@ void ProcessInput()
     player->racket.y += player->gravity - player->jump;
     float s = .9;
     player->jump *= s;
+    player->racket.y = min(window.height - player->racket.height, player->racket.y);
 }
 
 bool CheckCollision(float x1, float y1, float w1, float h1,
@@ -92,14 +96,14 @@ void ProcessPortal()
     }
 }
 
-void ProcessHero() //jump
-{
-    player->racket.y += player->gravity - player->jump;
-    player->racket.y = min(window.height - player->racket.height, player->racket.y);
-    player->jump *= .9;
-    player->racket.dy = player->racket.y + player->gravity - player->jump; // Дельта для вектора движения в следующем кадре по y
-    player->jump = max(player->jump, 0);
-}
+//void ProcessHero() //jump
+//{
+//    player->racket.y += player->gravity - player->jump;
+//    player->racket.y = min(window.height - player->racket.height, player->racket.y);
+//    player->jump *= .9;
+//    player->racket.dy = player->racket.y + player->gravity - player->jump; // Дельта для вектора движения в следующем кадре по y
+//    player->jump = max(player->jump, 0);
+//}
 HANDLE hTimer;
 void TweenDash(int idx)
 {

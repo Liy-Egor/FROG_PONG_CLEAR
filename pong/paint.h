@@ -46,15 +46,15 @@ void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool
 
     DeleteDC(hMemDC); // Удаляем контекст памяти
 }
+    
 
 void ShowRacketAndBall()
 {
     location[player->currentLocation].hBack.showBack();
     player->racket.show();
+    /*player->racket.dy = player->gravity - player->jump;
+    player->racket.dx = player->tdx - player->racket.x;*/
 
-
-    player->tdx = player->racket.x;
-    player->tdy = player->racket.y;
     player->racket.dy = player->gravity - player->jump;
     player->racket.dx = player->tdx - player->racket.x;
     float ddx = player->racket.dx;
@@ -65,14 +65,19 @@ void ShowRacketAndBall()
     for (float i = 0; i < lenght * 2; i++) {
 
         float s = i / lenght;
-        float pixel_x = player->racket.x + ddx * s;
-        float pixel_y = player->racket.y + ddy * s;
+        float pixel_x = player->racket.x + player->racket.width / 2 + ddx * s;
+        float pixel_y = player->racket.y + player->racket.height / 2 +  ddy * s;
+
+        float midX = ((player->racket.x + player->racket.width / 2) ) + ddx * s;
+        float midY = ((player->racket.y + player->racket.height / 2) ) + ddy * s;
+
 
         for (int j = 0; j < location[player->currentLocation].walls.size(); j++)
         {
             auto walls = location[player->currentLocation].walls[j].Sprite;
 
             SetPixel(window.context, pixel_x, pixel_y, RGB(255, 255, 255));
+            //SetPixel(window.context, midX, midY, RGB(255, 255, 0));
 
             if ((pixel_x >= walls.x &&
                 pixel_x <= walls.x + walls.width) &&
@@ -100,7 +105,7 @@ void ShowRacketAndBall()
 
                     if (left < right)
                     {
-                        player->racket.x = walls.x -  player->racket.speed; // ???????? ????? ?????
+                        player->racket.x = walls.x - player->racket.width -   player->racket.speed; // ???????? ????? ?????
 
                     }
                     else
@@ -116,7 +121,7 @@ void ShowRacketAndBall()
 
                     if (down < top)
                     {
-                        player->racket.y = (walls.y  + walls.height) + player->racket.height + 100; // ?????? ????? ?? ???????
+                        player->racket.y = (walls.y  + walls.height) + player->racket.height  ; // ?????? ????? ?? ???????
                         //player.jump *= .4;
                     }
                     else
