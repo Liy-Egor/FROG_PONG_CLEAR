@@ -52,17 +52,16 @@ void ShowRacketAndBall()
 {
     location[player->currentLocation].hBack.showBack();
     player->racket.show();
-    /*player->racket.dy = player->gravity - player->jump;
-    player->racket.dx = player->tdx - player->racket.x;*/
-
+    
     player->racket.dy = player->gravity - player->jump;
     player->racket.dx = player->tdx - player->racket.x;
     float ddx = player->racket.dx;
     float ddy = player->racket.dy;
-
     float lenght = sqrt(pow(ddx, 2) + pow(ddy, 2));
+    
 
-    for (float i = 0; i < lenght * 2; i++) {
+    for (float i = 0; i < lenght; i++) 
+    {
 
         float s = i / lenght;
         float pixel_x = player->racket.x + player->racket.width / 2 + ddx * s;
@@ -70,14 +69,11 @@ void ShowRacketAndBall()
 
         float midX = ((player->racket.x + player->racket.width / 2) ) + ddx * s;
         float midY = ((player->racket.y + player->racket.height / 2) ) + ddy * s;
-
+        SetPixel(window.context, pixel_x, pixel_y, RGB(255, 255, 255));
 
         for (int j = 0; j < location[player->currentLocation].walls.size(); j++)
         {
             auto walls = location[player->currentLocation].walls[j].Sprite;
-
-            SetPixel(window.context, pixel_x, pixel_y, RGB(255, 255, 255));
-            //SetPixel(window.context, midX, midY, RGB(255, 255, 0));
 
             if ((pixel_x >= walls.x &&
                 pixel_x <= walls.x + walls.width) &&
@@ -85,12 +81,6 @@ void ShowRacketAndBall()
                     pixel_y <= walls.y + walls.height))
                 
             {
-
-                float col = i;
-
-
-                auto walls = location[player->currentLocation].walls[j].Sprite;
-
                 float top = pixel_y - walls.y;
                 float down = (walls.y + walls.height) - pixel_y;
                 float left = pixel_x - walls.x;
@@ -105,15 +95,15 @@ void ShowRacketAndBall()
 
                     if (left < right)
                     {
-                        player->racket.x = walls.x - player->racket.width -   player->racket.speed; // ???????? ????? ?????
-
+                        player->racket.x = walls.x - player->racket.width - 2.0f;
+                        player->inJump = true;
                     }
                     else
                     {
-                        player->racket.x = (walls.x + walls.width)  + player->racket.speed;  // ???????? ????? ??????
-
+                        player->racket.x = walls.x + walls.width; 
+                        player->inJump = true;
                     }
-                    // dash_allow = false; // ?? ???? ?????? ????? (????? ????????? ?????????? ? ?????????)
+                    
 
                 }
                 else
@@ -121,23 +111,24 @@ void ShowRacketAndBall()
 
                     if (down < top)
                     {
-                        player->racket.y = (walls.y  + walls.height) + player->racket.height  ; // ?????? ????? ?? ???????
-                        //player.jump *= .4;
+                        player->racket.y = walls.y  + walls.height + i; 
+                        player->inJump = true;
+                        
                     }
                     else
                     {
 
-                        player->racket.y = min(walls.y - player->racket.height - player->gravity, player->racket.y); // ???????? ????? ?? ?????????
-                        player->inJump = false; // ???? ?????????? ?? ?????? (????? ????????? ?????????? ? ?????????)
-
+                        player->racket.y = walls.y - player->racket.height - player->gravity; 
+                        player->inJump = false; 
+                        
                     }
-
+                    
                 }
-
+                
             }
-
+            
         }
-
+        
     }
 
 }
