@@ -4,10 +4,10 @@
 void InitGame()
 {
     player = new player_(0.2, 0.25, 0.023, 0.032, "racket.bmp");
-    player->racket.speed = 35;
+    player->racket.speed = 100;
     //-----------------------------location0_______________
     location[0].hBack.loadBitmapWithNativeSize("background_0.bmp");
-    location[0].portal.emplace_back(0.96, 0.89, 0.021, 0.09, 1, "racket.bmp");//портал в локацию 1
+    location[0].portal.emplace_back(0.96, 0.89, 0.021, 0.2, 1, "racket.bmp");//портал в локацию 1
     location[0].walls.emplace_back(0.5, 0, 0.009, 0.99, "walls.bmp");//левая стена
     location[0].walls.emplace_back(0.98, 0, 0.02, 0.99, "walls.bmp");//правая стена
     //location[0].walls.emplace_back(0, 0.98, 0.999, 0.02, "walls.bmp");//пол

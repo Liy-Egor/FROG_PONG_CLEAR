@@ -95,13 +95,14 @@ void ShowRacketAndBall()
 
                     if (left < right)
                     {
-                        player->racket.x = walls.x - player->racket.width - 2.0f;
-                        player->inJump = true;
+                        player->racket.x = walls.x - player->racket.width - i;
+                        player->racket.x = walls.x - player->racket.width;
+                        //player->inJump = true;
                     }
                     else
                     {
                         player->racket.x = walls.x + walls.width; 
-                        player->inJump = true;
+                        //player->inJump = true;
                     }
                     
 
