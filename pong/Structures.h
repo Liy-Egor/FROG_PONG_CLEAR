@@ -56,6 +56,10 @@ struct sprite {
         int startY = 10;
         ShowBitmap(window.context, startX - (i * (h_w + margin)), startY, h_w, h_w, hBitmap, false);
     }
+   /* bool showAnyBitmap(const char* filename)
+    {
+        return (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    }*/
 
 };
 

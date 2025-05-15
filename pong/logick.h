@@ -4,16 +4,16 @@
 void InitGame()
 {
     player = new player_(0.2, 0.25, 0.023, 0.032, "racket.bmp");
-    player->racket.speed = 100;
+    player->racket.speed = 30;
     //-----------------------------location0_______________
     location[0].hBack.loadBitmapWithNativeSize("background_0.bmp");
     location[0].portal.emplace_back(0.96, 0.89, 0.021, 0.2, 1, "racket.bmp");//портал в локацию 1
-    location[0].walls.emplace_back(0.5, 0, 0.009, 0.99, "walls.bmp");//левая стена
+   // location[0].walls.emplace_back(0.5, 0, 0.009, 0.99, "walls.bmp");//левая стена
     location[0].walls.emplace_back(0.98, 0, 0.02, 0.99, "walls.bmp");//правая стена
     //location[0].walls.emplace_back(0, 0.98, 0.999, 0.02, "walls.bmp");//пол
     location[0].walls.emplace_back(0, 0, 0.999, 0.04, "walls.bmp");//потолок
     location[0].locationObjects.emplace_back(0.3, 0.98, 0.012, 0.021, "ball.bmp", "healing");
-    location[0].locationObjects.emplace_back(0.5, 0.98, 0.012, 0.021, "spike.bmp", "spike");
+    location[0].locationObjects.emplace_back(0.5, 0.98, 0.025, 0.025, "spike.bmp", "spike");
     location[0].locationTexture.emplace_back(0.8, 0.85, 0.15, 0.05, "racket_enemy.bmp");
     location[0].locationTexture.emplace_back(0.4, 0.85, 0.15, 0.05, "racket_enemy.bmp");
     //location[0].locationTexture.emplace_back(0.6, 0.95, 0.15, 0.05, "racket_enemy.bmp");
@@ -36,8 +36,6 @@ void ProcessSound(const char* name)//проигрывание аудиофайла в формате .wav, фай
 
 float clickTimeOut = 100;
 float clickTime = 0;
-//tdx = player->racket.x;
-//player->tdy = player->racket.y;
 void ProcessInput()
 {
     
@@ -65,6 +63,7 @@ void ProcessInput()
     float s = .9;
     player->jump *= s;
     player->racket.y = min(window.height - player->racket.height, player->racket.y);
+    
 }
 
 bool CheckCollision(float x1, float y1, float w1, float h1,
@@ -150,6 +149,7 @@ void CollisionGroup()
 {
     static int lastDamageTime = 0;
     bool spikeCollision = false;
+    player->racket.loadBitmapWithNativeSize("racket.bmp");
     for (int i = 0; i < location[player->currentLocation].locationObjects.size(); ++i)
     {
         Objects& obj = location[player->currentLocation].locationObjects[i];
@@ -160,7 +160,6 @@ void CollisionGroup()
                 player->racket.y + player->racket.height >= obj.Sprite.y &&
                 player->racket.y <= obj.Sprite.y + obj.Sprite.height)
             {
-
                 spikeCollision = true;
                 break;
             }
@@ -182,11 +181,16 @@ void CollisionGroup()
     if (spikeCollision && currenttime > lastDamageTime + 1000) {
         health.current_lives--;
         lastDamageTime = currenttime;
+        player->jump = 200;
+        player->racket.x += 20;
+        player->inJump = true;
+        player->racket.loadBitmapWithNativeSize("walls.bmp");
     }
-    if (health.current_lives <= 0) {
+    /*if (health.current_lives <= 0) {
         MessageBox(window.hWnd, "Game Over!", "Info", MB_OK);
         exit(0);
-    }
+    }*/
+    player->jump *= .3;
 }
 
 
