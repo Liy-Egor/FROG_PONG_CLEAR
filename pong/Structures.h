@@ -12,24 +12,14 @@ POINT mouse;
 
 void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool alpha = false);
 
-
-
-struct {
-    int score, balls;
-    bool action = false;
-} game;
-
 struct {
     HWND hWnd;//хэндл окна
     HDC device_context, context;// два контекста устройства (для буферизации)
     int width, height;//сюда сохраним размеры окна которое создаст программа
 } window;
 
-// HBITMAP hBack;// хэндл для фонового изображения????????????????
-// секция данных игры  
-
 struct sprite {
-    float x, y, width, height, rad, dx, dy, speed, time;
+    float x, y, width, height, rad, dx, dy, speed, time, jump, gravity;
     bool vect_right = true, vect_left = false;
     HBITMAP hBitmap;
 
@@ -56,11 +46,13 @@ struct sprite {
         int startY = 10;
         ShowBitmap(window.context, startX - (i * (h_w + margin)), startY, h_w, h_w, hBitmap, false);
     }
-   /* bool showAnyBitmap(const char* filename)
-    {
-        return (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    }*/
+};
 
+enum class ObjectsTipe
+{
+    spike,
+    healing,
+    frog
 };
 
 struct Texture // структура платформ
@@ -80,14 +72,13 @@ struct Texture // структура платформ
 
 };
 
+
 struct Objects // структура игровых обьектов
 {
-
-
     sprite Sprite;
-    string type;
+    ObjectsTipe type;
 
-    Objects(float p_x, float p_y, float p_width, float p_height, const char* filename, const char* objTipe) {
+    Objects(float p_x, float p_y, float p_width, float p_height, const char* filename, ObjectsTipe objTipe) {
         this->Sprite.x = p_x * window.width;
         this->Sprite.y = p_y * window.height;
         this->Sprite.width = p_width * window.width;
@@ -107,15 +98,13 @@ struct player_ //структура игрока
     int max_lives;
     int current_lives;
     int currentLocation = 0;
-    float gravity = 30;
-    float jump = 0;
+    
+    
     float maxjump = 10;
     bool inJump = false;
-    float tdx;
-    float tdy;
     const int dashDistance = 20;
     bool wasShiftPressed = false;
-    
+    bool colis = false;
     bool dash_allow = true;
 
     player_(int p_health, int p_max_lives, int p_current_lives, const char* filename, const char* filename2)
@@ -134,6 +123,25 @@ struct player_ //структура игрока
         this->racket.width = p_width * window.width;
         this->racket.height = p_height * window.height;
         this->racket.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    }
+
+};
+
+struct enemy_ //структура врагов
+{
+    sprite Sprite;
+    ObjectsTipe tipe;//тип врага
+    float gravity = 0;
+    //bool colis = false;
+    
+    enemy_(float p_x, float p_y, float p_width, float p_height, const char* filename, ObjectsTipe objtipe)
+    {
+        this->Sprite.x = p_x * window.width;
+        this->Sprite.y = p_y * window.height;
+        this->Sprite.width = p_width * window.width;
+        this->Sprite.height = p_height * window.height;
+        this->Sprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+        this->tipe = objtipe;
     }
 
 };
@@ -160,13 +168,12 @@ struct Location_
     vector<Texture> locationTexture;
     vector<Texture> walls;
     vector<Objects> locationObjects;
-    
+    vector<enemy_> enemy;
 };
 
 Location_ location[5];
 
 player_* player;
-
 player_ health{ 40, 5, 3, "health_full.bmp", "health_empty.bmp" };
 
 

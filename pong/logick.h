@@ -5,20 +5,26 @@ void InitGame()
 {
     player = new player_(0.2, 0.25, 0.023, 0.032, "racket.bmp");
     player->racket.speed = 30;
+    player->racket.dx = 0;
+    player->racket.dy = 0;
+    player->racket.jump = 0;
+    player->racket.gravity = 30;
     //-----------------------------location0_______________
     location[0].hBack.loadBitmapWithNativeSize("background_0.bmp");
     location[0].portal.emplace_back(0.96, 0.89, 0.021, 0.2, 1, "racket.bmp");//портал в локацию 1
-   // location[0].walls.emplace_back(0.5, 0, 0.009, 0.99, "walls.bmp");//левая стена
+    location[0].walls.emplace_back(0, 0, 0.009, 0.99, "walls.bmp");//левая стена
     location[0].walls.emplace_back(0.98, 0, 0.02, 0.99, "walls.bmp");//правая стена
-    //location[0].walls.emplace_back(0, 0.98, 0.999, 0.02, "walls.bmp");//пол
+    location[0].walls.emplace_back(0, 0.98, 0.999, 0.02, "walls.bmp");//пол
     location[0].walls.emplace_back(0, 0, 0.999, 0.04, "walls.bmp");//потолок
-    location[0].locationObjects.emplace_back(0.3, 0.98, 0.012, 0.021, "ball.bmp", "healing");
-    location[0].locationObjects.emplace_back(0.5, 0.98, 0.025, 0.025, "spike.bmp", "spike");
+    location[0].locationObjects.emplace_back(0.3, 0.955, 0.02, 0.025, "ball.bmp", ObjectsTipe::healing);
+    location[0].locationObjects.emplace_back(0.5, 0.955, 0.025, 0.025, "spike.bmp", ObjectsTipe::spike);
     location[0].locationTexture.emplace_back(0.8, 0.85, 0.15, 0.05, "racket_enemy.bmp");
     location[0].locationTexture.emplace_back(0.4, 0.85, 0.15, 0.05, "racket_enemy.bmp");
     //location[0].locationTexture.emplace_back(0.6, 0.95, 0.15, 0.05, "racket_enemy.bmp");
     location[0].walls.emplace_back(0.1, 0.8, 0.15, 0.05, "walls.bmp");
-    location[0].walls.emplace_back(0.6, 0.95, 0.15, 0.05, "walls.bmp");
+    location[0].walls.emplace_back(0.6, 0.93, 0.15, 0.05, "walls.bmp");
+    //-----------------------------------------------------------------------------
+    location[0].enemy.emplace_back(0.6, 0.25, 0.023, 0.032, "walls.bmp", ObjectsTipe::frog);
     //___________________________location1________________
     location[1].hBack.loadBitmapWithNativeSize("background_1.bmp");
     location[1].portal.emplace_back(0.02, 0.89, 0.021, 0.09, 0, "racket.bmp");//портал в локацию 0
@@ -34,35 +40,107 @@ void ProcessSound(const char* name)//проигрывание аудиофайла в формате .wav, фай
     PlaySound(TEXT(name), NULL, SND_FILENAME | SND_ASYNC);//переменная name содежрит имя файла. флаг ASYNC позволяет проигрывать звук паралельно с исполнением программы
 }
 
-float clickTimeOut = 100;
-float clickTime = 0;
+
+void tracer_collide()
+{
+    player->colis = false;
+    float lenght = sqrt(pow(player->racket.dx, 2) + pow(player->racket.dy, 2));
+    for (float i = 0; i < lenght; i++)
+    {
+
+        float pixel_x = player->racket.x + player->racket.width / 2 + player->racket.dx / lenght * i;
+        float pixel_y = player->racket.y + player->racket.dy / lenght * i;
+
+        SetPixel(window.context, pixel_x, pixel_y, RGB(255, 255, 255));
+
+        for (int j = 0; j < location[player->currentLocation].walls.size(); j++)
+        {
+
+            auto walls = location[player->currentLocation].walls[j].Sprite;
+            if ((pixel_x >= walls.x  &&
+                pixel_x <= walls.x + walls.width) &&
+                (pixel_y >= walls.y  &&
+                    pixel_y <= walls.y  + walls.height)
+                )
+            {
+                float top = pixel_y - walls.y;
+                float down = (walls.y + walls.height) - pixel_y;
+                float left = pixel_x - walls.x;
+                float right = (walls.x + walls.width) - pixel_x;
+
+                float minX = min(left, right);
+                float minY = min(top, down);
+                player->inJump = false;
+
+                if (minX < minY)
+                {
+                    if (left < right)
+                    {
+
+                        player->racket.x = walls.x - player->racket.width;
+                        player->inJump = true;
+                        break;
+                    }
+                    else
+                    {
+                        player->racket.x = walls.x + walls.width + player->racket.width;
+                        player->inJump = true;
+                        break;
+                    }
+                }
+                else
+                {
+                    if (down < top)
+                    {
+                        player->racket.y = walls.y + walls.height + player->racket.height;
+                        player->inJump = true;
+                        break;
+                    }
+                    else
+                    {
+                        player->racket.y = walls.y  - player->racket.height;
+                        player->inJump = false;
+                        break;
+                    }
+                }
+                player->colis = true;
+            }
+           
+        }
+    }
+}
+
 void ProcessInput()
 {
     
-    player->racket.dx = player->racket.x; // и Дельта для вектора движения если игрок стоит на месте
-    player->tdx = player->racket.x;
-    if (GetAsyncKeyState(VK_LEFT)) 
+    if (!player->colis)
     {
-        player->racket.x -= player->racket.speed;
-        player->tdx = player->racket.x - player->racket.speed;
-        
+        player->racket.x += player->racket.dx;
+
+        player->racket.y += player->racket.dy;
+
     }
 
-    if (GetAsyncKeyState(VK_RIGHT)) 
-    {
-        player->racket.x += player->racket.speed;
-        player->tdx = player->racket.x + player->racket.speed;
+    if (GetAsyncKeyState(VK_LEFT)) {
+        player->racket.dx = -player->racket.speed;
     }
+
+    if (GetAsyncKeyState(VK_RIGHT)) {
+        player->racket.dx = player->racket.speed;
+    }
+
     if (GetAsyncKeyState(VK_SPACE) && player->inJump == false)
     {
-
-        player->jump = 100;
+        player->racket.jump = 110;
         player->inJump = true;
     }
-    player->racket.y += player->gravity - player->jump;
     float s = .9;
-    player->jump *= s;
-    player->racket.y = min(window.height - player->racket.height, player->racket.y);
+    player->racket.jump *= s;
+
+    player->racket.dx *= .5;
+    player->racket.dy = player->racket.gravity - player->racket.jump;
+
+    tracer_collide();
     
 }
 
@@ -153,7 +231,7 @@ void CollisionGroup()
     for (int i = 0; i < location[player->currentLocation].locationObjects.size(); ++i)
     {
         Objects& obj = location[player->currentLocation].locationObjects[i];
-        if (obj.type == "spike")
+        if (obj.type == ObjectsTipe::spike)
         {
             if (player->racket.x + player->racket.width >= obj.Sprite.x &&
                 player->racket.x <= obj.Sprite.x + obj.Sprite.width &&
@@ -164,7 +242,7 @@ void CollisionGroup()
                 break;
             }
         }
-        if (obj.type == "healing")
+        if (obj.type == ObjectsTipe::healing)
         {
             if (player->racket.x + player->racket.width >= obj.Sprite.x &&
                 player->racket.x <= obj.Sprite.x + obj.Sprite.width &&
@@ -181,17 +259,26 @@ void CollisionGroup()
     if (spikeCollision && currenttime > lastDamageTime + 1000) {
         health.current_lives--;
         lastDamageTime = currenttime;
-        player->jump = 200;
+        player->racket.jump = 60;
         player->racket.x += 20;
         player->inJump = true;
         player->racket.loadBitmapWithNativeSize("walls.bmp");
+        
     }
     /*if (health.current_lives <= 0) {
         MessageBox(window.hWnd, "Game Over!", "Info", MB_OK);
         exit(0);
     }*/
-    player->jump *= .3;
+    
 }
+
+//void enemyPhysics()
+//{
+//    for (int i = 0; i < location[player->currentLocation].enemy.size();i++) {
+//        location[player->currentLocation].enemy[i].Sprite.y += location[player->currentLocation].enemy[i].gravity;
+//        if(CheckCollision())
+//    }
+//}
 
 
 
