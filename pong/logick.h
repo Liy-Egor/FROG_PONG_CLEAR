@@ -1,4 +1,4 @@
-#pragma once
+ #pragma once
 #include "Structures.h"
 
 void InitGame()
@@ -22,6 +22,7 @@ void InitGame()
     location[0].locationTexture.emplace_back(0.4, 0.85, 0.15, 0.05, "racket_enemy.bmp");
     //location[0].locationTexture.emplace_back(0.6, 0.95, 0.15, 0.05, "racket_enemy.bmp");
     location[0].walls.emplace_back(0.1, 0.8, 0.15, 0.05, "walls.bmp");
+    location[0].walls.emplace_back(0.3, 0.85, 0.15, 0.05, "walls.bmp");
     location[0].walls.emplace_back(0.6, 0.93, 0.15, 0.05, "walls.bmp");
     //-----------------------------------------------------------------------------
     location[0].enemy.emplace_back(0.6, 0.25, 0.023, 0.032, "walls.bmp", ObjectsTipe::frog);
@@ -48,7 +49,7 @@ void tracer_collide()
     for (float i = 0; i < lenght; i++)
     {
 
-        float pixel_x = player->racket.x + player->racket.width / 2 + player->racket.dx / lenght * i;
+        float pixel_x = player->racket.x + player->racket.width/2 + player->racket.dx / lenght * i;
         float pixel_y = player->racket.y + player->racket.dy / lenght * i;
 
         SetPixel(window.context, pixel_x, pixel_y, RGB(255, 255, 255));
@@ -60,7 +61,7 @@ void tracer_collide()
             if ((pixel_x >= walls.x  &&
                 pixel_x <= walls.x + walls.width) &&
                 (pixel_y >= walls.y  &&
-                    pixel_y <= walls.y  + walls.height)
+                pixel_y <= walls.y  + walls.height)
                 )
             {
                 float top = pixel_y - walls.y;
@@ -77,14 +78,14 @@ void tracer_collide()
                     if (left < right)
                     {
 
-                        player->racket.x = walls.x - player->racket.width;
-                        player->inJump = true;
+                        player->racket.x = pixel_x - player->racket.width;
+                        //player->inJump = true;
                         break;
                     }
                     else
                     {
-                        player->racket.x = walls.x + walls.width + player->racket.width;
-                        player->inJump = true;
+                        player->racket.x = walls.x + walls.width;
+                        //player->inJump = true;
                         break;
                     }
                 }
@@ -92,18 +93,22 @@ void tracer_collide()
                 {
                     if (down < top)
                     {
-                        player->racket.y = walls.y + walls.height + player->racket.height;
-                        player->inJump = true;
+                        //player->racket.y = walls.y + walls.height + player->racket.height;
+                        player->racket.y = pixel_y + player->racket.jump;
+                        player->racket.jump = 48;
+                        //player->inJump = true;
                         break;
                     }
                     else
                     {
-                        player->racket.y = walls.y  - player->racket.height;
-                        player->inJump = false;
+                        player->racket.y = walls.y - player->racket.height;
+                        //player->racket.jump = 0;
+                        //player->inJump = false;
                         break;
                     }
                 }
                 player->colis = true;
+                //return;
             }
            
         }
