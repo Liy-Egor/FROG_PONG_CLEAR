@@ -18,22 +18,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     {
         currenttime = timeGetTime();
 
+        BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);//копируем буфер в окно
+        Sleep(16);//ждем 16 милисекунд (1/количество кадров в секунду)
         GetCursorPos(&mouse);
         ScreenToClient(window.hWnd, &mouse);
         int sz = 5;
         Ellipse(window.context, mouse.x - sz, mouse.y - sz, mouse.x + sz, mouse.y + sz);
 
-        ProcessInput();//опрос клавиатуры
         ShowRacketAndBall();//рисуем фон, ракетку и шарик
+        //ShowEnemy();
         ShowTexture();
         ShowObjects();
         DrawHealth();
         ProcessPortal();
-        //ProcessHero();//прыжок 
+        CollisionGroup();
+        ProcessInput();//опрос клавиатуры
         ProcessDash();//рывок
-        BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);//копируем буфер в окно
-        Sleep(1000);//ждем 16 милисекунд (1/количество кадров в секунду)
-        //CollisionGroup();
     }
 
 }
