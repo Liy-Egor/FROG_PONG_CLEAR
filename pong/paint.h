@@ -62,7 +62,7 @@ void ShowRacketAndBall()
 
     float lenght = sqrt(pow(ddx, 2) + pow(ddy, 2));
 
-    for (float i = 0; i < lenght * 2; i++) {
+    for (float i = 0; i < lenght; i++) {
 
         float s = i / lenght;
         float pixel_x = player->racket.x + player->racket.width / 2 + ddx * s;
@@ -105,8 +105,8 @@ void ShowRacketAndBall()
 
                     if (left < right)
                     {
-                        player->racket.x = walls.x - player->racket.width -   player->racket.speed; // ???????? ????? ?????
-
+                        player->racket.x = pixel_x - player->racket.width; // ???????? ????? ?????
+                        break;
                     }
                     else
                     {
