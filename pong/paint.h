@@ -26,7 +26,7 @@ void CreateMap()
     window.device_context = GetDC(window.hWnd);//из хэндла окна достаем хэндл контекста устройства для рисования
     z.left = 0;
     z.right = window.width * 3;
-    z.bottom = window.height;
+    z.bottom = window.height*1.5;
     z.top = 0;
 
     window.width_z = z.right - z.left;
@@ -71,9 +71,9 @@ void PrintBitblt()
 
     //BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);//копируем буфер в окно
 
-    if (player->racket.x <= window.width / 2)
+    if (player->racket.x <= window.width / 2 && player->racket.y <= window.height)
     {
-        BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, 0, SRCCOPY); // если перс достиг края экрана
+        BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, player->racket.y - window.height + 500, SRCCOPY); // если перс достиг края экрана
 
 
     }
@@ -83,7 +83,7 @@ void PrintBitblt()
     }
     else
     {
-        BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, player->racket.x - window.width / 2, 0, SRCCOPY);//если перс дальше края экрая по х
+        BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, player->racket.x - window.width / 2, player->racket.y - window.height  , SRCCOPY);//если перс дальше края экрая по х
     }
 
 
