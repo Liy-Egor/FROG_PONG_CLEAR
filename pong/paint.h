@@ -19,6 +19,8 @@ void InitWindow()
 
 }
 
+
+
 void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool alpha)
 {
     HBITMAP hbm, hOldbm;
@@ -46,7 +48,14 @@ void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool
 
     DeleteDC(hMemDC); // Удаляем контекст памяти
 }
-    
+
+void CreateMap()
+{
+    RECT z;
+
+
+
+}
 
 void ShowRacketAndBall()
 {
