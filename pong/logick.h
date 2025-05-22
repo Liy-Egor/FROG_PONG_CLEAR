@@ -48,69 +48,74 @@ void tracer_collide()
     float lenght = sqrt(pow(player->racket.dx, 2) + pow(player->racket.dy, 2));
     for (float i = 0; i < lenght; i++)
     {
+        for (float k = 0; k < player->racket.width; k++) {
 
-        float pixel_x = player->racket.x + player->racket.width/2 + player->racket.dx / lenght * i;
-        float pixel_y = player->racket.y + player->racket.dy / lenght * i;
+            float pixel_x = player->racket.x + (player->racket.width / k) + player->racket.dx / lenght * i;
+            float pixel_y = player->racket.y + player->racket.dy / lenght * i;
 
-        SetPixel(window.context, pixel_x, pixel_y, RGB(255, 255, 255));
+            float px = player->racket.x + (player->racket.width / k) + player->racket.dx / lenght * i;
+            float py = player->racket.y + player->racket.dy / lenght * i;
 
-        for (int j = 0; j < location[player->currentLocation].walls.size(); j++)
-        {
-
-            auto walls = location[player->currentLocation].walls[j].Sprite;
-            if ((pixel_x >= walls.x  &&
-                pixel_x <= walls.x + walls.width) &&
-                (pixel_y >= walls.y  &&
-                pixel_y <= walls.y  + walls.height)
-                )
+            SetPixel(window.context, pixel_x, pixel_y, RGB(255, 255, 255));
+            //SetPixel(window.context, px, py, RGB(255, 255, 0));
+            for (int j = 0; j < location[player->currentLocation].walls.size(); j++)
             {
-                float top = pixel_y - walls.y;
-                float down = (walls.y + walls.height) - pixel_y;
-                float left = pixel_x - walls.x;
-                float right = (walls.x + walls.width) - pixel_x;
 
-                float minX = min(left, right);
-                float minY = min(top, down);
-                player->inJump = false;
-
-                if (minX < minY)
+                auto walls = location[player->currentLocation].walls[j].Sprite;
+                if ((pixel_x >= walls.x &&
+                    pixel_x <= walls.x + walls.width) &&
+                    (pixel_y >= walls.y &&
+                        pixel_y <= walls.y + walls.height)
+                    )
                 {
-                    if (left < right)
-                    {
+                    float top = pixel_y - walls.y;
+                    float down = (walls.y + walls.height) - pixel_y;
+                    float left = pixel_x - walls.x;
+                    float right = (walls.x + walls.width) - pixel_x;
 
-                        player->racket.x = pixel_x - player->racket.width;
-                        //player->inJump = true;
-                        break;
+                    float minX = min(left, right);
+                    float minY = min(top, down);
+                    player->inJump = false;
+
+                    if (minX < minY)
+                    {
+                        if (left < right)
+                        {
+
+                            player->racket.x = pixel_x - player->racket.width;
+                            //player->inJump = true;
+                            break;
+                        }
+                        else
+                        {
+                            player->racket.x = walls.x + walls.width;
+                            //player->inJump = true;
+                            break;
+                        }
                     }
                     else
                     {
-                        player->racket.x = walls.x + walls.width;
-                        //player->inJump = true;
-                        break;
+                        if (down < top)
+                        {
+                            //player->racket.y = walls.y + walls.height + player->racket.height;
+                            player->racket.y = pixel_y + player->racket.jump;
+                            player->racket.jump = 48;
+                            //player->inJump = true;
+                            break;
+                        }
+                        else
+                        {
+                            player->racket.y = walls.y - player->racket.height;
+                            //player->racket.jump = 0;
+                            //player->inJump = false;
+                            break;
+                        }
                     }
+                    player->colis = true;
+                    //return;
                 }
-                else
-                {
-                    if (down < top)
-                    {
-                        //player->racket.y = walls.y + walls.height + player->racket.height;
-                        player->racket.y = pixel_y + player->racket.jump;
-                        player->racket.jump = 48;
-                        //player->inJump = true;
-                        break;
-                    }
-                    else
-                    {
-                        player->racket.y = walls.y - player->racket.height;
-                        //player->racket.jump = 0;
-                        //player->inJump = false;
-                        break;
-                    }
-                }
-                player->colis = true;
-                //return;
+
             }
-           
         }
     }
 }
