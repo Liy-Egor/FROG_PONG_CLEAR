@@ -71,20 +71,31 @@ void PrintBitblt()
 
     //BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);//копируем буфер в окно
 
-    if (player->racket.x <= window.width / 2 && player->racket.y <= window.height)
+    if (player->racket.x <= window.width / 2)
     {
-        BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, player->racket.y - window.height + 500, SRCCOPY); // если перс достиг края экрана
+        if (player->racket.y <= window.height) 
+        {
+            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, 0, SRCCOPY); // если перс достиг края экрана
+        }
+        else if (player->racket.y <= window.height_z - window.height)
+        {
+            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0,  window.height_z - window.height, SRCCOPY);
+        }
+        else
+        {
+            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, player->racket.y - window.height + 50, SRCCOPY);
 
-
+        }
     }
-    else if (player->racket.x >= window.width_z - window.width/2)
-    {
-        BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, window.width_z - window.width, 0, SRCCOPY); // если перс достиг края экрана
-    }
-    else
-    {
-        BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, player->racket.x - window.width / 2, player->racket.y - window.height  , SRCCOPY);//если перс дальше края экрая по х
-    }
+  
+    //else if (player->racket.x >= window.width_z - window.width/2)
+    //{
+    //    BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, window.width_z - window.width, player->racket.y - window.height + 150, SRCCOPY); // если перс достиг края экрана
+    //}
+    //else
+    //{
+    //    BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, player->racket.x - window.width / 2, player->racket.y - window.height + 150, SRCCOPY);//если перс дальше края экрая по х
+    //}
 
 
     //else if (player->racket.x < window.width_z - window.width / 2)
