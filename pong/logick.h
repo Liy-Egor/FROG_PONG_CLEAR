@@ -50,22 +50,24 @@ void tracer_collide()
     {
         for (float k = 0; k < player->racket.width; k++) {
 
-            float pixel_x = player->racket.x + (player->racket.width / k) + player->racket.dx / lenght * i;
+            float pixel_x = player->racket.x +  k + player->racket.dx / lenght * i;
             float pixel_y = player->racket.y + player->racket.dy / lenght * i;
 
             float px = player->racket.x + (player->racket.width / k) + player->racket.dx / lenght * i;
             float py = player->racket.y + player->racket.dy / lenght * i;
 
             SetPixel(window.context, pixel_x, pixel_y, RGB(255, 255, 255));
-            //SetPixel(window.context, px, py, RGB(255, 255, 0));
+            /*SetPixel(window.context, px, py, RGB(255, 255, 0));*/
             for (int j = 0; j < location[player->currentLocation].walls.size(); j++)
             {
 
                 auto walls = location[player->currentLocation].walls[j].Sprite;
+
+
                 if ((pixel_x >= walls.x &&
-                    pixel_x <= walls.x + walls.width) &&
+                     pixel_x <= walls.x + walls.width) &&
                     (pixel_y >= walls.y &&
-                        pixel_y <= walls.y + walls.height)
+                     pixel_y <= walls.y + walls.height)
                     )
                 {
                     float top = pixel_y - walls.y;
@@ -82,13 +84,13 @@ void tracer_collide()
                         if (left < right)
                         {
 
-                            player->racket.x = pixel_x - player->racket.width;
+                            player->racket.x = pixel_x - player->racket.width*1.3;
                             //player->inJump = true;
                             break;
                         }
                         else
                         {
-                            player->racket.x = walls.x + walls.width;
+                            player->racket.x = pixel_x + player->racket.width/3;
                             //player->inJump = true;
                             break;
                         }
