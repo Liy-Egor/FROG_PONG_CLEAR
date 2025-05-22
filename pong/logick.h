@@ -11,9 +11,9 @@ void InitGame()
     player->racket.gravity = 30;
     //-----------------------------location0_______________
     location[0].hBack.loadBitmapWithNativeSize("background_0.bmp");
-    location[0].portal.emplace_back(0.96, 0.89, 0.021, 0.2, 1, "racket.bmp");//портал в локацию 1
+    //location[0].portal.emplace_back(0.96, 0.89, 0.021, 0.2, 1, "racket.bmp");//портал в локацию 1
     location[0].walls.emplace_back(0, 0, 0.009, 0.99, "walls.bmp");//левая стена
-    location[0].walls.emplace_back(0.98, 0, 0.02, 0.99, "walls.bmp");//правая стена
+    //location[0].walls.emplace_back(0.98, 0, 0.02, 0.99, "walls.bmp");//правая стена
     location[0].walls.emplace_back(0, 0.98, 0.999, 0.02, "walls.bmp");//пол
     location[0].walls.emplace_back(0, 0, 0.999, 0.04, "walls.bmp");//потолок
     location[0].locationObjects.emplace_back(0.3, 0.955, 0.02, 0.025, "ball.bmp", ObjectsTipe::healing);

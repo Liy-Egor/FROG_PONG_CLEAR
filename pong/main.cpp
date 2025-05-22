@@ -9,18 +9,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
 
     InitWindow();//здесь инициализируем все что нужно для рисования в окне
-
+    CreateMap();
     InitGame();//здесь инициализируем переменные игры
     //ShowCursor(FALSE);
+    
 
 
     while (!GetAsyncKeyState(VK_ESCAPE))
     {
         currenttime = timeGetTime();
 
-        BitBlt(window.device_context, 0,0, window.width, window.height, window.context, 0, 0, SRCCOPY);//копируем буфер в окно
-
-        
+        PrintBitblt(); //копируем буфер в окно и отрисовывает окно за игроком
 
         Sleep(16);//ждем 16 милисекунд (1/количество кадров в секунду)
         GetCursorPos(&mouse);

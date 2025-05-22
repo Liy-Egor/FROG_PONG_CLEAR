@@ -16,6 +16,7 @@ struct {
     HWND hWnd;//хэндл окна
     HDC device_context, context;// два контекста устройства (для буферизации)
     int width, height;//сюда сохраним размеры окна которое создаст программа
+    int width_z, height_z;
 } window;
 
 struct sprite {
@@ -36,7 +37,7 @@ struct sprite {
 
     void showBack()
     {
-        ShowBitmap(window.context, 0, 0, window.width, window.height, hBitmap, false);
+        ShowBitmap(window.context, 0, 0, window.width_z, window.height_z, hBitmap, false);
     }
 
     void showHealth(int i, int h_w)
@@ -62,10 +63,10 @@ struct Texture // структура платформ
 
 
     Texture(float p_x, float p_y, float p_width, float p_height, const char* filename) {
-        this->Sprite.x = p_x * window.width;
-        this->Sprite.y = p_y * window.height;
-        this->Sprite.width = p_width * window.width;
-        this->Sprite.height = p_height * window.height;
+        this->Sprite.x = p_x * window.width_z;
+        this->Sprite.y = p_y * window.height_z;
+        this->Sprite.width = p_width * window.width_z;
+        this->Sprite.height = p_height * window.height_z;
         this->Sprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
 
     }

@@ -19,7 +19,24 @@ void InitWindow()
 
 }
 
+void CreateMap()
+{
+    RECT z;
+    GetClientRect(window.hWnd, &z);
+    window.device_context = GetDC(window.hWnd);//из хэндла окна достаем хэндл контекста устройства для рисования
+    z.left = 0;
+    z.right = window.width * 3;
+    z.bottom = window.height;
+    z.top = 0;
 
+    window.width_z = z.right - z.left;
+    window.height_z = z.bottom - z.top;
+
+    window.context = CreateCompatibleDC(window.device_context);//второй буфер
+    SelectObject(window.context, CreateCompatibleBitmap(window.device_context, window.width_z, window.height_z));//привязываем окно к контексту
+    GetClientRect(window.hWnd, &z);
+
+}
 
 void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool alpha)
 {
@@ -49,11 +66,40 @@ void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool
     DeleteDC(hMemDC); // Удаляем контекст памяти
 }
 
-void CreateMap()
+void PrintBitblt()
 {
-    RECT z;
+
+    //BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);//копируем буфер в окно
+
+    if (player->racket.x <= window.width / 2)
+    {
+        BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, 0, SRCCOPY); // если перс достиг края экрана
 
 
+    }
+    else if (player->racket.x >= window.width_z - window.width/2)
+    {
+        BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, window.width_z - window.width, 0, SRCCOPY); // если перс достиг края экрана
+    }
+    else
+    {
+        BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, player->racket.x - window.width / 2, 0, SRCCOPY);//если перс дальше края экрая по х
+    }
+
+
+    //else if (player->racket.x < window.width_z - window.width / 2)
+    //{
+
+
+
+
+    //BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, 0, SRCCOPY); // если перс достиг края экрана
+
+    //}
+
+
+   
+    
 
 }
 
