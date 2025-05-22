@@ -75,7 +75,7 @@ void PrintBitblt()
     {
         if (player->racket.y <= window.height) 
         {
-            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, 0, SRCCOPY); // если перс достиг края экрана
+            BitBlt(window.device_context, 0, 0, window.width_z , window.height_z, window.context, 0, 0, SRCCOPY); // если перс достиг края экрана
         }
         else if (player->racket.y <= window.height_z - window.height)
         {
@@ -83,19 +83,19 @@ void PrintBitblt()
         }
         else
         {
-            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, player->racket.y - window.height + 50, SRCCOPY);
+            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, player->racket.y - window.height + 500, SRCCOPY);
 
         }
     }
   
-    //else if (player->racket.x >= window.width_z - window.width/2)
-    //{
-    //    BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, window.width_z - window.width, player->racket.y - window.height + 150, SRCCOPY); // если перс достиг края экрана
-    //}
-    //else
-    //{
-    //    BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, player->racket.x - window.width / 2, player->racket.y - window.height + 150, SRCCOPY);//если перс дальше края экрая по х
-    //}
+    else if (player->racket.x >= window.width_z - window.width/2)
+    {
+        BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, window.width_z - window.width, player->racket.y - window.height + 150, SRCCOPY); // если перс достиг края экрана
+    }
+    else
+    {
+        BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, player->racket.x - window.width / 2, player->racket.y - window.height + 150, SRCCOPY);//если перс дальше края экрая по х
+    }
 
 
     //else if (player->racket.x < window.width_z - window.width / 2)
