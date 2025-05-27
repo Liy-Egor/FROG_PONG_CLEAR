@@ -35,6 +35,7 @@ void InitGame()
     location[0].walls.emplace_back(0.8, 0.83, 0.15, 0.05, "walls.bmp");
     //-----------------------------------------------------------------------------
     location[0].enemy.emplace_back(0.6, 0.25, 0.023, 0.032, "walls.bmp", ObjectsTipe::frog);
+   
     //___________________________location1________________
     location[1].hBack.loadBitmapWithNativeSize("background_1.bmp");
     location[1].portal.emplace_back(0.02, 0.89, 0.021, 0.09, 0, "racket.bmp");//портал в локацию 0
@@ -174,6 +175,106 @@ bool CheckCollision(float x1, float y1, float w1, float h1,
         y1 + h1 > y2;
 }
 
+void EnemyColise()
+{
+    for (int q = 0;q < location[player->currentLocation].enemy.size(); q++)
+    {
+        auto enemy = location[player->currentLocation].enemy[q];
+        location[player->currentLocation].enemy[q].colis = false;
+        float lenght = sqrt(pow(enemy.Sprite.dx, 2) + pow(enemy.Sprite.dy, 2));
+        for (float i = 0; i < lenght; i++)
+        {
+            for (float k = 0; k < enemy.Sprite.width; k++) {
+
+                float pixel_x = enemy.Sprite.x + k + enemy.Sprite.dx / lenght * i;
+                float pixel_y = enemy.Sprite.y + enemy.Sprite.dy / lenght * i;
+
+                float px = enemy.Sprite.x + (enemy.Sprite.width / k) + enemy.Sprite.dx / lenght * i;
+                float py = enemy.Sprite.y + enemy.Sprite.dy / lenght * i;
+
+                SetPixel(window.context, pixel_x, pixel_y, RGB(255, 255, 255));
+                /*SetPixel(window.context, px, py, RGB(255, 255, 0));*/
+                for (int j = 0; j < location[player->currentLocation].walls.size(); j++)
+                {
+
+                    auto walls = location[player->currentLocation].walls[j].Sprite;
+
+
+                    if ((pixel_x >= walls.x &&
+                        pixel_x <= walls.x + walls.width) &&
+                        (pixel_y >= walls.y &&
+                            pixel_y <= walls.y + walls.height)
+                        )
+                    {
+                        float top = pixel_y - walls.y;
+                        float down = (walls.y + walls.height) - pixel_y;
+                        float left = pixel_x - walls.x;
+                        float right = (walls.x + walls.width) - pixel_x;
+
+                        float minX = min(left, right);
+                        float minY = min(top, down);
+                        player->inJump = false;
+
+                        if (minX < minY)
+                        {
+                            if (left < right)
+                            {
+
+                                location[player->currentLocation].enemy[q].Sprite.x = pixel_x - enemy.Sprite.width * 1.3;
+                                //player->inJump = true;
+                                break;
+                            }
+                            else
+                            {
+                                location[player->currentLocation].enemy[q].Sprite.x = pixel_x + enemy.Sprite.width / 3;
+                                //player->inJump = true;
+                                break;
+                            }
+                        }
+                        else
+                        {
+                            if (down < top)
+                            {
+                                location[player->currentLocation].enemy[q].Sprite.y = pixel_y + enemy.Sprite.jump;
+                                
+                                break;
+                            }
+                            else
+                            {
+                                location[player->currentLocation].enemy[q].Sprite.y = walls.y - enemy.Sprite.height;
+                                location[player->currentLocation].enemy[q].Sprite.x = +location[player->currentLocation].enemy[q].step;
+                                //player->inJump = false;
+                                break;
+                            }
+                        }
+                        location[player->currentLocation].enemy[q].colis = true;
+                        //return;
+                    }
+
+                }
+            }
+        }
+        
+    }
+
+}
+
+void EnemyPhisics()
+{
+    for (int q = 0;q < location[player->currentLocation].enemy.size(); q++)
+    {
+        location[player->currentLocation].enemy[q].Sprite.dx = location[player->currentLocation].enemy[q].Sprite.x 
+            + location[player->currentLocation].enemy[q].step;
+        location[player->currentLocation].enemy[q].Sprite.dy = location[player->currentLocation].enemy[q].Sprite.y 
+            + location[player->currentLocation].enemy[q].gravity;
+        /*if (!location[player->currentLocation].enemy[q].colis)
+        {*/
+            //location[player->currentLocation].enemy[q].Sprite.y = +location[player->currentLocation].enemy[q].gravity;
+        //}
+        
+    }
+    EnemyColise();
+}
 
 void ProcessPortal()
 {

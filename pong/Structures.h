@@ -22,6 +22,7 @@ struct {
 struct sprite {
     float x, y, width, height, rad, dx, dy, speed, time, jump, gravity;
     bool vect_right = true, vect_left = false;
+    bool colis;
     HBITMAP hBitmap;
 
     void loadBitmapWithNativeSize(const char* filename)
@@ -80,10 +81,10 @@ struct Objects // структура игровых обьектов
     ObjectsTipe type;
 
     Objects(float p_x, float p_y, float p_width, float p_height, const char* filename, ObjectsTipe objTipe) {
-        this->Sprite.x = p_x * window.width;
-        this->Sprite.y = p_y * window.height;
-        this->Sprite.width = p_width * window.width;
-        this->Sprite.height = p_height * window.height;
+        this->Sprite.x = p_x * window.width_z;
+        this->Sprite.y = p_y * window.height_z;
+        this->Sprite.width = p_width * window.width_z;
+        this->Sprite.height = p_height * window.height_z;
         this->Sprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
         this->type = objTipe;
 
@@ -132,8 +133,9 @@ struct enemy_ //структура врагов
 {
     sprite Sprite;
     ObjectsTipe tipe;//тип врага
-    float gravity = 0;
-    //bool colis = false;
+    float gravity = 30;
+    float step = 30;
+    bool colis = false;
     
     enemy_(float p_x, float p_y, float p_width, float p_height, const char* filename, ObjectsTipe objtipe)
     {

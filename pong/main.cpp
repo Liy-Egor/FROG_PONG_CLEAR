@@ -28,7 +28,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         Ellipse(window.context, mouse.x - sz, mouse.y - sz, mouse.x + sz, mouse.y + sz);
 
         ShowRacketAndBall();//рисуем фон, ракетку и шарик
-        //ShowEnemy();
+        ShowEnemy();
+        //EnemyPhisics();
         ShowTexture();
         ShowObjects();
         DrawHealth();
