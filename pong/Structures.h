@@ -105,6 +105,7 @@ struct player_ //структура игрока
     float maxjump = 10;
     bool inJump = false;
     const int dashDistance = 20;
+    bool inJumpBot = false;
     bool wasShiftPressed = false;
     bool colis = false;
     bool dash_allow = true;
@@ -134,6 +135,8 @@ struct enemy_ //структура врагов
     sprite Sprite;
     ObjectsTipe tipe;//тип врага
     float gravity = 30;
+    float jump = 100;
+    float inJump;
     float step = 30;
     bool colis = false;
     

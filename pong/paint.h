@@ -10,11 +10,11 @@ void InitWindow()
 
     RECT r;
     GetClientRect(window.hWnd, &r);
-    window.device_context = GetDC(window.hWnd);//из хэндла окна достаем хэндл контекста устройства для рисования
-    window.width = r.right - r.left;//определяем размеры и сохраняем
+    window.device_context = GetDC(window.hWnd);//?? ?????? ???? ??????? ????? ????????? ?????????? ??? ?????????
+    window.width = r.right - r.left;//?????????? ??????? ? ?????????
     window.height = r.bottom - r.top;
-    window.context = CreateCompatibleDC(window.device_context);//второй буфер
-    SelectObject(window.context, CreateCompatibleBitmap(window.device_context, window.width, window.height));//привязываем окно к контексту
+    window.context = CreateCompatibleDC(window.device_context);//?????? ?????
+    SelectObject(window.context, CreateCompatibleBitmap(window.device_context, window.width, window.height));//??????????? ???? ? ?????????
     GetClientRect(window.hWnd, &r);
 
 }
@@ -23,17 +23,17 @@ void CreateMap()
 {
     RECT z;
     GetClientRect(window.hWnd, &z);
-    window.device_context = GetDC(window.hWnd);//из хэндла окна достаем хэндл контекста устройства для рисования
+    window.device_context = GetDC(window.hWnd);//?? ?????? ???? ??????? ????? ????????? ?????????? ??? ?????????
     z.left = 0;
     z.right = window.width * 3;
-    z.bottom = window.height*3;
+    z.bottom = window.height * 2;
     z.top = 0;
 
     window.width_z = z.right - z.left;
     window.height_z = z.bottom - z.top;
 
-    window.context = CreateCompatibleDC(window.device_context);//второй буфер
-    SelectObject(window.context, CreateCompatibleBitmap(window.device_context, window.width_z, window.height_z));//привязываем окно к контексту
+    window.context = CreateCompatibleDC(window.device_context);//?????? ?????
+    SelectObject(window.context, CreateCompatibleBitmap(window.device_context, window.width_z, window.height_z));//??????????? ???? ? ?????????
     GetClientRect(window.hWnd, &z);
 
 }
@@ -44,75 +44,88 @@ void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool
     HDC hMemDC;
     BITMAP bm;
 
-    hMemDC = CreateCompatibleDC(hDC); // Создаем контекст памяти, совместимый с контекстом отображения
-    hOldbm = (HBITMAP)SelectObject(hMemDC, hBitmapBall);// Выбираем изображение bitmap в контекст памяти
+    hMemDC = CreateCompatibleDC(hDC); // ??????? ???????? ??????, ??????????? ? ?????????? ???????????
+    hOldbm = (HBITMAP)SelectObject(hMemDC, hBitmapBall);// ???????? ??????????? bitmap ? ???????? ??????
 
-    if (hOldbm) // Если не было ошибок, продолжаем работу
+    if (hOldbm) // ???? ?? ???? ??????, ?????????? ??????
     {
-        GetObject(hBitmapBall, sizeof(BITMAP), (LPSTR)&bm); // Определяем размеры изображения
+        GetObject(hBitmapBall, sizeof(BITMAP), (LPSTR)&bm); // ?????????? ??????? ???????????
 
         if (alpha)
         {
-            TransparentBlt(window.context, x, y, x1, y1, hMemDC, 0, 0, x1, y1, RGB(0, 0, 0));//все пиксели черного цвета будут интепретированы как прозрачные
+            TransparentBlt(window.context, x, y, x1, y1, hMemDC, 0, 0, x1, y1, RGB(0, 0, 0));//??? ??????? ??????? ????? ????? ??????????????? ??? ??????????
         }
         else
         {
-            StretchBlt(hDC, x, y, x1, y1, hMemDC, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY); // Рисуем изображение bitmap
+            StretchBlt(hDC, x, y, x1, y1, hMemDC, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY); // ?????? ??????????? bitmap
         }
 
-        SelectObject(hMemDC, hOldbm);// Восстанавливаем контекст памяти
+        SelectObject(hMemDC, hOldbm);// ??????????????? ???????? ??????
     }
 
-    DeleteDC(hMemDC); // Удаляем контекст памяти
+    DeleteDC(hMemDC); // ??????? ???????? ??????
 }
 
 void PrintBitblt()
 {
 
-    //BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);//копируем буфер в окно
+    //BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);//???????? ????? ? ????
 
     if (player->racket.x <= window.width / 2)
     {
-        if (player->racket.y <= window.height/2) 
+        if (player->racket.y <= window.height / 2)
         {
-            BitBlt(window.device_context, 0, 0, window.width_z , window.height_z, window.context, 0, 0, SRCCOPY); // если перс достиг края экрана
+            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, 0, SRCCOPY); // ???? ???? ?????? ???? ??????
         }
-        else if (player->racket.y <= window.height_z - window.height/2)
+        else if (player->racket.y <= window.height_z - window.height / 2)
         {
-            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, player->racket.y - window.height/2, SRCCOPY);
+            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, player->racket.y - window.height / 2, SRCCOPY);
         }
         else
         {
-            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, player->racket.y - window.height, SRCCOPY);
+            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, window.height_z - window.height, SRCCOPY);
 
         }
     }
-  
-    else if (player->racket.x >= window.width_z - window.width/2)
+
+    else if (player->racket.x >= window.width / 2)
     {
-        BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, window.width_z - window.width, player->racket.y - window.height + 150, SRCCOPY); // если перс достиг края экрана
+
+        if (player->racket.y <= window.height / 2)
+        {
+            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, player->racket.x - window.width / 2, 0, SRCCOPY); // ???? ???? ?????? ???? ??????
+        }
+        else if (player->racket.y <= window.height_z - window.height / 2)
+        {
+            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, player->racket.x - window.width / 2, player->racket.y - window.height / 2, SRCCOPY);
+        }
+        else
+        {
+            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, player->racket.x - window.width / 2, window.height_z - window.height, SRCCOPY);
+
+        }
+
     }
     else
     {
-        BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, player->racket.x - window.width / 2, player->racket.y - window.height + 150, SRCCOPY);//если перс дальше края экрая по х
+
+        if (player->racket.y <= window.height / 2)
+        {
+            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, window.width_z, 0, SRCCOPY); // ???? ???? ?????? ???? ??????
+        }
+        else if (player->racket.y <= window.height_z - window.height / 2)
+        {
+            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, window.width_z, player->racket.y - window.height / 2, SRCCOPY);
+        }
+        else
+        {
+            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, window.width_z, window.height_z - window.height, SRCCOPY);
+
+        }
+
     }
-
-
-    //else if (player->racket.x < window.width_z - window.width / 2)
-    //{
-
-
-
-
-    //BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, 0, SRCCOPY); // если перс достиг края экрана
-
-    //}
-
-
-   
-    
-
 }
+
 
 void ShowRacketAndBall()
 {

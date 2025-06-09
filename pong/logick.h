@@ -34,8 +34,7 @@ void InitGame()
     location[0].walls.emplace_back(0.6, 0.93, 0.15, 0.05, "walls.bmp");
     location[0].walls.emplace_back(0.8, 0.83, 0.15, 0.05, "walls.bmp");
     //-----------------------------------------------------------------------------
-    location[0].enemy.emplace_back(0.6, 0.25, 0.023, 0.032, "walls.bmp", ObjectsTipe::frog);
-   
+    location[0].enemy.emplace_back(0.6, 0.25, 0.023, 0.05, "enemy1.bmp", ObjectsTipe::frog);
     //___________________________location1________________
     location[1].hBack.loadBitmapWithNativeSize("background_1.bmp");
     location[1].portal.emplace_back(0.02, 0.89, 0.021, 0.09, 0, "racket.bmp");//портал в локацию 0
@@ -54,30 +53,40 @@ void ProcessSound(const char* name)//проигрывание аудиофайла в формате .wav, фай
 
 void tracer_collide()
 {
-    player->colis = false;
+    bool coll_x_found = false;
+    bool coll_y_found = false;
+
     float lenght = sqrt(pow(player->racket.dx, 2) + pow(player->racket.dy, 2));
     for (float i = 0; i < lenght; i++)
     {
-        for (float k = 0; k < player->racket.width; k++) {
+        if (coll_x_found && coll_y_found) return;
 
-            float pixel_x = player->racket.x +  k + player->racket.dx / lenght * i;
-            float pixel_y = player->racket.y + player->racket.dy / lenght * i;
+        for (int k = 0; k < 4; k++)
+        {
+            //if (coll_x_found|| coll_y_found) break;
 
-            float px = player->racket.x + (player->racket.width / k) + player->racket.dx / lenght * i;
-            float py = player->racket.y + player->racket.dy / lenght * i;
 
-            SetPixel(window.context, pixel_x, pixel_y, RGB(255, 255, 255));
-            /*SetPixel(window.context, px, py, RGB(255, 255, 0));*/
             for (int j = 0; j < location[player->currentLocation].walls.size(); j++)
             {
+                float Bbox[] = {
+                    player->racket.x + player->racket.dx * i / lenght, player->racket.y + player->racket.dy * i / lenght,
+                    player->racket.x + player->racket.width + player->racket.dx * i / lenght - 1, player->racket.y + player->racket.dy * i / lenght,
+                    player->racket.x + player->racket.width + player->racket.dx * i / lenght - 1, player->racket.y + player->racket.height + player->racket.dy * i / lenght - 1,
+                    player->racket.x + player->racket.dx * i / lenght, player->racket.y + player->racket.height + player->racket.dy * i / lenght - 1
+                };
+
+                float pixel_x = Bbox[k * 2];
+                float pixel_y = Bbox[k * 2 + 1];
+
+                SetPixel(window.context, pixel_x, pixel_y, RGB(255, 255, 255));
+
+
 
                 auto walls = location[player->currentLocation].walls[j].Sprite;
-
-
                 if ((pixel_x >= walls.x &&
-                     pixel_x <= walls.x + walls.width) &&
+                    pixel_x <= walls.x + walls.width) &&
                     (pixel_y >= walls.y &&
-                     pixel_y <= walls.y + walls.height)
+                        pixel_y <= walls.y + walls.height)
                     )
                 {
                     float top = pixel_y - walls.y;
@@ -89,59 +98,146 @@ void tracer_collide()
                     float minY = min(top, down);
                     player->inJump = false;
 
-                    if (minX < minY)
+                    if (minX < minY && !coll_x_found)
                     {
+                        player->racket.dx = 0;
+                        coll_x_found = true;
+                        j++;
+
                         if (left < right)
                         {
-
-                            player->racket.x = pixel_x - player->racket.width*1.3;
-                            //player->inJump = true;
-                            break;
+                            player->racket.x = walls.x - player->racket.width - 1;
                         }
                         else
                         {
-                            player->racket.x = pixel_x + player->racket.width/3;
-                            //player->inJump = true;
-                            break;
+                            player->racket.x = walls.x + walls.width + 1;
                         }
                     }
-                    else
+
+                    if (minX >= minY && !coll_y_found)
                     {
+                        player->racket.dy = 0;
+                        coll_y_found = true;
+                        j++;
+
                         if (down < top)
                         {
-                            //player->racket.y = walls.y + walls.height + player->racket.height;
-                            player->racket.y = pixel_y + player->racket.jump;
-                            player->racket.jump = 48;
-                            //player->inJump = true;
-                            break;
+                            player->racket.y = walls.y + walls.height + 1;
+                            player->racket.jump = 30;
                         }
                         else
                         {
-                            player->racket.y = walls.y - player->racket.height;
-                            //player->racket.jump = 0;
-                            //player->inJump = false;
-                            break;
+                            player->racket.y = walls.y - player->racket.height - 1;
+                            player->inJumpBot = false;
                         }
                     }
-                    player->colis = true;
-                    //return;
+
                 }
 
             }
         }
+
     }
+
+    if (!coll_x_found) player->racket.x += player->racket.dx;
+    if (!coll_y_found) player->racket.y += player->racket.dy;
 }
+
+void tracer_enemy()
+{
+    bool coll_x_found = false;
+    bool coll_y_found = false;
+    float lenght = sqrt(pow(player->racket.dx, 2) + pow(player->racket.dy, 2));
+    for (int i = 0; i < location[player->currentLocation].enemy.size();i++)
+    {
+        if (coll_x_found && coll_y_found) return;
+        auto enemy = location[player->currentLocation].enemy[i].Sprite;
+        for (int k = 0; k < 4; k++)
+        {
+            //if (coll_x_found|| coll_y_found) break;
+
+
+            for (int j = 0; j < location[player->currentLocation].walls.size(); j++)
+            {
+                float Bbox[] = {
+                    enemy.x + enemy.dx * i / lenght, enemy.y + enemy.dy * i / lenght,
+                    enemy.x + enemy.width + enemy.dx * i / lenght - 1, enemy.y + enemy.dy * i / lenght,
+                    enemy.x + enemy.width + enemy.dx * i / lenght - 1, enemy.y + enemy.height + enemy.dy * i / lenght - 1,
+                    enemy.x + enemy.dx * i / lenght, enemy.y + enemy.height + enemy.dy * i / lenght - 1
+                };
+
+                float pixel_x = Bbox[k * 2];
+                float pixel_y = Bbox[k * 2 + 1];
+
+                SetPixel(window.context, pixel_x, pixel_y, RGB(255, 255, 255));
+
+
+
+                auto walls = location[player->currentLocation].walls[j].Sprite;
+                if ((pixel_x >= walls.x &&
+                    pixel_x <= walls.x + walls.width) &&
+                    (pixel_y >= walls.y &&
+                        pixel_y <= walls.y + walls.height)
+                    )
+                {
+                    float top = pixel_y - walls.y;
+                    float down = (walls.y + walls.height) - pixel_y;
+                    float left = pixel_x - walls.x;
+                    float right = (walls.x + walls.width) - pixel_x;
+
+                    float minX = min(left, right);
+                    float minY = min(top, down);
+                    location[player->currentLocation].enemy[i].inJump = false;
+
+                    if (minX < minY && !coll_x_found)
+                    {
+                        location[player->currentLocation].enemy[i].Sprite.dx = 0;
+                        coll_x_found = true;
+                        j++;
+
+                        if (left < right)
+                        {
+                            location[player->currentLocation].enemy[i].Sprite.x = walls.x - enemy.width - 1;
+                        }
+                        else
+                        {
+                            location[player->currentLocation].enemy[i].Sprite.x = walls.x + walls.width + 1;
+                        }
+                    }
+
+                    if (minX >= minY && !coll_y_found)
+                    {
+                        location[player->currentLocation].enemy[i].Sprite.dy = 0;
+                        coll_y_found = true;
+                        j++;
+
+                        if (down < top)
+                        {
+                            location[player->currentLocation].enemy[i].Sprite.y = walls.y + walls.height + 1;
+                            location[player->currentLocation].enemy[i].jump = 30;
+                        }
+                        else
+                        {
+                            location[player->currentLocation].enemy[i].Sprite.y = walls.y - enemy.height - 1;
+                            location[player->currentLocation].enemy[i].Sprite.x -= location[player->currentLocation].enemy[i].Sprite.dx;
+                            //player->inJumpBot = false;
+                        }
+                    }
+
+                }
+
+            }
+        }
+        //if (!coll_x_found) location[player->currentLocation].enemy[i].Sprite.x += location[player->currentLocation].enemy[i].Sprite.dx;
+        if (!coll_y_found) location[player->currentLocation].enemy[i].Sprite.y += location[player->currentLocation].enemy[i].Sprite.dy;
+    }
+   
+}
+
 
 void ProcessInput()
 {
-    
-    if (!player->colis)
-    {
-        player->racket.x += player->racket.dx;
 
-        player->racket.y += player->racket.dy;
-
-    }
 
     if (GetAsyncKeyState(VK_LEFT)) {
         player->racket.dx = -player->racket.speed;
@@ -151,9 +247,10 @@ void ProcessInput()
         player->racket.dx = player->racket.speed;
     }
 
-    if (GetAsyncKeyState(VK_SPACE) && player->inJump == false)
+    if (GetAsyncKeyState(VK_SPACE) && player->inJump == false && player->inJumpBot == false)
     {
         player->racket.jump = 110;
+        player->inJumpBot = true;
         player->inJump = true;
     }
     float s = .9;
@@ -162,9 +259,21 @@ void ProcessInput()
     player->racket.dx *= .5;
     player->racket.dy = player->racket.gravity - player->racket.jump;
 
+
+    for (int i = 0; i < location[player->currentLocation].enemy.size();i++) 
+    {
+        location[player->currentLocation].enemy[i].jump *= s;
+        location[player->currentLocation].enemy[i].Sprite.dy = location[player->currentLocation].enemy[i].gravity - location[player->currentLocation].enemy[i].jump;
+        location[player->currentLocation].enemy[i].Sprite.dx = location[player->currentLocation].enemy[i].step;
+        //location[player->currentLocation].enemy[i].Sprite.dy = 0;
+        location[player->currentLocation].enemy[i].Sprite.dx *= .5;
+        tracer_enemy();
+    }
     tracer_collide();
     
 }
+
+
 
 bool CheckCollision(float x1, float y1, float w1, float h1,
     float x2, float y2, float w2, float h2)
