@@ -71,15 +71,15 @@ void PrintBitblt()
 
     //BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);//???????? ????? ? ????
 
-    if (player->racket.x <= window.width / 2)
+    if (player->Sprite.x <= window.width / 2)
     {
-        if (player->racket.y <= window.height / 2)
+        if (player->Sprite.y <= window.height / 2)
         {
             BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, 0, SRCCOPY); // ???? ???? ?????? ???? ??????
         }
-        else if (player->racket.y <= window.height_z - window.height / 2)
+        else if (player->Sprite.y <= window.height_z - window.height / 2)
         {
-            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, player->racket.y - window.height / 2, SRCCOPY);
+            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, player->Sprite.y - window.height / 2, SRCCOPY);
         }
         else
         {
@@ -88,20 +88,20 @@ void PrintBitblt()
         }
     }
 
-    else if (player->racket.x >= window.width / 2)
+    else if (player->Sprite.x >= window.width / 2)
     {
 
-        if (player->racket.y <= window.height / 2)
+        if (player->Sprite.y <= window.height / 2)
         {
-            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, player->racket.x - window.width / 2, 0, SRCCOPY); // ???? ???? ?????? ???? ??????
+            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, player->Sprite.x - window.width / 2, 0, SRCCOPY); // ???? ???? ?????? ???? ??????
         }
-        else if (player->racket.y <= window.height_z - window.height / 2)
+        else if (player->Sprite.y <= window.height_z - window.height / 2)
         {
-            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, player->racket.x - window.width / 2, player->racket.y - window.height / 2, SRCCOPY);
+            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, player->Sprite.x - window.width / 2, player->Sprite.y - window.height / 2, SRCCOPY);
         }
         else
         {
-            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, player->racket.x - window.width / 2, window.height_z - window.height, SRCCOPY);
+            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, player->Sprite.x - window.width / 2, window.height_z - window.height, SRCCOPY);
 
         }
 
@@ -109,13 +109,13 @@ void PrintBitblt()
     else
     {
 
-        if (player->racket.y <= window.height / 2)
+        if (player->Sprite.y <= window.height / 2)
         {
             BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, window.width_z, 0, SRCCOPY); // ???? ???? ?????? ???? ??????
         }
-        else if (player->racket.y <= window.height_z - window.height / 2)
+        else if (player->Sprite.y <= window.height_z - window.height / 2)
         {
-            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, window.width_z, player->racket.y - window.height / 2, SRCCOPY);
+            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, window.width_z, player->Sprite.y - window.height / 2, SRCCOPY);
         }
         else
         {
@@ -130,14 +130,17 @@ void PrintBitblt()
 void ShowRacketAndBall()
 {
     location[player->currentLocation].hBack.showBack();
-    player->racket.show();
+    player->Sprite.show();
 }
 
 void ShowEnemy()
 {
-    for (int i = 0; i < location[player->currentLocation].enemy.size();i++) {
-        location[player->currentLocation].enemy[i].Sprite.show();
-    }
+    /*for (int i = 0; i < location[player->currentLocation].enemy.size();i++) {
+        location[Sprite->currentLocation].enemy[i].Sprite.show();
+    }*/
+    wolf->Sprite.show();
+
+
 }
 
 void ShowTexture()
@@ -158,15 +161,15 @@ void ShowObjects()
     }
 }
 
-void DrawHealth()
-{
-   
-    for (int i = 0; i < health.max_lives; i++)
-    {
-        if (i < health.current_lives)
-        {
-            health.hHealthFull.showHealth(i, health.health_width);
-        }
-        else health.hHealthEmpty.showHealth(i, health.health_width);
-    }
-}
+//void DrawHealth()
+//{
+//   
+//    for (int i = 0; i < player->max_lives; i++)
+//    {
+//        if (i < player->current_lives)
+//        {
+//            health.hHealthFull.showHealth(i, health.health_width);
+//        }
+//        else health.hHealthEmpty.showHealth(i, health.health_width);
+//    }
+//}

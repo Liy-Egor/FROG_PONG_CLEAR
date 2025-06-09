@@ -32,11 +32,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         //tracer_enemy();
         ShowTexture();
         ShowObjects();
-        DrawHealth();
-        ProcessPortal();
+        //DrawHealth();
+        //ProcessPortal();
         CollisionGroup();
         ProcessInput();//опрос клавиатуры
-        ProcessDash();//рывок
+        //ProcessDash();//рывок
     }
 
 }
