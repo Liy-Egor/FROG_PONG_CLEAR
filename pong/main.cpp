@@ -29,7 +29,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         ShowRacketAndBall();//рисуем фон, ракетку и шарик
         ShowEnemy();
-        //tracer_enemy();
         ShowTexture();
         ShowObjects();
         //DrawHealth();

@@ -143,7 +143,7 @@ public:
         this->Sprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     }
 
-    void tracer_collide()
+    virtual void tracer_collide() 
 {
     bool coll_x_found = false;
     bool coll_y_found = false;
@@ -240,6 +240,7 @@ class Wolf : public character //структура врагов
 {
 public:
 
+    int direction = 1; // 1 - вправо, -1 - влево
     Wolf(float p_x, float p_y, float p_width, float p_height, const char* filename):
         character(p_x, p_y, p_width, p_height, filename)
     {
@@ -248,6 +249,104 @@ public:
         this->Sprite.width = p_width * window.width;
         this->Sprite.height = p_height * window.height;
         this->Sprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+    }
+
+    void tracer_collide() override
+    {
+        bool coll_x_found = false;
+        bool coll_y_found = false;
+
+        float lenght = sqrt(pow(Sprite.dx, 2) + pow(Sprite.dy, 2));
+        for (float i = 0; i < lenght; i++)
+        {
+            if (coll_x_found && coll_y_found) return;
+
+            for (int k = 0; k < 4; k++)
+            {
+                //if (coll_x_found|| coll_y_found) break;
+
+
+                for (int j = 0; j < location[currentLocation].walls.size(); j++)
+                {
+                    float Bbox[] = {
+                        Sprite.x + Sprite.dx * i / lenght, Sprite.y + Sprite.dy * i / lenght,
+                        Sprite.x + Sprite.width + Sprite.dx * i / lenght - 1, Sprite.y + Sprite.dy * i / lenght,
+                        Sprite.x + Sprite.width + Sprite.dx * i / lenght - 1, Sprite.y + Sprite.height + Sprite.dy * i / lenght - 1,
+                        Sprite.x + Sprite.dx * i / lenght, Sprite.y + Sprite.height + Sprite.dy * i / lenght - 1
+                    };
+
+                    float pixel_x = Bbox[k * 2];
+                    float pixel_y = Bbox[k * 2 + 1];
+
+                    SetPixel(window.context, pixel_x, pixel_y, RGB(255, 255, 255));
+
+
+
+                    auto walls = location[currentLocation].walls[j].Sprite;
+                    if ((pixel_x >= walls.x &&
+                        pixel_x <= walls.x + walls.width) &&
+                        (pixel_y >= walls.y &&
+                            pixel_y <= walls.y + walls.height)
+                        )
+                    {
+                        float top = pixel_y - walls.y;
+                        float down = (walls.y + walls.height) - pixel_y;
+                        float left = pixel_x - walls.x;
+                        float right = (walls.x + walls.width) - pixel_x;
+
+                        float minX = min(left, right);
+                        float minY = min(top, down);
+                        inJump = false;
+
+                        if (minX < minY && !coll_x_found)
+                        {
+                            Sprite.dx = 0;
+                            coll_x_found = true;
+                            j++;
+
+                            if (left < right)
+                            {
+                                Sprite.x = walls.x - Sprite.width - 1;
+                            }
+                            else
+                            {
+                                Sprite.x = walls.x + walls.width + 1;
+                            }
+                        }
+
+                        if (minX >= minY && !coll_y_found)
+                        {
+                            Sprite.dy = 0;
+                            coll_y_found = true;
+                            j++;
+
+                            if (down < top)
+                            {
+                                Sprite.y = walls.y + walls.height + 1;
+                                Sprite.jump = 30;
+                            }
+                            else
+                            {
+                                Sprite.y = walls.y - Sprite.height - 1;
+                                inJumpBot = true;
+                                if (Sprite.x <= walls.x) 
+                                {
+                                    direction = 1;
+                                }
+                                else if (Sprite.x + Sprite.width >= walls.x + walls.width) 
+                                {
+                                    direction = -1;
+                                }
+                                Sprite.dx = direction * Sprite.speed;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        if (!coll_x_found) Sprite.x += Sprite.dx;
+        if (!coll_y_found) Sprite.y += Sprite.dy;
     }
 
 };
