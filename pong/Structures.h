@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "windows.h"
 #include "math.h"
 #include "ctime"
@@ -13,9 +13,9 @@ POINT mouse;
 void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool alpha = false);
 
 struct {
-    HWND hWnd;//õýíäë îêíà
-    HDC device_context, context;// äâà êîíòåêñòà óñòðîéñòâà (äëÿ áóôåðèçàöèè)
-    int width, height;//ñþäà ñîõðàíèì ðàçìåðû îêíà êîòîðîå ñîçäàñò ïðîãðàììà
+    HWND hWnd;//Ñ…ÑÐ½Ð´Ð» Ð¾ÐºÐ½Ð°
+    HDC device_context, context;// Ð´Ð²Ð° ÐºÐ¾Ð½Ñ‚ÐµÐºÑÑ‚Ð° ÑƒÑÑ‚Ñ€Ð¾Ð¹ÑÑ‚Ð²Ð° (Ð´Ð»Ñ Ð±ÑƒÑ„ÐµÑ€Ð¸Ð·Ð°Ñ†Ð¸Ð¸)
+    int width, height;//ÑÑŽÐ´Ð° ÑÐ¾Ñ…Ñ€Ð°Ð½Ð¸Ð¼ Ñ€Ð°Ð·Ð¼ÐµÑ€Ñ‹ Ð¾ÐºÐ½Ð° ÐºÐ¾Ñ‚Ð¾Ñ€Ð¾Ðµ ÑÐ¾Ð·Ð´Ð°ÑÑ‚ Ð¿Ñ€Ð¾Ð³Ñ€Ð°Ð¼Ð¼Ð°
     int width_z, height_z;
 } window;
 
@@ -57,7 +57,7 @@ enum class ObjectsTipe
     frog
 };
 
-struct Texture // ñòðóêòóðà ïëàòôîðì
+struct Texture // ÑÑ‚Ñ€ÑƒÐºÑ‚ÑƒÑ€Ð° Ð¿Ð»Ð°Ñ‚Ñ„Ð¾Ñ€Ð¼
 {
 
     sprite Sprite;
@@ -75,7 +75,7 @@ struct Texture // ñòðóêòóðà ïëàòôîðì
 };
 
 
-struct Objects // ñòðóêòóðà èãðîâûõ îáüåêòîâ
+struct Objects // ÑÑ‚Ñ€ÑƒÐºÑ‚ÑƒÑ€Ð° Ð¸Ð³Ñ€Ð¾Ð²Ñ‹Ñ… Ð¾Ð±ÑŒÐµÐºÑ‚Ð¾Ð²
 {
     sprite Sprite;
     ObjectsTipe type;
@@ -105,17 +105,18 @@ struct Location_
 
 Location_ location[5];
 
+void tracer_collide(auto& Character);
 
-class character //ñòðóêòóðà èãðîêà
+class character //ÑÑ‚Ñ€ÑƒÐºÑ‚ÑƒÑ€Ð° Ð¸Ð³Ñ€Ð¾ÐºÐ°
 {
 public:
-    sprite Sprite;//èãðîê
+    sprite Sprite;//Ð¸Ð³Ñ€Ð¾Ðº
     sprite hHealthFull, hHealthEmpty;
     int health_width;
     int max_lives;
     int current_lives;
     int currentLocation = 0;
-    
+    int last_trace_platform_num = -1;
     
     float maxjump = 10;
     bool inJump = false;
@@ -142,105 +143,19 @@ public:
         this->Sprite.height = p_height * window.height;
         this->Sprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     }
-
-    virtual void tracer_collide() 
-{
-    bool coll_x_found = false;
-    bool coll_y_found = false;
-
-    float lenght = sqrt(pow(Sprite.dx, 2) + pow(Sprite.dy, 2));
-    for (float i = 0; i < lenght; i++)
+   
+    virtual void move()
     {
-        if (coll_x_found && coll_y_found) return;
-
-        for (int k = 0; k < 4; k++)
-        {
-            //if (coll_x_found|| coll_y_found) break;
-
-
-            for (int j = 0; j < location[currentLocation].walls.size(); j++)
-            {
-                float Bbox[] = {
-                    Sprite.x + Sprite.dx * i / lenght, Sprite.y + Sprite.dy * i / lenght,
-                    Sprite.x + Sprite.width + Sprite.dx * i / lenght - 1, Sprite.y + Sprite.dy * i / lenght,
-                    Sprite.x + Sprite.width + Sprite.dx * i / lenght - 1, Sprite.y + Sprite.height + Sprite.dy * i / lenght - 1,
-                    Sprite.x + Sprite.dx * i / lenght, Sprite.y + Sprite.height + Sprite.dy * i / lenght - 1
-                };
-
-                float pixel_x = Bbox[k * 2];
-                float pixel_y = Bbox[k * 2 + 1];
-
-                SetPixel(window.context, pixel_x, pixel_y, RGB(255, 255, 255));
-
-
-
-                auto walls = location[currentLocation].walls[j].Sprite;
-                if ((pixel_x >= walls.x &&
-                    pixel_x <= walls.x + walls.width) &&
-                    (pixel_y >= walls.y &&
-                        pixel_y <= walls.y + walls.height)
-                    )
-                {
-                    float top = pixel_y - walls.y;
-                    float down = (walls.y + walls.height) - pixel_y;
-                    float left = pixel_x - walls.x;
-                    float right = (walls.x + walls.width) - pixel_x;
-
-                    float minX = min(left, right);
-                    float minY = min(top, down);
-                    inJump = false;
-
-                    if (minX < minY && !coll_x_found)
-                    {
-                        Sprite.dx = 0;
-                        coll_x_found = true;
-                        j++;
-
-                        if (left < right)
-                        {
-                            Sprite.x = walls.x - Sprite.width - 1;
-                        }
-                        else
-                        {
-                            Sprite.x = walls.x + walls.width + 1;
-                        }
-                    }
-
-                    if (minX >= minY && !coll_y_found)
-                    {
-                        Sprite.dy = 0;
-                        coll_y_found = true;
-                        j++;
-
-                        if (down < top)
-                        {
-                            Sprite.y = walls.y + walls.height + 1;
-                            Sprite.jump = 30;
-                        }
-                        else
-                        {
-                            Sprite.y = walls.y - Sprite.height - 1;
-                            inJumpBot = false;
-                        }
-                    }
-
-                }
-
-            }
-        }
-
+        tracer_collide(*this);
     }
-
-    if (!coll_x_found) Sprite.x += Sprite.dx;
-    if (!coll_y_found) Sprite.y += Sprite.dy;
-}
+    
 };
 
-class Wolf : public character //ñòðóêòóðà âðàãîâ
+class Wolf : public character //ÑÑ‚Ñ€ÑƒÐºÑ‚ÑƒÑ€Ð° Ð²Ñ€Ð°Ð³Ð¾Ð²
 {
 public:
-
-    int direction = 1; // 1 - âïðàâî, -1 - âëåâî
+   
+    int direction = 1; // 1 - Ð²Ð¿Ñ€Ð°Ð²Ð¾, -1 - Ð²Ð»ÐµÐ²Ð¾
     Wolf(float p_x, float p_y, float p_width, float p_height, const char* filename):
         character(p_x, p_y, p_width, p_height, filename)
     {
@@ -251,104 +166,22 @@ public:
         this->Sprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     }
 
-    void tracer_collide() override
+    void move()
     {
-        bool coll_x_found = false;
-        bool coll_y_found = false;
-
-        float lenght = sqrt(pow(Sprite.dx, 2) + pow(Sprite.dy, 2));
-        for (float i = 0; i < lenght; i++)
+        tracer_collide(*this);
+        if (last_trace_platform_num >= 0)
         {
-            if (coll_x_found && coll_y_found) return;
-
-            for (int k = 0; k < 4; k++)
+            if (Sprite.x <= location[currentLocation].walls[last_trace_platform_num].Sprite.x)
             {
-                //if (coll_x_found|| coll_y_found) break;
-
-
-                for (int j = 0; j < location[currentLocation].walls.size(); j++)
-                {
-                    float Bbox[] = {
-                        Sprite.x + Sprite.dx * i / lenght, Sprite.y + Sprite.dy * i / lenght,
-                        Sprite.x + Sprite.width + Sprite.dx * i / lenght - 1, Sprite.y + Sprite.dy * i / lenght,
-                        Sprite.x + Sprite.width + Sprite.dx * i / lenght - 1, Sprite.y + Sprite.height + Sprite.dy * i / lenght - 1,
-                        Sprite.x + Sprite.dx * i / lenght, Sprite.y + Sprite.height + Sprite.dy * i / lenght - 1
-                    };
-
-                    float pixel_x = Bbox[k * 2];
-                    float pixel_y = Bbox[k * 2 + 1];
-
-                    SetPixel(window.context, pixel_x, pixel_y, RGB(255, 255, 255));
-
-
-
-                    auto walls = location[currentLocation].walls[j].Sprite;
-                    if ((pixel_x >= walls.x &&
-                        pixel_x <= walls.x + walls.width) &&
-                        (pixel_y >= walls.y &&
-                            pixel_y <= walls.y + walls.height)
-                        )
-                    {
-                        float top = pixel_y - walls.y;
-                        float down = (walls.y + walls.height) - pixel_y;
-                        float left = pixel_x - walls.x;
-                        float right = (walls.x + walls.width) - pixel_x;
-
-                        float minX = min(left, right);
-                        float minY = min(top, down);
-                        inJump = false;
-
-                        if (minX < minY && !coll_x_found)
-                        {
-                            Sprite.dx = 0;
-                            coll_x_found = true;
-                            j++;
-
-                            if (left < right)
-                            {
-                                Sprite.x = walls.x - Sprite.width - 1;
-                            }
-                            else
-                            {
-                                Sprite.x = walls.x + walls.width + 1;
-                            }
-                        }
-
-                        if (minX >= minY && !coll_y_found)
-                        {
-                            Sprite.dy = 0;
-                            coll_y_found = true;
-                            j++;
-
-                            if (down < top)
-                            {
-                                Sprite.y = walls.y + walls.height + 1;
-                                Sprite.jump = 30;
-                            }
-                            else
-                            {
-                                Sprite.y = walls.y - Sprite.height - 1;
-                                inJumpBot = true;
-                                if (Sprite.x <= walls.x) 
-                                {
-                                    direction = 1;
-                                }
-                                else if (Sprite.x + Sprite.width >= walls.x + walls.width) 
-                                {
-                                    direction = -1;
-                                }
-                                Sprite.dx = direction * Sprite.speed;
-                            }
-                        }
-                    }
-                }
+                direction = 1;
             }
+            else if (Sprite.x + Sprite.width >= location[currentLocation].walls[last_trace_platform_num].Sprite.x + location[currentLocation].walls[last_trace_platform_num].Sprite.width)
+            {
+                direction = -1;
+            }
+            Sprite.dx = direction * Sprite.speed;
         }
-
-        if (!coll_x_found) Sprite.x += Sprite.dx;
-        if (!coll_y_found) Sprite.y += Sprite.dy;
     }
-
 };
 
 struct portal_ 
@@ -370,6 +203,7 @@ struct portal_
 
 shared_ptr<character> player;
 shared_ptr<Wolf> wolf;
+shared_ptr<Wolf> wolf2;
 
 //player_ health{ 40, 5, 3, "health_full.bmp", "health_empty.bmp" };
 

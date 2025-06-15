@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include "Structures.h"
 
 
@@ -139,7 +139,7 @@ void ShowEnemy()
         location[Sprite->currentLocation].enemy[i].Sprite.show();
     }*/
     wolf->Sprite.show();
-
+    wolf2->Sprite.show();
 
 }
 
