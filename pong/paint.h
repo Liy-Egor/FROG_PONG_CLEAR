@@ -127,21 +127,7 @@ void PrintBitblt()
 }
 
 
-void ShowRacketAndBall()
-{
-    location[player->currentLocation].hBack.showBack();
-    player->Sprite.show();
-}
 
-void ShowEnemy()
-{
-    /*for (int i = 0; i < location[player->currentLocation].enemy.size();i++) {
-        location[Sprite->currentLocation].enemy[i].Sprite.show();
-    }*/
-    wolf->Sprite.show();
-    wolf2->Sprite.show();
-
-}
 
 void ShowTexture()
 {

@@ -28,14 +28,19 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         int sz = 5;
         Ellipse(window.context, mouse.x - sz, mouse.y - sz, mouse.x + sz, mouse.y + sz);
 
-        ShowRacketAndBall();//рисуем фон, ракетку и шарик
-        ShowEnemy();
+        location[player->currentLocation].hBack.showBack();
+
+        for (int i = 0; i < Persona.size(); i++) {
+
+            Persona[i]->Sprite.show();
+            Persona[i]->move();
+        }
+        
         ShowTexture();
         ShowObjects();
         //DrawHealth();
         //ProcessPortal();
         CollisionGroup();
-        ProcessInput();//опрос клавиатуры
         //ProcessDash();//рывок
     }
 

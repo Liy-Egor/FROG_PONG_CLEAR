@@ -144,11 +144,48 @@ public:
         this->Sprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
     }
    
-    virtual void move()
-    {
-        tracer_collide(*this);
-    }
+    virtual void move() = 0;
     
+};
+
+vector<character*> Persona;
+
+class Hero : public character
+{
+    public:
+        Hero(float p_x, float p_y, float p_width, float p_height, const char* filename) : character(p_x, p_y, p_width, p_height, filename)
+        {
+            Persona.push_back(this);
+        }
+
+        void move()
+        {
+            if (GetAsyncKeyState(VK_LEFT)) {
+                Sprite.dx = -Sprite.speed;
+            }
+
+            if (GetAsyncKeyState(VK_RIGHT)) {
+                Sprite.dx = Sprite.speed;
+            }
+
+            if (GetAsyncKeyState(VK_SPACE) && inJump == false && inJumpBot == false)
+            {
+                Sprite.jump = 110;
+                inJumpBot = true;
+                inJump = true;
+            }
+
+   
+
+            tracer_collide(*this);
+
+            float s = .9;
+            Sprite.jump *= s;
+            Sprite.dx *= .5;
+            Sprite.dy = Sprite.gravity - Sprite.jump;
+
+
+        }
 };
 
 class Wolf : public character //структура врагов
@@ -164,18 +201,27 @@ public:
         this->Sprite.width = p_width * window.width;
         this->Sprite.height = p_height * window.height;
         this->Sprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+        Persona.push_back(this);
     }
 
     void move()
     {
         tracer_collide(*this);
+
+        float s = .9;
+        Sprite.jump *= s;
+        Sprite.dx *= .5;
+        Sprite.dy = Sprite.gravity - Sprite.jump;
+
         if (last_trace_platform_num >= 0)
         {
             if (Sprite.x <= location[currentLocation].walls[last_trace_platform_num].Sprite.x)
             {
                 direction = 1;
             }
-            else if (Sprite.x + Sprite.width >= location[currentLocation].walls[last_trace_platform_num].Sprite.x + location[currentLocation].walls[last_trace_platform_num].Sprite.width)
+            
+            auto& platform = location[currentLocation].walls[last_trace_platform_num].Sprite;
+            if (Sprite.x + Sprite.width >= platform.x + platform.width)
             {
                 direction = -1;
             }
@@ -201,9 +247,10 @@ struct portal_
 
 
 
-shared_ptr<character> player;
-shared_ptr<Wolf> wolf;
-shared_ptr<Wolf> wolf2;
+Hero* player;
+Wolf* wolf;
+Wolf* wolf2;
+
 
 //player_ health{ 40, 5, 3, "health_full.bmp", "health_empty.bmp" };
 

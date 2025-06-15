@@ -6,9 +6,9 @@ void InitGame()
 {
     //player_ health{ 40, 5, 3, "health_full.bmp", "health_empty.bmp" };
     //player = make_shared<character>(40, 5, 3, "health_full.bmp", "health_empty.bmp");
-    player = make_shared<character>(0.2, 0.25, 0.023, 0.032, "racket.bmp");
-    wolf = make_shared<Wolf>(0.25, 0.25, 0.023, 0.05, "walls.bmp");
-    wolf2 = make_shared<Wolf>(0.15, 0.25, 0.023, 0.05, "walls.bmp");
+    player = new Hero(0.2, 0.25, 0.023, 0.032, "racket.bmp");
+    wolf = new Wolf(0.25, 0.25, 0.023, 0.05, "walls.bmp");
+    wolf2 = new Wolf(0.15, 0.25, 0.023, 0.05, "walls.bmp");
     player->Sprite.speed = 60;
     player->Sprite.dx = 0;
     player->Sprite.dy = 0;
@@ -26,6 +26,11 @@ void InitGame()
     wolf2->Sprite.dy = 0;
     wolf2->Sprite.jump = 0;
     wolf2->Sprite.gravity = 30;
+
+//    Persona.push_back(player);
+//    Persona.push_back(wolf);
+//    Persona.push_back(wolf2);
+
     //-----------------------------location0_______________
     location[0].hBack.loadBitmapWithNativeSize("background_0.bmp");
     //location[0].portal.emplace_back(0.96, 0.89, 0.021, 0.2, 1, "racket.bmp");//портал в локацию 1
@@ -123,7 +128,6 @@ void tracer_collide(auto& Character)
                     {
                         Sprite.dx = 0;
                         coll_x_found = true;
-                        j++;
 
                         if (left < right)
                         {
@@ -133,6 +137,8 @@ void tracer_collide(auto& Character)
                         {
                             Sprite.x = walls.x + walls.width + 1;
                         }
+
+                        j++;
                     }
 
                     if (minX >= minY && !coll_y_found)
@@ -151,6 +157,7 @@ void tracer_collide(auto& Character)
                             Sprite.y = walls.y - Sprite.height - 1;
                             Character.inJumpBot = false;
                         }
+
                         j++;
                     }
 
@@ -165,59 +172,9 @@ void tracer_collide(auto& Character)
     if (!coll_y_found) Sprite.y += Sprite.dy;
 }
 
-void ProcessInput()
-{
 
 
-    if (GetAsyncKeyState(VK_LEFT)) {
-        player->Sprite.dx = -player->Sprite.speed;
-    }
 
-    if (GetAsyncKeyState(VK_RIGHT)) {
-        player->Sprite.dx = player->Sprite.speed;
-    }
-
-    if (GetAsyncKeyState(VK_SPACE) && player->inJump == false && player->inJumpBot == false)
-    {
-        player->Sprite.jump = 110;
-        player->inJumpBot = true;
-        player->inJump = true;
-    }
-    float s = .9;
-    player->Sprite.jump *= s;
-    player->Sprite.dx *= .5;
-    player->Sprite.dy = player->Sprite.gravity - player->Sprite.jump;
-
-    wolf->Sprite.jump *= s;
-    wolf->Sprite.dx *= .5;
-    wolf->Sprite.dy = wolf->Sprite.gravity - wolf->Sprite.jump;
-    
-    wolf2->Sprite.jump *= s;
-    wolf2->Sprite.dx *= .5;
-    wolf2->Sprite.dy = wolf2->Sprite.gravity - wolf2->Sprite.jump;
-   
-    vector<shared_ptr<character>> Persona;
-    Persona.push_back(player);
-    Persona.push_back(wolf);
-    Persona.push_back(wolf2);
-    //for (int i = 0; i < location[player->currentLocation].walls.size(); i++)
-    /*if (wolf->Sprite.x <= location[player->currentLocation].walls.x)
-    {
-        direction = 1;
-    }
-    else if (Sprite.x + Sprite.width >= walls.x + walls.width)
-    {
-        direction = -1;
-    }
-    Sprite.dx = direction * Sprite.speed;*/
-
-    for (int i = 0; i < Persona.size(); i++) {
-
-        //Persona[i]->tracer();
-        Persona[i]->move();
-
-    }
-}
 
 bool CheckCollision(float x1, float y1, float w1, float h1,
     float x2, float y2, float w2, float h2)
