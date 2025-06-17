@@ -21,8 +21,6 @@ struct {
 
 struct sprite {
     float x, y, width, height, dx, dy, speed, jump, gravity;
-    bool vect_right = true, vect_left = false;
-    bool colis;
     HBITMAP hBitmap;
 
     void loadBitmapWithNativeSize(const char* filename)
@@ -41,13 +39,7 @@ struct sprite {
         ShowBitmap(window.context, 0, 0, window.width_z, window.height_z, hBitmap, false);
     }
 
-    void showHealth(int i, int h_w)
-    {
-        int margin = 10;
-        int startX = window.width - 50;
-        int startY = 10;
-        ShowBitmap(window.context, startX - (i * (h_w + margin)), startY, h_w, h_w, hBitmap, false);
-    }
+
 };
 
 enum class ObjectsTipe
@@ -120,19 +112,32 @@ public:
         health_empty.loadBitmapWithNativeSize(max_empty_bitmap);
     }
 
-    void Show() {
+    void showHealth(int i, int h_w)
+    {
+
+        //ShowBitmap(window.context, startX - (i * (h_w + margin)), startY, h_w, h_w, hBitmap, false);
+    }
+
+    void Show(int i, int h_w) {
+
+        int margin = 10;
+        int startX = window.width - 50;
+        int startY = 10;
+
         for (int i = 0; i < max_hp; i++) {
             if (i < health) {
-                health_full.showHealth(i, health);
+                ShowBitmap(window.context, startX - (i * (h_w + margin)), startY, h_w, h_w, health_full.hBitmap, false);
             }
             else {
-                health_empty.showHealth(i, health);
+                ShowBitmap(window.context, startX - (i * (h_w + margin)), startY, h_w, h_w, health_empty.hBitmap, false);
             }
         }
     }
 
 
 };
+
+//health_bar Health_bar;
 
 class character //структура игрока
 {
@@ -194,6 +199,8 @@ class Hero : public character
             Sprite.gravity = 30;
             Persona.push_back(this);
         }
+
+
 
         void move()
         {
