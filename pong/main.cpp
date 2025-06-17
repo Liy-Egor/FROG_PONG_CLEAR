@@ -35,6 +35,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             Persona[i]->Sprite.show();
             Persona[i]->move();
         }
+
+        //player->Sprite.showHealth()
+        //player.h
         
         ShowTexture();
         ShowObjects();

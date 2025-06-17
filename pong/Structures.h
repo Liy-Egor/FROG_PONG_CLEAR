@@ -20,7 +20,7 @@ struct {
 } window;
 
 struct sprite {
-    float x, y, width, height, rad, dx, dy, speed, time, jump, gravity;
+    float x, y, width, height, dx, dy, speed, jump, gravity;
     bool vect_right = true, vect_left = false;
     bool colis;
     HBITMAP hBitmap;
@@ -64,11 +64,11 @@ struct Texture // структура платформ
 
 
     Texture(float p_x, float p_y, float p_width, float p_height, const char* filename) {
-        this->Sprite.x = p_x * window.width_z;
-        this->Sprite.y = p_y * window.height_z;
-        this->Sprite.width = p_width * window.width_z;
-        this->Sprite.height = p_height * window.height_z;
-        this->Sprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+        Sprite.x = p_x * window.width_z;
+        Sprite.y = p_y * window.height_z;
+        Sprite.width = p_width * window.width_z;
+        Sprite.height = p_height * window.height_z;
+        Sprite.loadBitmapWithNativeSize(filename);;
 
     }
 
@@ -81,12 +81,12 @@ struct Objects // структура игровых обьектов
     ObjectsTipe type;
 
     Objects(float p_x, float p_y, float p_width, float p_height, const char* filename, ObjectsTipe objTipe) {
-        this->Sprite.x = p_x * window.width_z;
-        this->Sprite.y = p_y * window.height_z;
-        this->Sprite.width = p_width * window.width_z;
-        this->Sprite.height = p_height * window.height_z;
-        this->Sprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-        this->type = objTipe;
+        Sprite.x = p_x * window.width_z;
+        Sprite.y = p_y * window.height_z;
+        Sprite.width = p_width * window.width_z;
+        Sprite.height = p_height * window.height_z;
+        Sprite.loadBitmapWithNativeSize(filename);
+        type = objTipe;
 
     }
 
@@ -107,6 +107,33 @@ Location_ location[5];
 
 void tracer_collide(auto& Character);
 
+class health_bar {
+public:
+    sprite health_full, health_empty;
+    int health;
+    int max_hp;
+
+    health_bar(int health, int max_hp, const char* max_hp_bitmap, const char* max_empty_bitmap) {
+        this->max_hp = max_hp;
+        this->health = health;
+        health_full.loadBitmapWithNativeSize(max_hp_bitmap);
+        health_empty.loadBitmapWithNativeSize(max_empty_bitmap);
+    }
+
+    void Show() {
+        for (int i = 0; i < max_hp; i++) {
+            if (i < health) {
+                health_full.showHealth(i, health);
+            }
+            else {
+                health_empty.showHealth(i, health);
+            }
+        }
+    }
+
+
+};
+
 class character //структура игрока
 {
 public:
@@ -126,35 +153,45 @@ public:
     bool colis = false;
     bool dash_allow = true;
 
-    character(int p_health, int p_max_lives, int p_current_lives, const char* filename, const char* filename2)
+    character(float p_x, float p_y, float p_width, float p_height, const char* filename, int p_health, int p_max_lives, int p_current_lives, const char* AliveFilename, const char* DeadFilename)
     {
-        this->health_width = p_health;
-        this->max_lives = p_max_lives;
-        this->current_lives = p_current_lives;
-        this->hHealthFull.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-        this->hHealthEmpty.hBitmap = (HBITMAP)LoadImageA(NULL, filename2, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-    }
-
-    character(float p_x, float p_y, float p_width, float p_height, const char* filename)
-    {
-        this->Sprite.x = p_x * window.width;
-        this->Sprite.y = p_y * window.height;
-        this->Sprite.width = p_width * window.width;
-        this->Sprite.height = p_height * window.height;
-        this->Sprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+        Sprite.x = p_x * window.width;
+        Sprite.y = p_y * window.height;
+        Sprite.width = p_width * window.width;
+        Sprite.height = p_height * window.height;
+        Sprite.loadBitmapWithNativeSize(filename);
+        
+        health_width = p_health;
+        max_lives = p_max_lives;
+        current_lives = p_current_lives;
+        hHealthFull.loadBitmapWithNativeSize(AliveFilename);
+        hHealthEmpty.loadBitmapWithNativeSize(DeadFilename);
     }
    
     virtual void move() = 0;
     
 };
 
+void processGravity(auto& spriteName)
+{
+    spriteName.jump *= .9;
+    spriteName.dx *= .5;
+    spriteName.dy = spriteName.gravity - spriteName.jump;
+}
+
 vector<character*> Persona;
 
 class Hero : public character
 {
     public:
-        Hero(float p_x, float p_y, float p_width, float p_height, const char* filename) : character(p_x, p_y, p_width, p_height, filename)
+        Hero(float p_x, float p_y, float p_width, float p_height, const char* filename, int p_health, int p_max_lives, int p_current_lives, const char* AliveFilename, const char* DeadFilename) 
+            : character(p_x, p_y, p_width, p_height, filename, p_health, p_max_lives, p_current_lives, AliveFilename, DeadFilename)
         {
+            Sprite.speed = 60;
+            Sprite.dx = 0;
+            Sprite.dy = 0;
+            Sprite.jump = 0;
+            Sprite.gravity = 30;
             Persona.push_back(this);
         }
 
@@ -179,10 +216,7 @@ class Hero : public character
 
             tracer_collide(*this);
 
-            float s = .9;
-            Sprite.jump *= s;
-            Sprite.dx *= .5;
-            Sprite.dy = Sprite.gravity - Sprite.jump;
+            processGravity(Sprite);
 
 
         }
@@ -193,14 +227,15 @@ class Wolf : public character //структура врагов
 public:
    
     int direction = 1; // 1 - вправо, -1 - влево
-    Wolf(float p_x, float p_y, float p_width, float p_height, const char* filename):
-        character(p_x, p_y, p_width, p_height, filename)
+    Wolf(float p_x, float p_y, float p_width, float p_height, const char* filename, int p_health, int p_max_lives, int p_current_lives, const char* AliveFilename, const char* DeadFilename)
+    : character(p_x, p_y, p_width, p_height, filename, p_health, p_max_lives, p_current_lives, AliveFilename, DeadFilename)
     {
-        this->Sprite.x = p_x * window.width;
-        this->Sprite.y = p_y * window.height;
-        this->Sprite.width = p_width * window.width;
-        this->Sprite.height = p_height * window.height;
-        this->Sprite.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+        Sprite.speed = 5;
+        Sprite.dx = 0;
+        Sprite.dy = 0;
+        Sprite.jump = 0;
+        Sprite.gravity = 30;
+
         Persona.push_back(this);
     }
 
@@ -208,10 +243,7 @@ public:
     {
         tracer_collide(*this);
 
-        float s = .9;
-        Sprite.jump *= s;
-        Sprite.dx *= .5;
-        Sprite.dy = Sprite.gravity - Sprite.jump;
+        processGravity(Sprite);
 
         if (last_trace_platform_num >= 0)
         {
@@ -236,12 +268,12 @@ struct portal_
     int destination;
     portal_(float p_x, float p_y, float p_width, float p_height, int p_destination, const char* filename)
     {
-        this->spr.x = p_x * window.width;
-        this->spr.y = p_y * window.height;
-        this->spr.width = p_width * window.width;
-        this->spr.height = p_height * window.height;
-        this->destination = p_destination;
-        this->spr.hBitmap = (HBITMAP)LoadImageA(NULL, filename, IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
+        spr.x = p_x * window.width;
+        spr.y = p_y * window.height;
+        spr.width = p_width * window.width;
+        spr.height = p_height * window.height;
+        destination = p_destination;
+        spr.loadBitmapWithNativeSize(filename);
     }
 };
 
@@ -251,7 +283,5 @@ Hero* player;
 Wolf* wolf;
 Wolf* wolf2;
 
-
-//player_ health{ 40, 5, 3, "health_full.bmp", "health_empty.bmp" };
 
 

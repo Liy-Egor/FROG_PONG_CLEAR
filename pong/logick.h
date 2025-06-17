@@ -6,31 +6,10 @@ void InitGame()
 {
     //player_ health{ 40, 5, 3, "health_full.bmp", "health_empty.bmp" };
     //player = make_shared<character>(40, 5, 3, "health_full.bmp", "health_empty.bmp");
-    player = new Hero(0.2, 0.25, 0.023, 0.032, "racket.bmp");
-    wolf = new Wolf(0.25, 0.25, 0.023, 0.05, "walls.bmp");
-    wolf2 = new Wolf(0.15, 0.25, 0.023, 0.05, "walls.bmp");
-    player->Sprite.speed = 60;
-    player->Sprite.dx = 0;
-    player->Sprite.dy = 0;
-    player->Sprite.jump = 0;
-    player->Sprite.gravity = 30;
-
-    wolf->Sprite.speed = 5;
-    wolf->Sprite.dx = 0;
-    wolf->Sprite.dy = 0;
-    wolf->Sprite.jump = 0;
-    wolf->Sprite.gravity = 30;
-
-    wolf2->Sprite.speed = 5;
-    wolf2->Sprite.dx = 0;
-    wolf2->Sprite.dy = 0;
-    wolf2->Sprite.jump = 0;
-    wolf2->Sprite.gravity = 30;
-
-//    Persona.push_back(player);
-//    Persona.push_back(wolf);
-//    Persona.push_back(wolf2);
-
+    player = new Hero(0.2, 0.25, 0.023, 0.032, "racket.bmp", 40, 5, 3, "health_full.bmp", "health_empty.bmp");
+    wolf = new Wolf(0.25, 0.25, 0.023, 0.05, "walls.bmp", 40, 5, 3, "health_full.bmp", "health_empty.bmp");
+    wolf2 = new Wolf(0.15, 0.25, 0.023, 0.05, "walls.bmp", 40, 5, 3, "health_full.bmp", "health_empty.bmp");
+    
     //-----------------------------location0_______________
     location[0].hBack.loadBitmapWithNativeSize("background_0.bmp");
     //location[0].portal.emplace_back(0.96, 0.89, 0.021, 0.2, 1, "racket.bmp");//портал в локацию 1
