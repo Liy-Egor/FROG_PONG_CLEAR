@@ -10,7 +10,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
 
     InitWindow();//здесь инициализируем все что нужно для рисования в окне
-    CreateMap();
+  
     InitGame();//здесь инициализируем переменные игры
     //ShowCursor(FALSE);
     
@@ -20,8 +20,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     {
         currenttime = timeGetTime();
 
-        PrintBitblt(); //копируем буфер в окно и отрисовывает окно за игроком
-
+        BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);
+        //PrintBitblt(); //копируем буфер в окно и отрисовывает окно за игроком
+        
         Sleep(16);//ждем 16 милисекунд (1/количество кадров в секунду)
         GetCursorPos(&mouse);
         ScreenToClient(window.hWnd, &mouse);
@@ -38,6 +39,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         player->Sprite.show();
         player->move();
         Health_bar.Show();
+
+
+        if (GetAsyncKeyState('A'))
+        {
+            player_view.x++;
+        }
+
+        if (GetAsyncKeyState('D'))
+        {
+            player_view.x--;
+        }
+
+        player_view.x = player->Sprite.x - .5 * window.width/ 3;
+        player_view.y = player->Sprite.y-.5*window.height/3;
 
         //player->Sprite.showHealth()
         //player.h

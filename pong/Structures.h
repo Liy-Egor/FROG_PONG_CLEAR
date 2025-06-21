@@ -18,8 +18,16 @@ struct {
     HWND hWnd;//хэндл окна
     HDC device_context, context;// два контекста устройства (для буферизации)
     int width, height;//сюда сохраним размеры окна которое создаст программа
-    int width_z, height_z;
+    //int width_z, height_z;
 } window;
+
+struct {
+    int x =0;
+    int y =0;
+    int w;
+    int h;
+
+} player_view;
 
 struct sprite {
     float x, y, width, height, dx, dy, speed, jump, gravity;
@@ -34,12 +42,16 @@ struct sprite {
 
     void show()
     {
-        ShowBitmap(window.context, x, y, width, height, hBitmap, false);
+        float scale = 3;
+
+
+
+        ShowBitmap(window.context, x*scale- player_view.x*scale, y*scale - player_view.y*scale, width*scale, height*scale, hBitmap, false);
     }
 
     void showBack()
     {
-        ShowBitmap(window.context, 0, 0, window.width_z, window.height_z, hBitmap, false);
+        ShowBitmap(window.context, 0, 0, window.width, window.height, hBitmap, false);
     }
 
 };
@@ -58,10 +70,10 @@ struct Texture // структура платформ
 
 
     Texture(float p_x, float p_y, float p_width, float p_height, const string& filename) {
-        Sprite.x = p_x * window.width_z;
-        Sprite.y = p_y * window.height_z;
-        Sprite.width = p_width * window.width_z;
-        Sprite.height = p_height * window.height_z;
+        Sprite.x = p_x * window.width;
+        Sprite.y = p_y * window.height;
+        Sprite.width = p_width * window.width;
+        Sprite.height = p_height * window.height;
         Sprite.loadBitmapWithNativeSize(filename);;
 
     }
@@ -75,10 +87,10 @@ struct Objects // структура игровых обьектов
     ObjectsTipe type;
 
     Objects(float p_x, float p_y, float p_width, float p_height, const string& filename, ObjectsTipe objTipe) {
-        Sprite.x = p_x * window.width_z;
-        Sprite.y = p_y * window.height_z;
-        Sprite.width = p_width * window.width_z;
-        Sprite.height = p_height * window.height_z;
+        Sprite.x = p_x * window.width;
+        Sprite.y = p_y * window.height;
+        Sprite.width = p_width * window.width;
+        Sprite.height = p_height * window.height;
         Sprite.loadBitmapWithNativeSize(filename);
         type = objTipe;
 
@@ -92,10 +104,10 @@ struct portal_
     int destination;
     portal_(float p_x, float p_y, float p_width, float p_height, int p_destination, const string& filename)
     {
-        spr.x = p_x * window.width_z;
-        spr.y = p_y * window.height_z;
-        spr.width = p_width * window.width_z;
-        spr.height = p_height * window.height_z;
+        spr.x = p_x * window.width;
+        spr.y = p_y * window.height;
+        spr.width = p_width * window.width;
+        spr.height = p_height * window.height;
         destination = p_destination;
         spr.loadBitmapWithNativeSize(filename);
     }

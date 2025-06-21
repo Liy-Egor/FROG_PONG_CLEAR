@@ -10,33 +10,33 @@ void InitWindow()
 
     RECT r;
     GetClientRect(window.hWnd, &r);
-    window.device_context = GetDC(window.hWnd);//?? ?????? ???? ??????? ????? ????????? ?????????? ??? ?????????
-    window.width = r.right - r.left;//?????????? ??????? ? ?????????
+    window.device_context = GetDC(window.hWnd);
+    window.width = r.right - r.left;
     window.height = r.bottom - r.top;
-    window.context = CreateCompatibleDC(window.device_context);//?????? ?????
-    SelectObject(window.context, CreateCompatibleBitmap(window.device_context, window.width, window.height));//??????????? ???? ? ?????????
+    window.context = CreateCompatibleDC(window.device_context);
+    SelectObject(window.context, CreateCompatibleBitmap(window.device_context, window.width, window.height));
     GetClientRect(window.hWnd, &r);
 
 }
 
-void CreateMap()
-{
-    RECT z;
-    GetClientRect(window.hWnd, &z);
-    window.device_context = GetDC(window.hWnd);//?? ?????? ???? ??????? ????? ????????? ?????????? ??? ?????????
-    z.left = 0;
-    z.right = window.width * 3;
-    z.bottom = window.height * 2;
-    z.top = 0;
-
-    window.width_z = z.right - z.left;
-    window.height_z = z.bottom - z.top;
-
-    window.context = CreateCompatibleDC(window.device_context);//?????? ?????
-    SelectObject(window.context, CreateCompatibleBitmap(window.device_context, window.width_z, window.height_z));//??????????? ???? ? ?????????
-    GetClientRect(window.hWnd, &z);
-
-}
+//void CreateMap()
+//{
+//    RECT z;
+//    GetClientRect(window.hWnd, &z);
+//    window.device_context = GetDC(window.hWnd);
+//    z.left = 0;
+//    z.right = window.width * 3;
+//    z.bottom = window.height * 2;
+//    z.top = 0;
+//
+//    window.width_z = z.right - z.left;
+//    window.height_z = z.bottom - z.top;
+//
+//    window.context = CreateCompatibleDC(window.device_context);
+//    SelectObject(window.context, CreateCompatibleBitmap(window.device_context, window.width_z, window.height_z));
+//    GetClientRect(window.hWnd, &z);
+//
+//}
 
 void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool alpha)
 {
@@ -44,12 +44,12 @@ void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool
     HDC hMemDC;
     BITMAP bm;
 
-    hMemDC = CreateCompatibleDC(hDC); // ??????? ???????? ??????, ??????????? ? ?????????? ???????????
-    hOldbm = (HBITMAP)SelectObject(hMemDC, hBitmapBall);// ???????? ??????????? bitmap ? ???????? ??????
+    hMemDC = CreateCompatibleDC(hDC); 
+    hOldbm = (HBITMAP)SelectObject(hMemDC, hBitmapBall);
 
-    if (hOldbm) // ???? ?? ???? ??????, ?????????? ??????
+    if (hOldbm) 
     {
-        GetObject(hBitmapBall, sizeof(BITMAP), (LPSTR)&bm); // ?????????? ??????? ???????????
+        GetObject(hBitmapBall, sizeof(BITMAP), (LPSTR)&bm); 
 
         if (alpha)
         {
@@ -66,65 +66,65 @@ void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool
     DeleteDC(hMemDC); // ??????? ???????? ??????
 }
 
-void PrintBitblt()
-{
-
-    //BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);//???????? ????? ? ????
-
-    if (player->Sprite.x <= window.width / 2)
-    {
-        if (player->Sprite.y <= window.height / 2)
-        {
-            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, 0, SRCCOPY); // ???? ???? ?????? ???? ??????
-        }
-        else if (player->Sprite.y <= window.height_z - window.height / 2)
-        {
-            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, player->Sprite.y - window.height / 2, SRCCOPY);
-        }
-        else
-        {
-            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, window.height_z - window.height, SRCCOPY);
-
-        }
-    }
-
-    else if (player->Sprite.x >= window.width / 2)
-    {
-
-        if (player->Sprite.y <= window.height / 2)
-        {
-            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, player->Sprite.x - window.width / 2, 0, SRCCOPY); // ???? ???? ?????? ???? ??????
-        }
-        else if (player->Sprite.y <= window.height_z - window.height / 2)
-        {
-            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, player->Sprite.x - window.width / 2, player->Sprite.y - window.height / 2, SRCCOPY);
-        }
-        else
-        {
-            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, player->Sprite.x - window.width / 2, window.height_z - window.height, SRCCOPY);
-
-        }
-
-    }
-    else
-    {
-
-        if (player->Sprite.y <= window.height / 2)
-        {
-            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, window.width_z, 0, SRCCOPY); // ???? ???? ?????? ???? ??????
-        }
-        else if (player->Sprite.y <= window.height_z - window.height / 2)
-        {
-            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, window.width_z, player->Sprite.y - window.height / 2, SRCCOPY);
-        }
-        else
-        {
-            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, window.width_z, window.height_z - window.height, SRCCOPY);
-
-        }
-
-    }
-}
+//void PrintBitblt()
+//{
+//
+//    //BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);//???????? ????? ? ????
+//
+//    if (player->Sprite.x <= window.width / 2)
+//    {
+//        if (player->Sprite.y <= window.height / 2)
+//        {
+//            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, 0, SRCCOPY); // ???? ???? ?????? ???? ??????
+//        }
+//        else if (player->Sprite.y <= window.height_z - window.height / 2)
+//        {
+//            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, player->Sprite.y - window.height / 2, SRCCOPY);
+//        }
+//        else
+//        {
+//            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, 0, window.height_z - window.height, SRCCOPY);
+//
+//        }
+//    }
+//
+//    else if (player->Sprite.x >= window.width / 2)
+//    {
+//
+//        if (player->Sprite.y <= window.height / 2)
+//        {
+//            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, player->Sprite.x - window.width / 2, 0, SRCCOPY); // ???? ???? ?????? ???? ??????
+//        }
+//        else if (player->Sprite.y <= window.height_z - window.height / 2)
+//        {
+//            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, player->Sprite.x - window.width / 2, player->Sprite.y - window.height / 2, SRCCOPY);
+//        }
+//        else
+//        {
+//            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, player->Sprite.x - window.width / 2, window.height_z - window.height, SRCCOPY);
+//
+//        }
+//
+//    }
+//    else
+//    {
+//
+//        if (player->Sprite.y <= window.height / 2)
+//        {
+//            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, window.width_z, 0, SRCCOPY); // ???? ???? ?????? ???? ??????
+//        }
+//        else if (player->Sprite.y <= window.height_z - window.height / 2)
+//        {
+//            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, window.width_z, player->Sprite.y - window.height / 2, SRCCOPY);
+//        }
+//        else
+//        {
+//            BitBlt(window.device_context, 0, 0, window.width_z, window.height_z, window.context, window.width_z, window.height_z - window.height, SRCCOPY);
+//
+//        }
+//
+//    }
+//}
 
 
 
@@ -146,16 +146,3 @@ void ShowObjects()
         location[player->currentLocation].locationObjects[i].Sprite.show();
     }
 }
-
-//void DrawHealth()
-//{
-//   
-//    for (int i = 0; i < player->max_lives; i++)
-//    {
-//        if (i < player->current_lives)
-//        {
-//            health.hHealthFull.showHealth(i, health.health_width);
-//        }
-//        else health.hHealthEmpty.showHealth(i, health.health_width);
-//    }
-//}
