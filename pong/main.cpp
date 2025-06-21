@@ -35,6 +35,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             Persona[i]->Sprite.show();
             Persona[i]->move();
         }
+        Health_bar.Show();
 
         //player->Sprite.showHealth()
         //player.h

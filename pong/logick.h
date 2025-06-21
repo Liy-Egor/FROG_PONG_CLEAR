@@ -2,48 +2,51 @@
 #include "Structures.h"
 #include <memory>
 
+
+
 void InitGame()
 {
-    //player_ health{ 40, 5, 3, "health_full.bmp", "health_empty.bmp" };
-    //player = make_shared<character>(40, 5, 3, "health_full.bmp", "health_empty.bmp");
-    player = new Hero(0.2, 0.25, 0.023, 0.032, "racket.bmp", 40, 5, 3, "health_full.bmp", "health_empty.bmp");
-    wolf = new Wolf(0.25, 0.25, 0.023, 0.05, "walls.bmp", 40, 5, 3, "health_full.bmp", "health_empty.bmp");
-    wolf2 = new Wolf(0.15, 0.25, 0.023, 0.05, "walls.bmp", 40, 5, 3, "health_full.bmp", "health_empty.bmp");
-    
+
+    //player_ health{ 40, 5, 3, "health_full", "health_empty" };
+    //player = make_shared<character>(40, 5, 3, "health_full", "health_empty");
+    player = new Hero(0.2, 0.25, 0.023, 0.032, "racket", 40, 5, 3);
+    wolf = new Wolf(0.25, 0.25, 0.023, 0.05, "walls", 40, 5, 3);
+    wolf2 = new Wolf(0.15, 0.25, 0.023, 0.05, "walls", 40, 5, 3);
+   
     //-----------------------------location0_______________
-    location[0].hBack.loadBitmapWithNativeSize("background_0.bmp");
-    //location[0].portal.emplace_back(0.96, 0.89, 0.021, 0.2, 1, "racket.bmp");//портал в локацию 1
-    location[0].walls.emplace_back(0, 0, 0.009, 0.99, "walls.bmp");//левая стена
-    location[0].walls.emplace_back(0.98, 0, 0.02, 0.99, "walls.bmp");//правая стена
-    location[0].walls.emplace_back(0, 0.98, 0.999, 0.02, "walls.bmp");//пол
-    location[0].walls.emplace_back(0, 0, 0.999, 0.04, "walls.bmp");//потолок
-    location[0].locationObjects.emplace_back(0.3, 0.955, 0.02, 0.025, "ball.bmp", ObjectsTipe::healing);
-    location[0].locationObjects.emplace_back(0.5, 0.955, 0.025, 0.025, "spike.bmp", ObjectsTipe::spike);
-    location[0].locationTexture.emplace_back(0.8, 0.85, 0.15, 0.05, "racket_enemy.bmp");
-    location[0].locationTexture.emplace_back(0.4, 0.85, 0.15, 0.05, "racket_enemy.bmp");
-    //location[0].locationTexture.emplace_back(0.6, 0.95, 0.15, 0.05, "racket_enemy.bmp");
-    location[0].walls.emplace_back(0.1, 0.8, 0.15, 0.05, "walls.bmp");
-    location[0].walls.emplace_back(0.05, 0.9, 0.15, 0.05, "walls.bmp");
-    location[0].walls.emplace_back(0.1, 0.7, 0.05, 0.05, "walls.bmp");
-    location[0].walls.emplace_back(0.1, 0.6, 0.05, 0.05, "walls.bmp");
-    location[0].walls.emplace_back(0.1, 0.5, 0.05, 0.05, "walls.bmp");
-    location[0].walls.emplace_back(0.1, 0.3, 0.05, 0.05, "walls.bmp");
-    location[0].walls.emplace_back(0.1, 0.2, 0.05, 0.05, "walls.bmp");
-    location[0].walls.emplace_back(0.1, 0.1, 0.05, 0.05, "walls.bmp");
-    location[0].walls.emplace_back(0.1, 0.4, 0.05, 0.05, "walls.bmp");
-    location[0].walls.emplace_back(0.3, 0.85, 0.15, 0.05, "walls.bmp");
-    location[0].walls.emplace_back(0.6, 0.93, 0.15, 0.05, "walls.bmp");
-    location[0].walls.emplace_back(0.8, 0.83, 0.15, 0.05, "walls.bmp");
+    location[0].hBack.loadBitmapWithNativeSize("background_0");
+    //location[0].portal.emplace_back(0.96, 0.89, 0.021, 0.2, 1, "racket");//портал в локацию 1
+    location[0].walls.emplace_back(0, 0, 0.009, 0.99, "walls");//левая стена
+    location[0].walls.emplace_back(0.98, 0, 0.02, 0.99, "walls");//правая стена
+    location[0].walls.emplace_back(0, 0.98, 0.999, 0.02, "walls");//пол
+    location[0].walls.emplace_back(0, 0, 0.999, 0.04, "walls");//потолок
+    location[0].locationObjects.emplace_back(0.3, 0.955, 0.02, 0.025, "ball", ObjectsTipe::healing);
+    location[0].locationObjects.emplace_back(0.5, 0.955, 0.025, 0.025, "spike", ObjectsTipe::spike);
+    location[0].locationTexture.emplace_back(0.8, 0.85, 0.15, 0.05, "racket_enemy");
+    location[0].locationTexture.emplace_back(0.4, 0.85, 0.15, 0.05, "racket_enemy");
+    //location[0].locationTexture.emplace_back(0.6, 0.95, 0.15, 0.05, "racket_enemy");
+    location[0].walls.emplace_back(0.1, 0.8, 0.15, 0.05, "walls");
+    location[0].walls.emplace_back(0.05, 0.9, 0.15, 0.05, "walls");
+    location[0].walls.emplace_back(0.1, 0.7, 0.05, 0.05, "walls");
+    location[0].walls.emplace_back(0.1, 0.6, 0.05, 0.05, "walls");
+    location[0].walls.emplace_back(0.1, 0.5, 0.05, 0.05, "walls");
+    location[0].walls.emplace_back(0.1, 0.3, 0.05, 0.05, "walls");
+    location[0].walls.emplace_back(0.1, 0.2, 0.05, 0.05, "walls");
+    location[0].walls.emplace_back(0.1, 0.1, 0.05, 0.05, "walls");
+    location[0].walls.emplace_back(0.1, 0.4, 0.05, 0.05, "walls");
+    location[0].walls.emplace_back(0.3, 0.85, 0.15, 0.05, "walls");
+    location[0].walls.emplace_back(0.6, 0.93, 0.15, 0.05, "walls");
+    location[0].walls.emplace_back(0.8, 0.83, 0.15, 0.05, "walls");
     //-----------------------------------------------------------------------------
     
     //___________________________location1________________
-    ////location[1].hBack.loadBitmapWithNativeSize("background_1.bmp");
-    ////location[1].portal.emplace_back(0.02, 0.89, 0.021, 0.09, 0, "racket.bmp");//портал в локацию 0
-    //location[1].walls.emplace_back(0, 0, 0.02, 0.99, "walls.bmp");//левая стена
-    //location[1].walls.emplace_back(0.98, 0, 0.02, 0.99, "walls.bmp");//правая стена
-    //location[1].walls.emplace_back(0, 0.98, 0.999, 0.02, "walls.bmp");//пол
-    //location[1].walls.emplace_back(0, 0, 0.999, 0.02, "walls.bmp");//потолок
-    //location[1].locationTexture.emplace_back(0.08, 0.9, 0.15, 0.05, "racket_enemy.bmp");
+    ////location[1].hBack.loadBitmapWithNativeSize("background_1");
+    ////location[1].portal.emplace_back(0.02, 0.89, 0.021, 0.09, 0, "racket");//портал в локацию 0
+    //location[1].walls.emplace_back(0, 0, 0.02, 0.99, "walls");//левая стена
+    //location[1].walls.emplace_back(0.98, 0, 0.02, 0.99, "walls");//правая стена
+    //location[1].walls.emplace_back(0, 0.98, 0.999, 0.02, "walls");//пол
+    //location[1].walls.emplace_back(0, 0, 0.999, 0.02, "walls");//потолок
+    //location[1].locationTexture.emplace_back(0.08, 0.9, 0.15, 0.05, "racket_enemy");
 }
 
 void ProcessSound(const char* name)//проигрывание аудиофайла в формате .wav, файл должен лежать в той же папке где и программа
@@ -238,7 +241,7 @@ void CollisionGroup()
 {
     static int lastDamageTime = 0;
     bool spikeCollision = false;
-   // player->Sprite.loadBitmapWithNativeSize("racket.bmp");
+   // player->Sprite.loadBitmapWithNativeSize("racket");
     for (int i = 0; i < location[player->currentLocation].locationObjects.size(); ++i)
     {
         Objects& obj = location[player->currentLocation].locationObjects[i];
@@ -273,7 +276,7 @@ void CollisionGroup()
         player->Sprite.jump = 60;
         player->Sprite.x += 20;
         player->inJump = true;
-        //player->Sprite.loadBitmapWithNativeSize("walls.bmp");
+        //player->Sprite.loadBitmapWithNativeSize("walls");
         
     }
     /*if (health.current_lives <= 0) {
