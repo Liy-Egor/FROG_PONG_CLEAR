@@ -13,23 +13,6 @@ int currenttime = 0;
 POINT mouse;
 
 void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool alpha = false);
-/*
-struct NameFileResource {
- string Back = "back.bmp",
-        Ball = "ball.bmp",
-        BounceSound = "bounce.wav",
-        EnemyFirst = "enemy1.bmp",
-        FailSound = "fail.wav",
-        HealthEmpty = "health_empty.bmp",
-        HealthFull = "health_full.bmp",
-        Racket = "racket.bmp",
-        RacketEnemy = "racket_enemy.bmp",
-        Spike = "spike.bmp",
-        Walls = "walls.bmp";
-};*/
-
-
-
 
 struct {
     HWND hWnd;//хэндл окна
@@ -103,11 +86,25 @@ struct Objects // структура игровых обьектов
 
 };
 
+struct portal_
+{
+    sprite spr;
+    int destination;
+    portal_(float p_x, float p_y, float p_width, float p_height, int p_destination, const string& filename)
+    {
+        spr.x = p_x * window.width_z;
+        spr.y = p_y * window.height_z;
+        spr.width = p_width * window.width_z;
+        spr.height = p_height * window.height_z;
+        destination = p_destination;
+        spr.loadBitmapWithNativeSize(filename);
+    }
+};
 
 struct Location_
 {
     sprite hBack;
-    //vector<portal_>portal;
+    vector<portal_>portal;
     vector<Texture> locationTexture;
     vector<Texture> walls;
     vector<Objects> locationObjects;
@@ -249,22 +246,8 @@ public:
     }
 };
 
-struct portal_ 
-{
-    sprite spr;
-    int destination;
-    portal_(float p_x, float p_y, float p_width, float p_height, int p_destination, const string& filename)
-    {
-        spr.x = p_x * window.width;
-        spr.y = p_y * window.height;
-        spr.width = p_width * window.width;
-        spr.height = p_height * window.height;
-        destination = p_destination;
-        spr.loadBitmapWithNativeSize(filename);
-    }
-};
 
-//NameFileResource NameFile;
+
 Hero* player;
 Wolf* wolf;
 Wolf* wolf2;

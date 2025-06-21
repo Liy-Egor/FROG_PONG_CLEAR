@@ -43,7 +43,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         ShowTexture();
         ShowObjects();
         //DrawHealth();
-        //ProcessPortal();
+        ProcessPortal();
         CollisionGroup();
         //ProcessDash();//рывок
     }
