@@ -9,9 +9,9 @@ void InitGame()
 
     //player_ health{ 40, 5, 3, "health_full", "health_empty" };
     //player = make_shared<character>(40, 5, 3, "health_full", "health_empty");
-    player = new Hero(0.2, 0.25, 0.023, 0.032, "racket", 40, 5, 3);
-    wolf = new Wolf(0.25, 0.25, 0.023, 0.05, "walls", 40, 5, 3);
-    wolf2 = new Wolf(0.15, 0.25, 0.023, 0.05, "walls", 40, 5, 3);
+    player = new Hero(0.2, 0.25, 0.023, 0.032, "racket", 40, 5, 3, 0);
+    wolf = new Wolf(0.25, 0.25, 0.023, 0.05, "walls", 40, 5, 3, 0);
+    wolf2 = new Wolf(0.15, 0.25, 0.023, 0.05, "walls", 40, 5, 3, 0);
    
     //-----------------------------location0_______________
     location[0].hBack.loadBitmapWithNativeSize("background_0");
@@ -177,6 +177,7 @@ void ProcessPortal()
 
         if (CheckCollision(player->Sprite.x, player->Sprite.y, player->Sprite.width, player->Sprite.height, i.spr.x, i.spr.y, i.spr.width, i.spr.height))
         {
+            //player = new Hero(0.2, 0.25, 0.023, 0.032, "racket", 40, 5, 3, 1);
             player->currentLocation = i.destination;
             player->Sprite.x = location[player->currentLocation].walls[0].Sprite.x + player->Sprite.width + location[player->currentLocation].walls[0].Sprite.width;
         }

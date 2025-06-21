@@ -101,17 +101,7 @@ struct portal_
     }
 };
 
-struct Location_
-{
-    sprite hBack;
-    vector<portal_>portal;
-    vector<Texture> locationTexture;
-    vector<Texture> walls;
-    vector<Objects> locationObjects;
 
-};
-
-Location_ location[5];
 
 void tracer_collide(auto& Character);
 
@@ -161,12 +151,25 @@ void processGravity(auto& spriteName)
     spriteName.dy = spriteName.gravity - spriteName.jump;
 }
 
-vector<character*> Persona;
+
+struct Location_
+{
+    sprite hBack;
+    vector<portal_>portal;
+    vector<Texture> locationTexture;
+    vector<Texture> walls;
+    vector<Objects> locationObjects;
+    vector<character*> Persona;
+
+};
+
+Location_ location[5];
+
 
 class Hero : public character
 {
     public:
-        Hero(float p_x, float p_y, float p_width, float p_height, const string& filename, int p_health, int p_max_lives, int p_current_lives) 
+        Hero(float p_x, float p_y, float p_width, float p_height, const string& filename, int p_health, int p_max_lives, int p_current_lives, int current_location) 
             : character(p_x, p_y, p_width, p_height, filename, p_health, p_max_lives, p_current_lives)
         {
 
@@ -177,7 +180,7 @@ class Hero : public character
             Sprite.dy = 0;
             Sprite.jump = 0;
             Sprite.gravity = 30;
-            Persona.push_back(this);
+            //location[current_location].Persona.push_back(this);
         }
 
 
@@ -212,7 +215,7 @@ class Wolf : public character //структура врагов
 public:
    
     int direction = 1; // 1 - вправо, -1 - влево
-    Wolf(float p_x, float p_y, float p_width, float p_height, const string& filename, int p_health, int p_max_lives, int p_current_lives)
+    Wolf(float p_x, float p_y, float p_width, float p_height, const string& filename, int p_health, int p_max_lives, int p_current_lives, int current_location)
     : character(p_x, p_y, p_width, p_height, filename, p_health, p_max_lives, p_current_lives)
     {
         Sprite.speed = 5;
@@ -220,7 +223,7 @@ public:
         Sprite.dy = 0;
         Sprite.jump = 0;
         Sprite.gravity = 30;
-        Persona.push_back(this);
+        location[current_location].Persona.push_back(this);
     }
 
     void move()

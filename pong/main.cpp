@@ -30,11 +30,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         location[player->currentLocation].hBack.showBack();
 
-        for (int i = 0; i < Persona.size(); i++) {
+        for (int i = 0; i < location[player->currentLocation].Persona.size(); i++) {
 
-            Persona[i]->Sprite.show();
-            Persona[i]->move();
+            location[player->currentLocation].Persona[i]->Sprite.show();
+            location[player->currentLocation].Persona[i]->move();
         }
+        player->Sprite.show();
+        player->move();
         Health_bar.Show();
 
         //player->Sprite.showHealth()
