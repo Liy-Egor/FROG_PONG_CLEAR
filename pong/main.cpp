@@ -3,6 +3,17 @@
 #include "logick.h"
 
 
+float lerp(float x1, float x2, float a)
+{
+    return x1 * (1 - a) + x2 * a;
+}
+
+float length(float x1, float y1, float x2, float y2)
+{
+    return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
+}
+
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
     _In_ LPWSTR lpCmdLine,
@@ -12,7 +23,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     InitWindow();//здесь инициализируем все что нужно для рисования в окне
   
     InitGame();//здесь инициализируем переменные игры
-    //ShowCursor(FALSE);
+    ShowCursor(FALSE);
     
 
 
@@ -27,7 +38,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         GetCursorPos(&mouse);
         ScreenToClient(window.hWnd, &mouse);
         int sz = 5;
-        Ellipse(window.context, mouse.x - sz, mouse.y - sz, mouse.x + sz, mouse.y + sz);
+        
 
         location[player->currentLocation].hBack.showBack();
 
@@ -40,6 +51,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         player->move();
         Health_bar.Show();
 
+        //player->Sprite.showHealth()
+        //player.h
+        
+        ShowTexture();
+        ShowObjects();
+        //DrawHealth();
+        ProcessPortal();
+        CollisionGroup();
+        //ProcessDash();//рывок
+        Ellipse(window.context, mouse.x - sz, mouse.y - sz, mouse.x + sz, mouse.y + sz);
 
         if (GetAsyncKeyState('A'))
         {
@@ -51,18 +72,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             player_view.x--;
         }
 
-        player_view.x = player->Sprite.x - .5 * window.width/ 3;
-        player_view.y = player->Sprite.y-.5*window.height/3;
-
-        //player->Sprite.showHealth()
-        //player.h
-        
-        ShowTexture();
-        ShowObjects();
-        //DrawHealth();
-        ProcessPortal();
-        CollisionGroup();
-        //ProcessDash();//рывок
+        float ls = .2* length(player_view.x, player->Sprite.x, player_view.y, player->Sprite.y)/500.;
+        ls = max(ls - .2, 0.1);
+        ls = min(ls, 1);
+        player_view.x = lerp(player_view.x, player->Sprite.x,ls);
+        player_view.y = lerp(player_view.y, player->Sprite.y,ls);
     }
 
 }

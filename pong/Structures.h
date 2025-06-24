@@ -42,11 +42,12 @@ struct sprite {
 
     void show()
     {
-        float scale = 3;
+        float scale = 2;
+         
+        float vx = (x - player_view.x) * scale + window.width/2;
+        float vy = (y - player_view.y) * scale + window.height / 2;
 
-
-
-        ShowBitmap(window.context, x*scale- player_view.x*scale, y*scale - player_view.y*scale, width*scale, height*scale, hBitmap, false);
+        ShowBitmap(window.context, vx, vy, width*scale, height*scale, hBitmap, false);
     }
 
     void showBack()
