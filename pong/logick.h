@@ -6,12 +6,9 @@
 
 void InitGame()
 {
-
-    //player_ health{ 40, 5, 3, "health_full", "health_empty" };
-    //player = make_shared<character>(40, 5, 3, "health_full", "health_empty");
     player = new Hero(0.2, 0.25, 0.023, 0.032, "racket", 40, 5, 3, 0);
-    wolf = new Wolf(0.25, 0.25, 0.023, 0.05, "walls", 40, 5, 3, 0);
-    wolf2 = new Wolf(0.15, 0.25, 0.023, 0.05, "walls", 40, 5, 3, 0);
+    wolf = new Wolf(0.25, 0.25, 0.023, 0.02, "enemy1", 40, 5, 3, 0);
+    wolf2 = new Wolf(0.15, 0.25, 0.023, 0.02, "enemy1", 40, 5, 3, 0);
    
     //-----------------------------location0_______________
     location[0].hBack.loadBitmapWithNativeSize("background_0");
@@ -20,11 +17,9 @@ void InitGame()
     location[0].walls.emplace_back(0, 0.98, 0.999, 0.02, "walls");//пол
     location[0].walls.emplace_back(0, 0, 0.999, 0.04, "walls");//потолок
     location[0].portal.emplace_back(0.96, 0.89, 0.021, 0.2, 1, "racket");//портал в локацию 1
-    location[0].locationObjects.emplace_back(0.3, 0.955, 0.02, 0.025, "ball", ObjectsTipe::healing);
-    location[0].locationObjects.emplace_back(0.5, 0.955, 0.025, 0.025, "spike", ObjectsTipe::spike);
-    location[0].locationTexture.emplace_back(0.8, 0.85, 0.15, 0.05, "racket_enemy");
-    location[0].locationTexture.emplace_back(0.4, 0.85, 0.15, 0.05, "racket_enemy");
-    //location[0].locationTexture.emplace_back(0.6, 0.95, 0.15, 0.05, "racket_enemy");
+    //location[0].locationObjects.emplace_back(0.3, 0.955, 0.02, 0.025, "ball", ObjectsTipe::healing);
+    //location[0].locationObjects.emplace_back(0.5, 0.955, 0.025, 0.025, "spike", ObjectsTipe::spike);
+    
     location[0].walls.emplace_back(0.1, 0.8, 0.15, 0.05, "walls");
     location[0].walls.emplace_back(0.05, 0.9, 0.15, 0.05, "walls");
     location[0].walls.emplace_back(0.1, 0.7, 0.05, 0.05, "walls");
@@ -47,7 +42,7 @@ void InitGame()
     location[1].walls.emplace_back(0, 0.98, 0.999, 0.02, "walls");//пол
     location[1].walls.emplace_back(0, 0, 0.999, 0.02, "walls");//потолок
     location[1].portal.emplace_back(0.8, 0.89, 0.021, 0.09, 0, "racket");//портал в локацию 0
-    location[1].locationTexture.emplace_back(0.08, 0.9, 0.15, 0.05, "racket_enemy");
+    
 }
 
 void ProcessSound(const char* name)//проигрывание аудиофайла в формате .wav, файл должен лежать в той же папке где и программа
@@ -87,7 +82,7 @@ void tracer_collide(auto& Character)
                 float pixel_x = Bbox[k * 2];
                 float pixel_y = Bbox[k * 2 + 1];
 
-                SetPixel(window.context, pixel_x, pixel_y, RGB(255, 255, 255));
+                SetPixel(window.context, (pixel_x - player_view.x) * 2 + window.width / 2, (pixel_y - player_view.y) * 2 + window.height / 2, RGB(255, 255, 255));
 
 
 
@@ -159,30 +154,10 @@ void tracer_collide(auto& Character)
 
 
 
-bool CheckCollision(float x1, float y1, float w1, float h1,
-    float x2, float y2, float w2, float h2)
-{
-    return x1 < x2 + w2 &&
-        x1 + w1 > x2 &&
-        y1 < y2 + h2 &&
-        y1 + h1 > y2;
-}
 
 
-void ProcessPortal()
-{
-    for (auto& i : location[player->currentLocation].portal)
-    {
-        i.spr.show();
 
-        if (CheckCollision(player->Sprite.x, player->Sprite.y, player->Sprite.width, player->Sprite.height, i.spr.x, i.spr.y, i.spr.width, i.spr.height))
-        {
-            //player = new Hero(0.2, 0.25, 0.023, 0.032, "racket", 40, 5, 3, 1);
-            player->currentLocation = i.destination;
-            player->Sprite.x = location[player->currentLocation].walls[0].Sprite.x + player->Sprite.width + location[player->currentLocation].walls[0].Sprite.width;
-        }
-    }
-}
+
 
 
 HANDLE hTimer;
@@ -233,55 +208,55 @@ HANDLE hTimer;
 //}
 
 
-
-void CollisionGroup()
-{
-    static int lastDamageTime = 0;
-    bool spikeCollision = false;
-   // player->Sprite.loadBitmapWithNativeSize("racket");
-    for (int i = 0; i < location[player->currentLocation].locationObjects.size(); ++i)
-    {
-        Objects& obj = location[player->currentLocation].locationObjects[i];
-        if (obj.type == ObjectsTipe::spike)
-        {
-            if (player->Sprite.x + player->Sprite.width >= obj.Sprite.x &&
-                player->Sprite.x <= obj.Sprite.x + obj.Sprite.width &&
-                player->Sprite.y + player->Sprite.height >= obj.Sprite.y &&
-                player->Sprite.y <= obj.Sprite.y + obj.Sprite.height)
-            {
-                spikeCollision = true;
-                break;
-            }
-        }
-        if (obj.type == ObjectsTipe::healing)
-        {
-            if (player->Sprite.x + player->Sprite.width >= obj.Sprite.x &&
-                player->Sprite.x <= obj.Sprite.x + obj.Sprite.width &&
-                player->Sprite.y + player->Sprite.height >= obj.Sprite.y &&
-                player->Sprite.y <= obj.Sprite.y + obj.Sprite.height)
-            {
-                location[player->currentLocation].locationObjects.erase(location[player->currentLocation].locationObjects.begin());
-                player->current_lives++;
-                break;
-            }
-        }
-
-    }
-    if (spikeCollision && currenttime > lastDamageTime + 1000) {
-        player->current_lives--;
-        lastDamageTime = currenttime;
-        player->Sprite.jump = 60;
-        player->Sprite.x += 20;
-        player->inJump = true;
-        //player->Sprite.loadBitmapWithNativeSize("walls");
-        
-    }
-    /*if (health.current_lives <= 0) {
-        MessageBox(window.hWnd, "Game Over!", "Info", MB_OK);
-        exit(0);
-    }*/
-    
-}
+//
+//void CollisionGroup()
+//{
+//    static int lastDamageTime = 0;
+//    bool spikeCollision = false;
+//   // player->Sprite.loadBitmapWithNativeSize("racket");
+//    for (int i = 0; i < location[player->currentLocation].locationObjects.size(); ++i)
+//    {
+//        Objects& obj = location[player->currentLocation].locationObjects[i];
+//        if (obj.type == ObjectsTipe::spike)
+//        {
+//            if (player->Sprite.x + player->Sprite.width >= obj.Sprite.x &&
+//                player->Sprite.x <= obj.Sprite.x + obj.Sprite.width &&
+//                player->Sprite.y + player->Sprite.height >= obj.Sprite.y &&
+//                player->Sprite.y <= obj.Sprite.y + obj.Sprite.height)
+//            {
+//                spikeCollision = true;
+//                break;
+//            }
+//        }
+//        if (obj.type == ObjectsTipe::healing)
+//        {
+//            if (player->Sprite.x + player->Sprite.width >= obj.Sprite.x &&
+//                player->Sprite.x <= obj.Sprite.x + obj.Sprite.width &&
+//                player->Sprite.y + player->Sprite.height >= obj.Sprite.y &&
+//                player->Sprite.y <= obj.Sprite.y + obj.Sprite.height)
+//            {
+//                location[player->currentLocation].locationObjects.erase(location[player->currentLocation].locationObjects.begin());
+//                player->current_lives++;
+//                break;
+//            }
+//        }
+//
+//    }
+//    if (spikeCollision && currenttime > lastDamageTime + 1000) {
+//        player->current_lives--;
+//        lastDamageTime = currenttime;
+//        player->Sprite.jump = 60;
+//        player->Sprite.x += 20;
+//        player->inJump = true;
+//        //player->Sprite.loadBitmapWithNativeSize("walls");
+//        
+//    }
+//    /*if (health.current_lives <= 0) {
+//        MessageBox(window.hWnd, "Game Over!", "Info", MB_OK);
+//        exit(0);
+//    }*/
+//    
+//}
 
 
 

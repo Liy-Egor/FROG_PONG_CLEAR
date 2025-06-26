@@ -19,24 +19,6 @@ void InitWindow()
 
 }
 
-//void CreateMap()
-//{
-//    RECT z;
-//    GetClientRect(window.hWnd, &z);
-//    window.device_context = GetDC(window.hWnd);
-//    z.left = 0;
-//    z.right = window.width * 3;
-//    z.bottom = window.height * 2;
-//    z.top = 0;
-//
-//    window.width_z = z.right - z.left;
-//    window.height_z = z.bottom - z.top;
-//
-//    window.context = CreateCompatibleDC(window.device_context);
-//    SelectObject(window.context, CreateCompatibleBitmap(window.device_context, window.width_z, window.height_z));
-//    GetClientRect(window.hWnd, &z);
-//
-//}
 
 void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool alpha)
 {
@@ -129,20 +111,14 @@ void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool
 
 
 
-void ShowTexture()
+void ShowStaticObjects()
 {
-
-    for (int i = 0; i < location[player->currentLocation].locationTexture.size();i++) {
-        location[player->currentLocation].locationTexture[i].Sprite.show();
-    }
     for (int i = 0; i < location[player->currentLocation].walls.size();i++) {
         location[player->currentLocation].walls[i].Sprite.show();
     }
-}
-
-void ShowObjects()
-{
     for (int i = 0; i < location[player->currentLocation].locationObjects.size();i++) {
         location[player->currentLocation].locationObjects[i].Sprite.show();
     }
 }
+
+

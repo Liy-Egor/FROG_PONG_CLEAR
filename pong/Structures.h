@@ -64,53 +64,67 @@ enum class ObjectsTipe
     frog
 };
 
-struct Texture // структура платформ
+class StaticObjects 
 {
+public:
 
     sprite Sprite;
-
-
-    Texture(float p_x, float p_y, float p_width, float p_height, const string& filename) {
+    StaticObjects(float p_x, float p_y, float p_width, float p_height, const string& filename) {
         Sprite.x = p_x * window.width;
         Sprite.y = p_y * window.height;
         Sprite.width = p_width * window.width;
         Sprite.height = p_height * window.height;
         Sprite.loadBitmapWithNativeSize(filename);;
-
     }
+};
 
+class Platform : public StaticObjects
+{
+public:
+    using StaticObjects::StaticObjects;
 };
 
 
-struct Objects // структура игровых обьектов
+class HealingFlask : public StaticObjects
 {
-    sprite Sprite;
-    ObjectsTipe type;
-
-    Objects(float p_x, float p_y, float p_width, float p_height, const string& filename, ObjectsTipe objTipe) {
-        Sprite.x = p_x * window.width;
-        Sprite.y = p_y * window.height;
-        Sprite.width = p_width * window.width;
-        Sprite.height = p_height * window.height;
-        Sprite.loadBitmapWithNativeSize(filename);
-        type = objTipe;
-
-    }
+public:
+    using StaticObjects::StaticObjects;
 
 };
 
-struct portal_
+class Spike : public StaticObjects
 {
-    sprite spr;
+public:
+    using StaticObjects::StaticObjects;
+
+};
+
+class portal_ : public StaticObjects
+{
+public:
     int destination;
-    portal_(float p_x, float p_y, float p_width, float p_height, int p_destination, const string& filename)
+    portal_(float p_x, float p_y, float p_width, float p_height, const string& filename, int p_destination)
+        : StaticObjects(p_x, p_y, p_width, p_height, filename)
     {
-        spr.x = p_x * window.width;
-        spr.y = p_y * window.height;
-        spr.width = p_width * window.width;
-        spr.height = p_height * window.height;
         destination = p_destination;
-        spr.loadBitmapWithNativeSize(filename);
+    }
+
+    bool CheckCollision(float x1, float y1, float w1, float h1,
+        float x2, float y2, float w2, float h2)
+    {
+        return x1 < x2 + w2 &&
+            x1 + w1 > x2 &&
+            y1 < y2 + h2 &&
+            y1 + h1 > y2;
+    }
+
+    void ProcessPortal(auto& player)
+    {
+         if (CheckCollision(player->Sprite.x, player->Sprite.y, player->Sprite.width, player->Sprite.height, Sprite.x, Sprite.y, Sprite.width, Sprite.height))
+         {
+             player->currentLocation = destination;
+             player->Sprite.x = location[player->currentLocation].walls[0].Sprite.x + player->Sprite.width + location[player->currentLocation].walls[0].Sprite.width;
+         }
     }
 };
 
@@ -169,9 +183,8 @@ struct Location_
 {
     sprite hBack;
     vector<portal_>portal;
-    vector<Texture> locationTexture;
-    vector<Texture> walls;
-    vector<Objects> locationObjects;
+    vector<Platform> walls;
+    //vector<Objects> locationObjects;
     vector<character*> Persona;
 
 };
@@ -188,7 +201,7 @@ class Hero : public character
 
             string name = __FUNCTION__; // получение имени класса (пока реализации нету)
             
-            Sprite.speed = 60;
+            Sprite.speed = 30;
             Sprite.dx = 0;
             Sprite.dy = 0;
             Sprite.jump = 0;
@@ -282,8 +295,8 @@ public:
 
         int h_w = 50;
         int margin = 10;
-        int startX = player->Sprite.x + window.width/2 - 50;
-        int startY = player->Sprite.y - window.height/2 -10;
+        int startX = window.width - h_w - 20;
+        int startY =  10;
 
         for (int i = 0; i < player->max_lives; i++) {
             if (i < player->current_lives) {
