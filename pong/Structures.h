@@ -29,6 +29,11 @@ struct {
 
 } player_view;
 
+struct float2 {
+    float x;
+    float y;
+};
+
 struct sprite {
     float x, y, width, height, dx, dy, speed, jump, gravity;
     HBITMAP hBitmap;
@@ -46,8 +51,28 @@ struct sprite {
          
         float vx = (x - player_view.x) * scale + window.width/2;
         float vy = (y - player_view.y) * scale + window.height / 2;
+        float vw = width * scale;
+        float vh = height * scale;
+        float2 p[4] = {
+            {vx,vy},
+            {vx + vw,vy},
+            {vx + vw,vy + vh},
+            {vx,vy + vh }
+        };
 
-        ShowBitmap(window.context, vx, vy, width*scale, height*scale, hBitmap, false);
+        bool in = false;
+        for (int i = 0; i < 4; i++)
+        {
+            if (p[i].x >= 0 && p[i].x < window.width && 
+                p[i].y >= 0 && p[i].y < window.height) in = true;
+
+        }
+
+        if (!in) return;
+
+        ShowBitmap(window.context, vx, vy, vw, vh, hBitmap, false);
+         
+        
     }
 
     void showBack()
@@ -103,7 +128,7 @@ class portal_ : public StaticObjects
 {
 public:
     int destination;
-    portal_(float p_x, float p_y, float p_width, float p_height, const string& filename, int p_destination)
+    portal_(float p_x, float p_y, float p_width, float p_height, int p_destination, const string& filename)
         : StaticObjects(p_x, p_y, p_width, p_height, filename)
     {
         destination = p_destination;
@@ -118,14 +143,7 @@ public:
             y1 + h1 > y2;
     }
 
-    void ProcessPortal(auto& player)
-    {
-         if (CheckCollision(player->Sprite.x, player->Sprite.y, player->Sprite.width, player->Sprite.height, Sprite.x, Sprite.y, Sprite.width, Sprite.height))
-         {
-             player->currentLocation = destination;
-             player->Sprite.x = location[player->currentLocation].walls[0].Sprite.x + player->Sprite.width + location[player->currentLocation].walls[0].Sprite.width;
-         }
-    }
+    void Portal(auto& player);
 };
 
 
@@ -313,3 +331,12 @@ public:
 };
 
 health_bar Health_bar;
+
+void portal_::Portal(auto& player)
+{
+    if (CheckCollision(player->Sprite.x, player->Sprite.y, player->Sprite.width, player->Sprite.height, Sprite.x, Sprite.y, Sprite.width, Sprite.height))
+    {
+        player->currentLocation = destination;
+        player->Sprite.x = location[player->currentLocation].walls[0].Sprite.x + player->Sprite.width + location[player->currentLocation].walls[0].Sprite.width;
+    }
+}

@@ -54,7 +54,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         for (int i = 0; i < location[player->currentLocation].portal.size(); i++) {
 
             location[player->currentLocation].portal[i].Sprite.show();
-            location[player->currentLocation].portal[i].ProcessPortal(player);
+            location[player->currentLocation].portal[i].Portal(player);
         }
         
         //CollisionGroup();
@@ -76,6 +76,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         ls = min(ls, 1);
         player_view.x = lerp(player_view.x, player->Sprite.x,ls);
         player_view.y = lerp(player_view.y, player->Sprite.y,ls);
+        
     }
+
 
 }

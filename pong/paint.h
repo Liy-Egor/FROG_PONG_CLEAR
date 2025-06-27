@@ -116,9 +116,9 @@ void ShowStaticObjects()
     for (int i = 0; i < location[player->currentLocation].walls.size();i++) {
         location[player->currentLocation].walls[i].Sprite.show();
     }
-    for (int i = 0; i < location[player->currentLocation].locationObjects.size();i++) {
+    /*for (int i = 0; i < location[player->currentLocation].locationObjects.size();i++) {
         location[player->currentLocation].locationObjects[i].Sprite.show();
-    }
+    }*/
 }
 
 
