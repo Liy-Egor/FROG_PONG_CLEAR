@@ -18,7 +18,6 @@ struct {
     HWND hWnd;//хэндл окна
     HDC device_context, context;// два контекста устройства (для буферизации)
     int width, height;//сюда сохраним размеры окна которое создаст программа
-    //int width_z, height_z;
 } window;
 
 struct {
@@ -49,30 +48,31 @@ struct sprite {
     {
         float scale = 2;
          
-        float vx = (x - player_view.x) * scale + window.width/2;
-        float vy = (y - player_view.y) * scale + window.height / 2;
+        float vx = (x - player_view.x) * scale + window.width /2;
+        float vy = (y - player_view.y) * scale + window.height /2;
         float vw = width * scale;
         float vh = height * scale;
+        
         float2 p[4] = {
             {vx,vy},
             {vx + vw,vy},
             {vx + vw,vy + vh},
-            {vx,vy + vh }
+            {vx,vy + vh}
         };
 
         bool in = false;
-        for (int i = 0; i < 4; i++)
+        /*for (int i = 0; i < 4; i++)
         {
-            if (p[i].x >= 0 && p[i].x < window.width && 
+            if (p[i].x >= 0 && p[i].x < window.width  && 
                 p[i].y >= 0 && p[i].y < window.height) in = true;
+        }*/
 
-        }
-
-        if (!in) return;
-
-        ShowBitmap(window.context, vx, vy, vw, vh, hBitmap, false);
-         
+        if (vx + vw >= 0 && vx < window.width &&
+            vy + vh >= 0 && vy < window.height) 
+            in = true;
         
+        if (!in) return;
+        ShowBitmap(window.context, vx, vy, vw, vh, hBitmap, false);
     }
 
     void showBack()
