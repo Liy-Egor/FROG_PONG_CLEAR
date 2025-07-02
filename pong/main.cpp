@@ -70,6 +70,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         //ProcessDash();//рывок
         Ellipse(window.context, mouse.x - sz, mouse.y - sz, mouse.x + sz, mouse.y + sz);
 
+
+        float ls = .2* length(player_view.x, player->Sprite.x, player_view.y, player->Sprite.y)/500.;
+        ls = max(ls - .2, 0.1);
+        ls = min(ls, 1);
+        player_view.x = lerp(player_view.x, player->Sprite.x,ls);
+        player_view.y = lerp(player_view.y, player->Sprite.y,ls);
+        
         if (GetAsyncKeyState('A'))
         {
             player_view.x++;
@@ -79,13 +86,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         {
             player_view.x--;
         }
+        if (GetAsyncKeyState('W'))
+        {
+            player_view.y--;
+        }
 
-        float ls = .2* length(player_view.x, player->Sprite.x, player_view.y, player->Sprite.y)/500.;
-        ls = max(ls - .2, 0.1);
-        ls = min(ls, 1);
-        player_view.x = lerp(player_view.x, player->Sprite.x,ls);
-        player_view.y = lerp(player_view.y, player->Sprite.y,ls);
-        
+        if (GetAsyncKeyState('S'))
+        {
+            player_view.y++;
+        }
     }
 
 

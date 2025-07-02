@@ -323,8 +323,16 @@ void portal_::Portal(auto& player)
 {
     if (CheckCollision(player->Sprite.x, player->Sprite.y, player->Sprite.width, player->Sprite.height, Sprite.x, Sprite.y, Sprite.width, Sprite.height))
     {
-        player->currentLocation = destination;
-        player->Sprite.x = location[player->currentLocation].walls[0].Sprite.x + player->Sprite.width + location[player->currentLocation].walls[0].Sprite.width;
+        if (destination > player->currentLocation)
+        {
+            player->currentLocation = destination;
+            player->Sprite.x = location[player->currentLocation].walls[0].Sprite.x + location[player->currentLocation].walls[0].Sprite.width;
+        }
+        else
+        {
+            player->currentLocation = destination;
+            player->Sprite.x = location[player->currentLocation].walls[1].Sprite.x - player->Sprite.width - Sprite.width - 60;
+        }
     }
 }
 
