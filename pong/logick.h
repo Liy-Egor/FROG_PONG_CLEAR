@@ -17,8 +17,8 @@ void InitGame()
     location[0].walls.emplace_back(0, 0.98, 0.999, 0.02, "walls");//пол
     location[0].walls.emplace_back(0, 0, 0.999, 0.04, "walls");//потолок
     location[0].portal.emplace_back(0.96, 0.89, 0.021, 0.2, 1, "racket");//портал в локацию 1
-    //location[0].locationObjects.emplace_back(0.3, 0.955, 0.02, 0.025, "ball", ObjectsTipe::healing);
-    //location[0].locationObjects.emplace_back(0.5, 0.955, 0.025, 0.025, "spike", ObjectsTipe::spike);
+    location[0].healingFlask.emplace_back(0.3, 0.955, 0.02, 0.025, "ball");
+    location[0].spike.emplace_back(0.5, 0.955, 0.025, 0.025, "spike");
     
     location[0].walls.emplace_back(0.1, 0.8, 0.15, 0.05, "walls");
     location[0].walls.emplace_back(0.05, 0.9, 0.15, 0.05, "walls");
@@ -150,16 +150,6 @@ void tracer_collide(auto& Character)
     if (!coll_y_found) Sprite.y += Sprite.dy;
 }
 
-
-
-
-
-
-
-
-
-
-
 HANDLE hTimer;
 //void TweenDash(int idx)
 //{
@@ -206,57 +196,3 @@ HANDLE hTimer;
 //
 //
 //}
-
-
-//
-//void CollisionGroup()
-//{
-//    static int lastDamageTime = 0;
-//    bool spikeCollision = false;
-//   // player->Sprite.loadBitmapWithNativeSize("racket");
-//    for (int i = 0; i < location[player->currentLocation].locationObjects.size(); ++i)
-//    {
-//        Objects& obj = location[player->currentLocation].locationObjects[i];
-//        if (obj.type == ObjectsTipe::spike)
-//        {
-//            if (player->Sprite.x + player->Sprite.width >= obj.Sprite.x &&
-//                player->Sprite.x <= obj.Sprite.x + obj.Sprite.width &&
-//                player->Sprite.y + player->Sprite.height >= obj.Sprite.y &&
-//                player->Sprite.y <= obj.Sprite.y + obj.Sprite.height)
-//            {
-//                spikeCollision = true;
-//                break;
-//            }
-//        }
-//        if (obj.type == ObjectsTipe::healing)
-//        {
-//            if (player->Sprite.x + player->Sprite.width >= obj.Sprite.x &&
-//                player->Sprite.x <= obj.Sprite.x + obj.Sprite.width &&
-//                player->Sprite.y + player->Sprite.height >= obj.Sprite.y &&
-//                player->Sprite.y <= obj.Sprite.y + obj.Sprite.height)
-//            {
-//                location[player->currentLocation].locationObjects.erase(location[player->currentLocation].locationObjects.begin());
-//                player->current_lives++;
-//                break;
-//            }
-//        }
-//
-//    }
-//    if (spikeCollision && currenttime > lastDamageTime + 1000) {
-//        player->current_lives--;
-//        lastDamageTime = currenttime;
-//        player->Sprite.jump = 60;
-//        player->Sprite.x += 20;
-//        player->inJump = true;
-//        //player->Sprite.loadBitmapWithNativeSize("walls");
-//        
-//    }
-//    /*if (health.current_lives <= 0) {
-//        MessageBox(window.hWnd, "Game Over!", "Info", MB_OK);
-//        exit(0);
-//    }*/
-//    
-//}
-
-
-

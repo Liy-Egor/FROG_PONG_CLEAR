@@ -50,14 +50,23 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         player->Sprite.show();
         player->move();
         Health_bar.Show();
-        ShowStaticObjects();
+        for (int i = 0; i < location[player->currentLocation].walls.size(); i++) {
+            location[player->currentLocation].walls[i].Sprite.show();
+        }
+        for (int i = 0; i < location[player->currentLocation].healingFlask.size(); i++) {
+            location[player->currentLocation].healingFlask[i].Sprite.show();
+            location[player->currentLocation].healingFlask[i].healing(player);
+        }
+        for (int i = 0; i < location[player->currentLocation].spike.size(); i++) {
+            location[player->currentLocation].spike[i].Sprite.show();
+            location[player->currentLocation].spike[i].damage(player);
+        }
         for (int i = 0; i < location[player->currentLocation].portal.size(); i++) {
-
             location[player->currentLocation].portal[i].Sprite.show();
             location[player->currentLocation].portal[i].Portal(player);
         }
         
-        //CollisionGroup();
+        
         //ProcessDash();//рывок
         Ellipse(window.context, mouse.x - sz, mouse.y - sz, mouse.x + sz, mouse.y + sz);
 

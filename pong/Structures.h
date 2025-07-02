@@ -53,19 +53,7 @@ struct sprite {
         float vw = width * scale;
         float vh = height * scale;
         
-        float2 p[4] = {
-            {vx,vy},
-            {vx + vw,vy},
-            {vx + vw,vy + vh},
-            {vx,vy + vh}
-        };
-
         bool in = false;
-        /*for (int i = 0; i < 4; i++)
-        {
-            if (p[i].x >= 0 && p[i].x < window.width  && 
-                p[i].y >= 0 && p[i].y < window.height) in = true;
-        }*/
 
         if (vx + vw >= 0 && vx < window.width &&
             vy + vh >= 0 && vy < window.height) 
@@ -101,6 +89,14 @@ public:
         Sprite.height = p_height * window.height;
         Sprite.loadBitmapWithNativeSize(filename);;
     }
+    bool CheckCollision(float x1, float y1, float w1, float h1,
+        float x2, float y2, float w2, float h2)
+    {
+        return x1 < x2 + w2 &&
+            x1 + w1 > x2 &&
+            y1 < y2 + h2 &&
+            y1 + h1 > y2;
+    }
 };
 
 class Platform : public StaticObjects
@@ -114,14 +110,14 @@ class HealingFlask : public StaticObjects
 {
 public:
     using StaticObjects::StaticObjects;
-
+    void healing(auto& player);
 };
 
 class Spike : public StaticObjects
 {
 public:
     using StaticObjects::StaticObjects;
-
+    void damage(auto& player);
 };
 
 class portal_ : public StaticObjects
@@ -133,16 +129,6 @@ public:
     {
         destination = p_destination;
     }
-
-    bool CheckCollision(float x1, float y1, float w1, float h1,
-        float x2, float y2, float w2, float h2)
-    {
-        return x1 < x2 + w2 &&
-            x1 + w1 > x2 &&
-            y1 < y2 + h2 &&
-            y1 + h1 > y2;
-    }
-
     void Portal(auto& player);
 };
 
@@ -202,7 +188,8 @@ struct Location_
     sprite hBack;
     vector<portal_>portal;
     vector<Platform> walls;
-    //vector<Objects> locationObjects;
+    vector<HealingFlask> healingFlask;
+    vector<Spike> spike;
     vector<character*> Persona;
 
 };
@@ -338,5 +325,31 @@ void portal_::Portal(auto& player)
     {
         player->currentLocation = destination;
         player->Sprite.x = location[player->currentLocation].walls[0].Sprite.x + player->Sprite.width + location[player->currentLocation].walls[0].Sprite.width;
+    }
+}
+
+void HealingFlask::healing(auto& player)
+{
+    if (CheckCollision(player->Sprite.x, player->Sprite.y, player->Sprite.width, player->Sprite.height, Sprite.x, Sprite.y, Sprite.width, Sprite.height))
+    {
+        location[player->currentLocation].healingFlask.erase(location[player->currentLocation].healingFlask.begin());
+        player->current_lives++;
+    }
+}
+void Spike::damage(auto& player)
+{
+    static int lastDamageTime = 0;
+    bool spikeCollision = false;
+    if (CheckCollision(player->Sprite.x, player->Sprite.y, player->Sprite.width, player->Sprite.height, Sprite.x, Sprite.y, Sprite.width, Sprite.height))
+    {
+        spikeCollision = true;
+
+    }
+    if (spikeCollision && currenttime > lastDamageTime + 1000) {
+        player->current_lives--;
+        lastDamageTime = currenttime;
+        player->Sprite.jump = 60;
+        player->Sprite.x += 20;
+        player->inJump = true;
     }
 }
