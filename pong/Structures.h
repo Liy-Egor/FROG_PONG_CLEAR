@@ -61,7 +61,8 @@ enum class ObjectsTipe
 {
     spike,
     healing,
-    frog
+    frog,
+    subject
 };
 
 struct Texture // структура платформ

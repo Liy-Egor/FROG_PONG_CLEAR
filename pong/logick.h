@@ -20,8 +20,15 @@ void InitGame()
     location[0].walls.emplace_back(0, 0.98, 0.999, 0.02, "walls");//пол
     location[0].walls.emplace_back(0, 0, 0.999, 0.04, "walls");//потолок
     location[0].portal.emplace_back(0.96, 0.89, 0.021, 0.2, 1, "racket");//портал в локацию 1
-    location[0].locationObjects.emplace_back(0.3, 0.955, 0.02, 0.025, "ball", ObjectsTipe::healing);
-    location[0].locationObjects.emplace_back(0.5, 0.955, 0.025, 0.025, "spike", ObjectsTipe::spike);
+
+    location[0].locationObjects.emplace_back(0.3, 0.800, 0.02, 0.025, "ball", ObjectsTipe::healing);//хилки
+    location[0].locationObjects.emplace_back(0.4, 0.955, 0.02, 0.025, "ball", ObjectsTipe::healing);
+   
+    location[0].locationObjects.emplace_back(0.55, 0.955, 0.025, 0.025, "Sub", ObjectsTipe::subject);//предметы
+    location[0].locationObjects.emplace_back(0.5, 0.800, 0.025, 0.025, "Sub", ObjectsTipe::subject);
+
+    location[0].locationObjects.emplace_back(0.5, 0.955, 0.025, 0.025, "spike", ObjectsTipe::spike);//шипы
+
     location[0].locationTexture.emplace_back(0.8, 0.85, 0.15, 0.05, "racket_enemy");
     location[0].locationTexture.emplace_back(0.4, 0.85, 0.15, 0.05, "racket_enemy");
     //location[0].locationTexture.emplace_back(0.6, 0.95, 0.15, 0.05, "racket_enemy");
@@ -159,13 +166,20 @@ void tracer_collide(auto& Character)
 
 
 
-bool CheckCollision(float x1, float y1, float w1, float h1,
-    float x2, float y2, float w2, float h2)
+//bool CheckCollision(float x1, float y1, float w1, float h1,
+//    float x2, float y2, float w2, float h2)
+//{
+//    return x1 < x2 + w2 &&
+//        x1 + w1 > x2 &&
+//        y1 < y2 + h2 &&
+//        y1 + h1 > y2;
+//}
+bool SpriteCollision(sprite x, sprite y)
 {
-    return x1 < x2 + w2 &&
-        x1 + w1 > x2 &&
-        y1 < y2 + h2 &&
-        y1 + h1 > y2;
+    return x.x < y.x + y.width &&
+        x.x + x.width > y.x &&
+        x.y < y.y + y.height &&
+        x.y + x.height > y.y;
 }
 
 
@@ -175,7 +189,7 @@ void ProcessPortal()
     {
         i.spr.show();
 
-        if (CheckCollision(player->Sprite.x, player->Sprite.y, player->Sprite.width, player->Sprite.height, i.spr.x, i.spr.y, i.spr.width, i.spr.height))
+        if (SpriteCollision(player->Sprite, i.spr))
         {
             //player = new Hero(0.2, 0.25, 0.023, 0.032, "racket", 40, 5, 3, 1);
             player->currentLocation = i.destination;
@@ -238,33 +252,36 @@ void CollisionGroup()
 {
     static int lastDamageTime = 0;
     bool spikeCollision = false;
+    bool healingCollision = false;
    // player->Sprite.loadBitmapWithNativeSize("racket");
     for (int i = 0; i < location[player->currentLocation].locationObjects.size(); ++i)
     {
         Objects& obj = location[player->currentLocation].locationObjects[i];
-        if (obj.type == ObjectsTipe::spike)
+        
+        if (SpriteCollision(player->Sprite, obj.Sprite))
         {
-            if (player->Sprite.x + player->Sprite.width >= obj.Sprite.x &&
-                player->Sprite.x <= obj.Sprite.x + obj.Sprite.width &&
-                player->Sprite.y + player->Sprite.height >= obj.Sprite.y &&
-                player->Sprite.y <= obj.Sprite.y + obj.Sprite.height)
+            if (obj.type == ObjectsTipe::spike)
             {
                 spikeCollision = true;
                 break;
             }
-        }
-        if (obj.type == ObjectsTipe::healing)
-        {
-            if (player->Sprite.x + player->Sprite.width >= obj.Sprite.x &&
-                player->Sprite.x <= obj.Sprite.x + obj.Sprite.width &&
-                player->Sprite.y + player->Sprite.height >= obj.Sprite.y &&
-                player->Sprite.y <= obj.Sprite.y + obj.Sprite.height)
+            if (obj.type == ObjectsTipe::healing)
             {
-                location[player->currentLocation].locationObjects.erase(location[player->currentLocation].locationObjects.begin());
+            
+                location[player->currentLocation].locationObjects.erase(location[player->currentLocation].locationObjects.begin()+i);
                 player->current_lives++;
                 break;
+            
+            }
+            if (obj.type == ObjectsTipe::subject)
+            {
+
+                location[player->currentLocation].locationObjects.erase(location[player->currentLocation].locationObjects.begin() + i);
+                break;
+            
             }
         }
+        
 
     }
     if (spikeCollision && currenttime > lastDamageTime + 1000) {
