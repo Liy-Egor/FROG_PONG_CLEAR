@@ -283,8 +283,8 @@ public:
 
         int h_w = 50;
         int margin = 10;
-        int startX = player->Sprite.x + window.width/2 - 50;
-        int startY = player->Sprite.y - window.height/2 -10;
+        int startX = window.width  - 50;
+        int startY = 10;
 
         for (int i = 0; i < player->max_lives; i++) {
             if (i < player->current_lives) {

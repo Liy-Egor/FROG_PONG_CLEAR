@@ -94,7 +94,12 @@ void tracer_collide(auto& Character)
                 float pixel_x = Bbox[k * 2];
                 float pixel_y = Bbox[k * 2 + 1];
 
-                SetPixel(window.context, pixel_x, pixel_y, RGB(255, 255, 255));
+                float scale = 2;
+
+                float vx = (pixel_x - player_view.x) * scale + window.width / 2;
+                float vy = (pixel_y - player_view.y) * scale + window.height / 2;
+
+                SetPixel(window.context, vx, vy, RGB(255, 255, 255));
 
 
 
