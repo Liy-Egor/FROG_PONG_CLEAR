@@ -74,27 +74,20 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         float ls = .2 * length(player_view.x, player->Sprite.x, player_view.y, player->Sprite.y) / 500.;
         ls = max(ls - .2, 0.1);
         ls = min(ls, 1);
-        player_view.x = lerp(player_view.x, player->Sprite.x, ls);
-        player_view.y = lerp(player_view.y, player->Sprite.y, ls);
 
-        if (GetAsyncKeyState('A'))
-        {
-            player_view.x++;
-        }
+        float cameraHalfWidth = (window.width / 2) / scale;
+        float cameraHalfHeight = (window.height / 2) / scale;
 
-        if (GetAsyncKeyState('D'))
-        {
-            player_view.x--;
-        }
-        if (GetAsyncKeyState('W'))
-        {
-            player_view.y--;
-        }
+        float targetX = player->Sprite.x;
+        float targetY = player->Sprite.y;
 
-        if (GetAsyncKeyState('S'))
-        {
-            player_view.y++;
-        }
+        targetX = max(0 + cameraHalfWidth,
+            min(window.width - cameraHalfWidth, targetX));
+        targetY = max(0 + cameraHalfHeight,
+            min(window.height - cameraHalfHeight, targetY));
+
+        player_view.x = lerp(player_view.x, targetX, 0.1f);
+        player_view.y = lerp(player_view.y, targetY, 0.1f);
     }
 
 

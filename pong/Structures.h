@@ -33,7 +33,7 @@ struct float2 {
     float x;
     float y;
 };
-
+float scale = 2;
 struct sprite {
     float x, y, width, height, dx, dy, speed, jump, gravity;
     HBITMAP hBitmap;
@@ -47,7 +47,7 @@ struct sprite {
 
     void show()
     {
-        float scale = 2;
+        
 
         float vx = (x - player_view.x) * scale + window.width / 2;
         float vy = (y - player_view.y) * scale + window.height / 2;
@@ -69,13 +69,6 @@ struct sprite {
         ShowBitmap(window.context, 0, 0, window.width, window.height, hBitmap, false);
     }
 
-};
-
-enum class ObjectsTipe
-{
-    spike,
-    healing,
-    frog
 };
 
 class StaticObjects
@@ -207,7 +200,7 @@ public:
 
         string name = __FUNCTION__; // получение имени класса (пока реализации нету)
 
-        Sprite.speed = 30;
+        Sprite.speed = 15;
         Sprite.dx = 0;
         Sprite.dy = 0;
         Sprite.jump = 0;
