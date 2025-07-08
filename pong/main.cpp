@@ -55,7 +55,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
         for (int i = 0; i < location[player->currentLocation].healingFlask.size(); i++) {
             location[player->currentLocation].healingFlask[i].Sprite.show();
-            location[player->currentLocation].healingFlask[i].healing(player);
+            location[player->currentLocation].healingFlask[i].healing(player, i);
         }
         for (int i = 0; i < location[player->currentLocation].spike.size(); i++) {
             location[player->currentLocation].spike[i].Sprite.show();

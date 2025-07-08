@@ -48,6 +48,7 @@ void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool
     DeleteDC(hMemDC); // ??????? ???????? ??????
 }
 
+
 //новая фича создание, читалка файлов формата Svg и преобразование ее данных в игровой уровень 
 //создание карт можно делать в редакторе Adobe Photoshop (*2023 версия на которой я проверял)
 
@@ -167,11 +168,11 @@ void LoadSVGDataMap(const string NameFileSVG)
 		}
 		else if (!nameObject.find("heal"))
 		{
-			location[0].healingFlask.emplace_back(0.3, 0.955, 0.02, 0.025, "ball");
+			location[0].healingFlask.emplace_back(x, y, width, height, "ball");
 		}
 		else if (!nameObject.find("spike"))
 		{
-			location[0].spike.emplace_back(0.5, 0.955, 0.025, 0.025, "spike");
+			location[0].spike.emplace_back(x, y, width, height, "spike");
 		}
 
 

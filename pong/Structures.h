@@ -111,7 +111,7 @@ class HealingFlask : public StaticObjects
 {
 public:
     using StaticObjects::StaticObjects;
-    void healing(auto& player);
+    void healing(auto& player, int i);
 };
 
 class Spike : public StaticObjects
@@ -337,11 +337,11 @@ void portal_::Portal(auto& player)
     }
 }
 
-void HealingFlask::healing(auto& player)
+void HealingFlask::healing(auto& player, int i)
 {
     if (CheckCollision(player->Sprite.x, player->Sprite.y, player->Sprite.width, player->Sprite.height, Sprite.x, Sprite.y, Sprite.width, Sprite.height))
     {
-        location[player->currentLocation].healingFlask.erase(location[player->currentLocation].healingFlask.begin());
+        location[player->currentLocation].healingFlask.erase(location[player->currentLocation].healingFlask.begin() + i);
         player->current_lives++;
     }
 }
