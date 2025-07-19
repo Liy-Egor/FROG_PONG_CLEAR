@@ -7,7 +7,7 @@ string StrReplace(string* str, string namestr) {
 
 //новая фича создание, читалка файлов формата Svg и преобразование ее данных в игровой уровень 
 //создание карт можно делать в редакторе Adobe Photoshop (*2023 версия на которой я проверял)
-
+ 
 void LoadSVGDataMap(const string NameFileSVG) {
     ifstream file;
 
