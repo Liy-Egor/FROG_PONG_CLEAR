@@ -1,0 +1,16 @@
+<healingFlask>index=0 height==29 width==29 xpos==220 ypos==594
+<spike>index=0 height==31 width==34 xpos==694 ypos==592
+<spike>index=1 height==31 width==34 xpos==612 ypos==592
+<spike>index=2 height==31 width==34 xpos==770 ypos==592
+<Persona>index=0 height==69 width==73 xpos==1068.99 ypos==678
+<Persona>index=1 height==67 width==71 xpos==1604 ypos==386
+<Persona>index=2 height==67 width==71 xpos==1315 ypos==680
+<Persona>index=3 height==67 width==71 xpos==919 ypos==920
+<portal>index=0 height==184 width==68 xpos==1759 ypos==804
+<walls>index=0 height==86 width==1878 xpos==20 ypos==988
+<walls>index=1 height==86 width==1878 xpos==20 ypos==15
+<walls>index=2 height==64 width==635 xpos==181 ypos==623
+<walls>index=3 height==64 width==635 xpos==837 ypos==748
+<walls>index=4 height==64 width==635 xpos==1091 ypos==454
+<walls>index=5 height==896 width==80 xpos==16 ypos==97
+<walls>index=6 height==887 width==71 xpos==1827 ypos==101

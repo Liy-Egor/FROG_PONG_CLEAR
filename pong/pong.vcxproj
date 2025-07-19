@@ -143,7 +143,7 @@
     <Image Include="..\Debug\health_full.bmp" />
     <Image Include="..\Debug\racket.bmp" />
     <Image Include="..\Debug\racket_enemy.bmp" />
-    <Image Include="..\Debug\walls.bmp" />
+    <Image Include="..\walls.bmp" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\Debug\bounce.wav" />
@@ -151,6 +151,7 @@
     <Media Include="..\Debug\music.mp3" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="GameFileSystem.h" />
     <ClInclude Include="logick.h" />
     <ClInclude Include="paint.h" />
     <ClInclude Include="Structures.h" />

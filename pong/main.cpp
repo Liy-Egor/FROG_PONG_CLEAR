@@ -1,7 +1,7 @@
 #include "Structures.h"
 #include "paint.h"
 #include "logick.h"
-
+#include "GameFileSystem.h"
 
 float lerp(float x1, float x2, float a)
 {
@@ -29,6 +29,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     while (!GetAsyncKeyState(VK_ESCAPE))
     {
+        Serialization DataGame(location[0]);
+        if (GetAsyncKeyState(VK_F1)) {
+            DataGame.Ser();
+        }
+        if (GetAsyncKeyState(VK_F2)) {
+            DataGame.Deser();
+        }
+
         currenttime = timeGetTime();
 
         BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);

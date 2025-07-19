@@ -205,7 +205,7 @@ public:
         Sprite.dy = 0;
         Sprite.jump = 0;
         Sprite.gravity = 30;
-        //location[current_location].Persona.push_back(this);
+        /*location[current_location].Persona.push_back(this);*/
     }
 
 
