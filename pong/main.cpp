@@ -1,4 +1,4 @@
-#include "Structures.h"
+п»ї#include "Structures.h"
 #include "paint.h"
 #include "logick.h"
 #include "GameFileSystem.h"
@@ -20,12 +20,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_ int nCmdShow)
 {
 
-    InitWindow();//здесь инициализируем все что нужно для рисования в окне
+    InitWindow();//Р·РґРµСЃСЊ РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј РІСЃРµ С‡С‚Рѕ РЅСѓР¶РЅРѕ РґР»СЏ СЂРёСЃРѕРІР°РЅРёСЏ РІ РѕРєРЅРµ
 
-    InitGame();//здесь инициализируем переменные игры
+    InitGame();//Р·РґРµСЃСЊ РёРЅРёС†РёР°Р»РёР·РёСЂСѓРµРј РїРµСЂРµРјРµРЅРЅС‹Рµ РёРіСЂС‹
     ShowCursor(FALSE);
     
-
+     
 
     while (!GetAsyncKeyState(VK_ESCAPE))
     {
@@ -40,9 +40,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         currenttime = timeGetTime();
 
         BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);
-        //PrintBitblt(); //копируем буфер в окно и отрисовывает окно за игроком
+        //PrintBitblt(); //РєРѕРїРёСЂСѓРµРј Р±СѓС„РµСЂ РІ РѕРєРЅРѕ Рё РѕС‚СЂРёСЃРѕРІС‹РІР°РµС‚ РѕРєРЅРѕ Р·Р° РёРіСЂРѕРєРѕРј
 
-        Sleep(16);//ждем 16 милисекунд (1/количество кадров в секунду)
+        Sleep(16);//Р¶РґРµРј 16 РјРёР»РёСЃРµРєСѓРЅРґ (1/РєРѕР»РёС‡РµСЃС‚РІРѕ РєР°РґСЂРѕРІ РІ СЃРµРєСѓРЅРґСѓ)
         GetCursorPos(&mouse);
         ScreenToClient(window.hWnd, &mouse);
         int sz = 5;
@@ -75,7 +75,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
 
 
-        //ProcessDash();//рывок
+        //ProcessDash();//СЂС‹РІРѕРє
         Ellipse(window.context, mouse.x - sz, mouse.y - sz, mouse.x + sz, mouse.y + sz);
 
 
