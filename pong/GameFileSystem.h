@@ -1,16 +1,17 @@
-#pragma once
+п»ї#pragma once
 #include "Structures.h"
 
 string StrReplace(string* str, string namestr) {
     return str->replace(str->find(namestr), namestr.length(), "");
 }
 
-//новая фича создание, читалка файлов формата Svg и преобразование ее данных в игровой уровень 
-//создание карт можно делать в редакторе Adobe Photoshop (*2023 версия на которой я проверял)
+//РЅРѕРІР°СЏ С„РёС‡Р° СЃРѕР·РґР°РЅРёРµ, С‡РёС‚Р°Р»РєР° С„Р°Р№Р»РѕРІ С„РѕСЂРјР°С‚Р° Svg Рё РїСЂРµРѕР±СЂР°Р·РѕРІР°РЅРёРµ РµРµ РґР°РЅРЅС‹С… РІ РёРіСЂРѕРІРѕР№ СѓСЂРѕРІРµРЅСЊ 
+//СЃРѕР·РґР°РЅРёРµ РєР°СЂС‚ РјРѕР¶РЅРѕ РґРµР»Р°С‚СЊ РІ СЂРµРґР°РєС‚РѕСЂРµ Adobe Photoshop (*2023 РІРµСЂСЃРёСЏ РЅР° РєРѕС‚РѕСЂРѕР№ СЏ РїСЂРѕРІРµСЂСЏР»)
 
 void LoadSVGDataMap(const string NameFileSVG) {
     ifstream file;
 
+    
     vector <vector<string>> dS{
         {},
         {},
@@ -18,16 +19,16 @@ void LoadSVGDataMap(const string NameFileSVG) {
         {},
         {},
         {}
-    }; // здесть хронятся основные данные имя объекта, x, y
+    }; // Р·РґРµСЃС‚СЊ С…СЂРѕРЅСЏС‚СЃСЏ РѕСЃРЅРѕРІРЅС‹Рµ РґР°РЅРЅС‹Рµ РёРјСЏ РѕР±СЉРµРєС‚Р°, x, y
 
-    vector <vector<string>> bufferData{ {},{} }; // здесть хронятся width, height объекта
+    vector <vector<string>> bufferData{ {},{} }; // Р·РґРµСЃС‚СЊ С…СЂРѕРЅСЏС‚СЃСЏ width, height РѕР±СЉРµРєС‚Р°
 
     string optionArr[]{ "id=", "x=", "y=" ,"width=", "height=","xlink:href=" };
 
     file.open(NameFileSVG + ".svg");
 
 
-    //запуск чтения файла
+    //Р·Р°РїСѓСЃРє С‡С‚РµРЅРёСЏ С„Р°Р№Р»Р°
     if (file.is_open()) {
         string str = "";
         while (!file.eof()) {
@@ -39,7 +40,7 @@ void LoadSVGDataMap(const string NameFileSVG) {
                     StrReplace(&str, "\"");
                     StrReplace(&str, "\"");
 
-                    //исключения
+                    //РёСЃРєР»СЋС‡РµРЅРёСЏ
                     if (!str.find("walls_f") || !str.find("background") || !str.find("image")) {
                         if (!str.find("walls_f")) {
                             dS[i].push_back("empty");
@@ -50,7 +51,7 @@ void LoadSVGDataMap(const string NameFileSVG) {
                         dS[2].push_back("0");
                     }
 
-                    //сортировка данных
+                    //СЃРѕСЂС‚РёСЂРѕРІРєР° РґР°РЅРЅС‹С…
                     if (str.find("walls_f")) {
                         if (str.find("data:")) {
                             dS[i].push_back(str);
@@ -63,7 +64,7 @@ void LoadSVGDataMap(const string NameFileSVG) {
             }
         }
 
-        //присвоение и пересборка массива новыми данными ширины и высоты объектов для тех объектов где эти данные записаны в шаблон #image
+        //РїСЂРёСЃРІРѕРµРЅРёРµ Рё РїРµСЂРµСЃР±РѕСЂРєР° РјР°СЃСЃРёРІР° РЅРѕРІС‹РјРё РґР°РЅРЅС‹РјРё С€РёСЂРёРЅС‹ Рё РІС‹СЃРѕС‚С‹ РѕР±СЉРµРєС‚РѕРІ РґР»СЏ С‚РµС… РѕР±СЉРµРєС‚РѕРІ РіРґРµ СЌС‚Рё РґР°РЅРЅС‹Рµ Р·Р°РїРёСЃР°РЅС‹ РІ С€Р°Р±Р»РѕРЅ #image
         for (int i = 0; i < dS[0].size(); i++) {
             if (dS[5][i] != "error image") {
                 for (int j = 0; j < dS[0].size(); j++) {
@@ -89,9 +90,9 @@ void LoadSVGDataMap(const string NameFileSVG) {
     }
 
 
-    //загрузка уровня на основе собранных данных
+    //Р·Р°РіСЂСѓР·РєР° СѓСЂРѕРІРЅСЏ РЅР° РѕСЃРЅРѕРІРµ СЃРѕР±СЂР°РЅРЅС‹С… РґР°РЅРЅС‹С…
     for (int i = 0; i < dS[0].size(); i++) {
-        //интрепритация стоковых данных в числовые значения типа 0.1 от разрешения экрана пользователя
+        //РёРЅС‚СЂРµРїСЂРёС‚Р°С†РёСЏ СЃС‚РѕРєРѕРІС‹С… РґР°РЅРЅС‹С… РІ С‡РёСЃР»РѕРІС‹Рµ Р·РЅР°С‡РµРЅРёСЏ С‚РёРїР° 0.1 РѕС‚ СЂР°Р·СЂРµС€РµРЅРёСЏ СЌРєСЂР°РЅР° РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ
         float x = stof(dS[1][i]) / window.width;
         float y = stof(dS[2][i]) / window.height;
         float width = stof(bufferData[0][i]) / window.width;
@@ -99,7 +100,7 @@ void LoadSVGDataMap(const string NameFileSVG) {
         string nameObject = dS[0][i];
 
 
-        //создание объектов пока что только для уровня 0
+        //СЃРѕР·РґР°РЅРёРµ РѕР±СЉРµРєС‚РѕРІ РїРѕРєР° С‡С‚Рѕ С‚РѕР»СЊРєРѕ РґР»СЏ СѓСЂРѕРІРЅСЏ 0
         if (!nameObject.find("walls")) {
             location[0].walls.emplace_back(x, y, width, height, "walls");
         }
@@ -113,7 +114,7 @@ void LoadSVGDataMap(const string NameFileSVG) {
             location[0].hBack.loadBitmapWithNativeSize(nameObject);
         }
         else if (!nameObject.find("portal")) {
-            location[0].portal.emplace_back(x, y, width, height, 1, "racket"); // пока реализациия работает на переход на 1 уровень
+            location[0].portal.emplace_back(x, y, width, height, 1, "racket"); // РїРѕРєР° СЂРµР°Р»РёР·Р°С†РёРёСЏ СЂР°Р±РѕС‚Р°РµС‚ РЅР° РїРµСЂРµС…РѕРґ РЅР° 1 СѓСЂРѕРІРµРЅСЊ
         }
         else if (!nameObject.find("heal")) {
             location[0].healingFlask.emplace_back(x, y, width, height, "ball");
@@ -130,8 +131,9 @@ class Serialization {
 public:
     Serialization(Location_ container) { this->container = container;}
     
-    /// добавить функцию создания сохранения с нуля и загрузка мира с нулевого сохранения
-    /// добавить функцию проверки на наличие изменения данных в файле чтобы создать мир с нуля и перезаписать данные на новые
+
+    /// РґРѕР±Р°РІРёС‚СЊ С„СѓРЅРєС†РёСЋ СЃРѕР·РґР°РЅРёСЏ СЃРѕС…СЂР°РЅРµРЅРёСЏ СЃ РЅСѓР»СЏ Рё Р·Р°РіСЂСѓР·РєР° РјРёСЂР° СЃ РЅСѓР»РµРІРѕРіРѕ СЃРѕС…СЂР°РЅРµРЅРёСЏ
+    /// РґРѕР±Р°РІРёС‚СЊ С„СѓРЅРєС†РёСЋ РїСЂРѕРІРµСЂРєРё РЅР° РЅР°Р»РёС‡РёРµ РёР·РјРµРЅРµРЅРёСЏ РґР°РЅРЅС‹С… РІ С„Р°Р№Р»Рµ С‡С‚РѕР±С‹ СЃРѕР·РґР°С‚СЊ РјРёСЂ СЃ РЅСѓР»СЏ Рё РїРµСЂРµР·Р°РїРёСЃР°С‚СЊ РґР°РЅРЅС‹Рµ РЅР° РЅРѕРІС‹Рµ
 
     void Ser() {
         ofile.open("SaveData.txt", ios::trunc);
@@ -173,7 +175,7 @@ public:
             while (!ifile.eof()) {
                 ifile >> str;
                 for (int i = 0; i < 9; i++) {
-                        ///определение объекта по его индексу и по экземляру стуктуры
+                        ///РѕРїСЂРµРґРµР»РµРЅРёРµ РѕР±СЉРµРєС‚Р° РїРѕ РµРіРѕ РёРЅРґРµРєСЃСѓ Рё РїРѕ СЌРєР·РµРјР»СЏСЂСѓ СЃС‚СѓРєС‚СѓСЂС‹
                         if (!str.find(StructureArr[i]) &&
                             !str.find(StructureArr[i] + "index=")) {
                             ReplaceStructure(str, StructureArr[i]);

@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 #include "windows.h"
 #include "math.h"
 #include "ctime"
@@ -16,9 +16,9 @@ POINT mouse;
 void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool alpha = false);
 
 struct {
-    HWND hWnd;//хэндл окна
-    HDC device_context, context;// два контекста устройства (для буферизации)
-    int width, height;//сюда сохраним размеры окна которое создаст программа
+    HWND hWnd;//С…СЌРЅРґР» РѕРєРЅР°
+    HDC device_context, context;// РґРІР° РєРѕРЅС‚РµРєСЃС‚Р° СѓСЃС‚СЂРѕР№СЃС‚РІР° (РґР»СЏ Р±СѓС„РµСЂРёР·Р°С†РёРё)
+    int width, height;//СЃСЋРґР° СЃРѕС…СЂР°РЅРёРј СЂР°Р·РјРµСЂС‹ РѕРєРЅР° РєРѕС‚РѕСЂРѕРµ СЃРѕР·РґР°СЃС‚ РїСЂРѕРіСЂР°РјРјР°
 } window;
 
 struct {
@@ -130,13 +130,40 @@ public:
 
 void tracer_collide(auto& Character);
 
+/// <summary>
+/// ////РЅСѓР¶РЅРѕ СЃРґРµР»Р°С‚СЊ ECS РЎРРЎРўР•РњРЈ
+/// </summary>
+class IComponent {
+protected:
+    void add();
+
+};
+
+class ECSystem : public IComponent {
+public:
+    ECSystem();
+
+   
+};
+
+
+class ICharacterProperty {
+public:
+    ICharacterProperty(int SpeedAttack, int Defense, int Damage, int Health, int MaxHealth, float Resistens, const string TypeCharacter) {}
+
+    virtual void Kill() = 0;
+    int SpeedAttack = 0, Defense = 0, Damage = 0, Health = 0, MaxHealth = 0;
+    float Resistens = 0.;
+    string TypeCharacter;
+};
 
 
 
-class character //структура игрока
+
+class character //СЃС‚СЂСѓРєС‚СѓСЂР° РёРіСЂРѕРєР°
 {
 public:
-    sprite Sprite;//игрок
+    sprite Sprite;//РёРіСЂРѕРє
     int health_width;
     int max_lives;
     int current_lives;
@@ -198,7 +225,7 @@ public:
         : character(p_x, p_y, p_width, p_height, filename, p_health, p_max_lives, p_current_lives)
     {
 
-        string name = __FUNCTION__; // получение имени класса (пока реализации нету)
+        string name = __FUNCTION__; // РїРѕР»СѓС‡РµРЅРёРµ РёРјРµРЅРё РєР»Р°СЃСЃР° (РїРѕРєР° СЂРµР°Р»РёР·Р°С†РёРё РЅРµС‚Сѓ)
 
         Sprite.speed = 15;
         Sprite.dx = 0;
@@ -235,11 +262,11 @@ public:
     }
 };
 
-class Wolf : public character //структура врагов
+class Wolf : public character //СЃС‚СЂСѓРєС‚СѓСЂР° РІСЂР°РіРѕРІ
 {
 public:
 
-    int direction = 1; // 1 - вправо, -1 - влево
+    int direction = 1; // 1 - РІРїСЂР°РІРѕ, -1 - РІР»РµРІРѕ
     Wolf(float p_x, float p_y, float p_width, float p_height, const string& filename, int p_health, int p_max_lives, int p_current_lives, int current_location)
         : character(p_x, p_y, p_width, p_height, filename, p_health, p_max_lives, p_current_lives)
     {
@@ -274,12 +301,9 @@ public:
     }
 };
 
-
-
 Hero* player;
 Wolf* wolf;
 Wolf* wolf2;
-
 
 class health_bar {
 public:
@@ -355,3 +379,6 @@ void Spike::damage(auto& player)
         player->inJump = true;
     }
 }
+
+
+

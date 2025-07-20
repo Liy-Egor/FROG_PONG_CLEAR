@@ -25,7 +25,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     InitGame();//здесь инициализируем переменные игры
     ShowCursor(FALSE);
     
-     
+    
 
     while (!GetAsyncKeyState(VK_ESCAPE))
     {
