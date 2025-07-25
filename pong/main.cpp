@@ -2,6 +2,7 @@
 #include "paint.h"
 #include "logick.h"
 #include "GameFileSystem.h"
+#include "ECSSoft.h"
 
 float lerp(float x1, float x2, float a)
 {
@@ -25,10 +26,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     InitGame();//здесь инициализируем переменные игры
     ShowCursor(FALSE);
     
-    
-
     while (!GetAsyncKeyState(VK_ESCAPE))
     {
+
         Serialization DataGame(location[0]);
         if (GetAsyncKeyState(VK_F1)) {
             DataGame.Ser();
@@ -90,13 +90,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         float targetY = player->Sprite.y;
 
         targetX = max(0 + cameraHalfWidth,
-            min(window.width - cameraHalfWidth, targetX));
+            min(MapSizeW - cameraHalfWidth, targetX));
         targetY = max(0 + cameraHalfHeight,
-            min(window.height - cameraHalfHeight, targetY));
+            min(MapSizeH - cameraHalfHeight, targetY));
 
         player_view.x = lerp(player_view.x, targetX, 0.1f);
         player_view.y = lerp(player_view.y, targetY, 0.1f);
     }
-
 
 }

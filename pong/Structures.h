@@ -34,6 +34,8 @@ struct float2 {
     float y;
 };
 float scale = 2;
+int MapSizeW = window.width;
+int MapSizeH = window.height;
 struct sprite {
     float x, y, width, height, dx, dy, speed, jump, gravity;
     HBITMAP hBitmap;
@@ -99,7 +101,6 @@ public:
     using StaticObjects::StaticObjects;
 };
 
-
 class HealingFlask : public StaticObjects
 {
 public:
@@ -129,22 +130,6 @@ public:
 
 
 void tracer_collide(auto& Character);
-
-/// <summary>
-/// ////нужно сделать ECS СИСТЕМУ
-/// </summary>
-class IComponent {
-protected:
-    void add();
-
-};
-
-class ECSystem : public IComponent {
-public:
-    ECSystem();
-
-   
-};
 
 
 class ICharacterProperty {

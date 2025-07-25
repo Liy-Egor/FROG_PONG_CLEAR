@@ -111,6 +111,9 @@ void LoadSVGDataMap(const string NameFileSVG) {
             player = new Hero(x, y, width, height, "racket", 40, 5, 3, 0);
         }
         else if (!nameObject.find("background")) {
+            
+            MapSizeW = stoi(bufferData[0][0]);
+            MapSizeH = stoi(bufferData[0][1]);
             location[0].hBack.loadBitmapWithNativeSize(nameObject);
         }
         else if (!nameObject.find("portal")) {

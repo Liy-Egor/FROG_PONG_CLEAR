@@ -151,10 +151,14 @@
     <Media Include="..\Debug\music.mp3" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="ArcheType.h" />
+    <ClInclude Include="Component.h" />
+    <ClInclude Include="ECSSoft.h" />
     <ClInclude Include="GameFileSystem.h" />
     <ClInclude Include="logick.h" />
     <ClInclude Include="paint.h" />
     <ClInclude Include="Structures.h" />
+    <ClInclude Include="SystemECS.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
