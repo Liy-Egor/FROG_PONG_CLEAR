@@ -1,4 +1,5 @@
 ﻿#pragma once
+
 #include "windows.h"
 #include "math.h"
 #include "ctime"
@@ -7,23 +8,47 @@
 #include <iostream>
 #include <string>
 #include <source_location>
-using namespace std;
+
+//using namespace std;
 int currenttime = 0;
 
 POINT mouse;
 
-void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool alpha = false);
+void ShowBitmap( int x, int y, int x1, int y1,int ID);
+
+std::vector<uint8_t> ConvertHBITMAPToRGBA(HBITMAP hBitmap, uint32_t& width, uint32_t& height)
+{
+    BITMAP bmp;
+    GetObject(hBitmap, sizeof(BITMAP), &bmp);
+
+    width = bmp.bmWidth;
+    height = bmp.bmHeight;
+
+    std::vector<uint8_t> rgbaData(width * height * 4);
+
+    HDC hdc = GetDC(nullptr);
+    BITMAPINFOHEADER bi = {};
+    bi.biSize = sizeof(BITMAPINFOHEADER);
+    bi.biWidth = width;
+    bi.biHeight = -static_cast<LONG>(height); // top-down
+    bi.biPlanes = 1;
+    bi.biBitCount = 32;
+    bi.biCompression = BI_RGB;
+
+    if (!GetDIBits(hdc, hBitmap, 0, height, rgbaData.data(), (BITMAPINFO*)&bi, DIB_RGB_COLORS))
+    {
+        OutputDebugStringA("GetDIBits failed\n");
+        rgbaData.clear();
+    }
+
+    ReleaseDC(nullptr, hdc);
+
+    return rgbaData;
+}
 
 struct {
-    HWND hWnd;//хэндл окна
-    HDC device_context, context;// два контекста устройства (для буферизации)
-    int width, height;//сюда сохраним размеры окна которое создаст программа
-    //int width_z, height_z;
-} window;
-
-struct {
-    int x =0;
-    int y =0;
+    int x = 0;
+    int y = 0;
     int w;
     int h;
 
@@ -31,28 +56,29 @@ struct {
 
 struct sprite {
     float x, y, width, height, dx, dy, speed, jump, gravity;
-    HBITMAP hBitmap;
+    int id;
+    HBITMAP sprite;
 
-    void loadBitmapWithNativeSize(const string& filename)
+    void loadBitmapWithNativeSize(const std::string& filename,int texture_id)
     {
-        const string fullName = filename + ".bmp";
-        hBitmap = (HBITMAP)LoadImageA(NULL, fullName.c_str(), IMAGE_BITMAP, 0, 0, LR_LOADFROMFILE);
-
+        id = texture_id;
     }
 
     void show()
     {
         float scale = 2;
-         
-        float vx = (x - player_view.x) * scale + window.width/2;
+
+        float vx = (x - player_view.x) * scale + window.width / 2;
         float vy = (y - player_view.y) * scale + window.height / 2;
 
-        ShowBitmap(window.context, vx, vy, width*scale, height*scale, hBitmap, false);
+        ShowBitmap( vx, vy, width * scale, height * scale, id);
+
     }
 
     void showBack()
     {
-        ShowBitmap(window.context, 0, 0, window.width, window.height, hBitmap, false);
+
+        ShowBitmap( 0, 0, window.width, window.height, id);
     }
 
 };
@@ -62,22 +88,35 @@ enum class ObjectsTipe
     spike,
     healing,
     frog,
-    subject
+    subject,
+    wall,
+    texture
 };
 
 struct Texture // структура платформ
 {
 
     sprite Sprite;
+    ObjectsTipe type;
 
-
-    Texture(float p_x, float p_y, float p_width, float p_height, const string& filename) {
+    Texture(float p_x, float p_y, float p_width, float p_height, const std::string& filename, ObjectsTipe objTipe= ObjectsTipe::wall) {
         Sprite.x = p_x * window.width;
         Sprite.y = p_y * window.height;
         Sprite.width = p_width * window.width;
         Sprite.height = p_height * window.height;
-        Sprite.loadBitmapWithNativeSize(filename);;
+        type = objTipe;
+        // Назначение текстуры по типу объекта
+        switch (type) {
+        case ObjectsTipe::texture:
+            Sprite.id = 8;  
+            break;
+        default:
+            Sprite.id = 3;  // background_0.bmp
+        }
 
+
+        
+        Sprite.loadBitmapWithNativeSize(filename, Sprite.id);
     }
 
 };
@@ -87,14 +126,34 @@ struct Objects // структура игровых обьектов
 {
     sprite Sprite;
     ObjectsTipe type;
-
-    Objects(float p_x, float p_y, float p_width, float p_height, const string& filename, ObjectsTipe objTipe) {
+    Objects(float p_x, float p_y, float p_width, float p_height, const std::string& filename, ObjectsTipe objTipe,int customId = -1) {
         Sprite.x = p_x * window.width;
         Sprite.y = p_y * window.height;
         Sprite.width = p_width * window.width;
         Sprite.height = p_height * window.height;
-        Sprite.loadBitmapWithNativeSize(filename);
+        int texture_id;
         type = objTipe;
+        if (customId != -1) {
+            Sprite.id = customId;
+        }
+        else {
+            // Назначение текстуры по типу объекта
+            switch (type) {
+            case ObjectsTipe::spike:
+                Sprite.id = 5;  // spike.bmp
+                break;
+            case ObjectsTipe::healing:
+                Sprite.id = 4;  // ball.bmp
+                break;
+            case ObjectsTipe::subject:
+                Sprite.id = 2;  // walls.bmp
+                break;
+            default:
+                Sprite.id = 1;  // background_0.bmp
+            }
+        }
+        Sprite.loadBitmapWithNativeSize(filename,Sprite.id);
+        
 
     }
 
@@ -104,14 +163,14 @@ struct portal_
 {
     sprite spr;
     int destination;
-    portal_(float p_x, float p_y, float p_width, float p_height, int p_destination, const string& filename)
+    portal_(float p_x, float p_y, float p_width, float p_height, int p_destination, const std::string& filename)
     {
         spr.x = p_x * window.width;
         spr.y = p_y * window.height;
         spr.width = p_width * window.width;
         spr.height = p_height * window.height;
         destination = p_destination;
-        spr.loadBitmapWithNativeSize(filename);
+        spr.loadBitmapWithNativeSize(filename,2);
     }
 };
 
@@ -131,7 +190,7 @@ public:
     int current_lives;
     int currentLocation = 0;
     int last_trace_platform_num = -1;
-    
+
     float maxjump = 10;
     bool inJump = false;
     const int dashDistance = 20;
@@ -140,22 +199,22 @@ public:
     bool colis = false;
     bool dash_allow = true;
 
-    character(float p_x, float p_y, float p_width, float p_height, const string& filename, int p_health, int p_max_lives, int p_current_lives)
+    character(float p_x, float p_y, float p_width, float p_height, const std::string& filename, int p_health, int p_max_lives, int p_current_lives)
     {
         Sprite.x = p_x * window.width;
         Sprite.y = p_y * window.height;
         Sprite.width = p_width * window.width;
         Sprite.height = p_height * window.height;
 
-        Sprite.loadBitmapWithNativeSize(filename);
+        Sprite.loadBitmapWithNativeSize(filename,2);
 
         health_width = p_health;
         max_lives = p_max_lives;
         current_lives = p_current_lives;
     }
-   
+
     virtual void move() = 0;
-    
+
 };
 
 void processGravity(auto& spriteName)
@@ -169,11 +228,11 @@ void processGravity(auto& spriteName)
 struct Location_
 {
     sprite hBack;
-    vector<portal_>portal;
-    vector<Texture> locationTexture;
-    vector<Texture> walls;
-    vector<Objects> locationObjects;
-    vector<character*> Persona;
+    std::vector<portal_>portal;
+    std::vector<Texture> locationTexture;
+    std::vector<Texture> walls;
+    std::vector<Objects> locationObjects;
+    std::vector<character*> Persona;
 
 };
 
@@ -182,55 +241,55 @@ Location_ location[5];
 
 class Hero : public character
 {
-    public:
-        Hero(float p_x, float p_y, float p_width, float p_height, const string& filename, int p_health, int p_max_lives, int p_current_lives, int current_location) 
-            : character(p_x, p_y, p_width, p_height, filename, p_health, p_max_lives, p_current_lives)
-        {
+public:
+    Hero(float p_x, float p_y, float p_width, float p_height, const std::string& filename, int p_health, int p_max_lives, int p_current_lives, int current_location)
+        : character(p_x, p_y, p_width, p_height, filename, p_health, p_max_lives, p_current_lives)
+    {
 
-            string name = __FUNCTION__; // получение имени класса (пока реализации нету)
-            
-            Sprite.speed = 60;
-            Sprite.dx = 0;
-            Sprite.dy = 0;
-            Sprite.jump = 0;
-            Sprite.gravity = 30;
-            //location[current_location].Persona.push_back(this);
+        std::string name = __FUNCTION__; // получение имени класса (пока реализации нету)
+
+        Sprite.speed = 60;
+        Sprite.dx = 0;
+        Sprite.dy = 0;
+        Sprite.jump = 0;
+        Sprite.gravity = 30;
+        //location[current_location].Persona.push_back(this);
+    }
+
+
+
+    void move()
+    {
+        if (GetAsyncKeyState(VK_LEFT)) {
+            Sprite.dx = -Sprite.speed;
         }
 
-
-
-        void move()
-        {
-            if (GetAsyncKeyState(VK_LEFT)) {
-                Sprite.dx = -Sprite.speed;
-            }
-
-            if (GetAsyncKeyState(VK_RIGHT)) {
-                Sprite.dx = Sprite.speed;
-            }
-
-            if (GetAsyncKeyState(VK_SPACE) && inJump == false && inJumpBot == false)
-            {
-                Sprite.jump = 110;
-                inJumpBot = true;
-                inJump = true;
-            }
-
-            tracer_collide(*this);
-
-            processGravity(Sprite);
-
-
+        if (GetAsyncKeyState(VK_RIGHT)) {
+            Sprite.dx = Sprite.speed;
         }
+
+        if (GetAsyncKeyState(VK_SPACE) && inJump == false && inJumpBot == false)
+        {
+            Sprite.jump = 110;
+            inJumpBot = true;
+            inJump = true;
+        }
+
+        tracer_collide(*this);
+
+        processGravity(Sprite);
+
+
+    }
 };
 
 class Wolf : public character //структура врагов
 {
 public:
-   
+
     int direction = 1; // 1 - вправо, -1 - влево
-    Wolf(float p_x, float p_y, float p_width, float p_height, const string& filename, int p_health, int p_max_lives, int p_current_lives, int current_location)
-    : character(p_x, p_y, p_width, p_height, filename, p_health, p_max_lives, p_current_lives)
+    Wolf(float p_x, float p_y, float p_width, float p_height, const std::string& filename, int p_health, int p_max_lives, int p_current_lives, int current_location)
+        : character(p_x, p_y, p_width, p_height, filename, p_health, p_max_lives, p_current_lives)
     {
         Sprite.speed = 5;
         Sprite.dx = 0;
@@ -252,7 +311,7 @@ public:
             {
                 direction = 1;
             }
-            
+
             auto& platform = location[currentLocation].walls[last_trace_platform_num].Sprite;
             if (Sprite.x + Sprite.width >= platform.x + platform.width)
             {
@@ -275,25 +334,25 @@ public:
     sprite health_full, health_empty;
 
     health_bar() {
-        health_full.loadBitmapWithNativeSize("health_full");
-        health_empty.loadBitmapWithNativeSize("health_empty");
+        health_full.loadBitmapWithNativeSize("health_full",6);
+        health_empty.loadBitmapWithNativeSize("health_empty",7);
     }
 
     void Show() {
 
         int h_w = 50;
         int margin = 10;
-        int startX = window.width  - 50;
+        int startX = window.width - 50;
         int startY = 10;
 
         for (int i = 0; i < player->max_lives; i++) {
             if (i < player->current_lives) {
-                ShowBitmap(window.context, startX - (i * (h_w + margin)), startY, h_w, h_w, health_full.hBitmap, false);
-               
+                ShowBitmap( startX - (i * (h_w + margin)), startY, h_w, h_w,6);
+
             }
             else {
-                ShowBitmap(window.context, startX - (i * (h_w + margin)), startY, h_w, h_w, health_empty.hBitmap, false);
-               
+                ShowBitmap( startX - (i * (h_w + margin)), startY, h_w, h_w, 7);
+
             }
         }
     }

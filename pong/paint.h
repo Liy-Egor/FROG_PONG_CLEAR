@@ -3,21 +3,7 @@
 
 
 
-void InitWindow()
-{
-    SetProcessDPIAware();
-    window.hWnd = CreateWindow("edit", 0, WS_POPUP | WS_VISIBLE | WS_MAXIMIZE, 0, 0, 0, 0, 0, 0, 0, 0);
 
-    RECT r;
-    GetClientRect(window.hWnd, &r);
-    window.device_context = GetDC(window.hWnd);
-    window.width = r.right - r.left;
-    window.height = r.bottom - r.top;
-    window.context = CreateCompatibleDC(window.device_context);
-    SelectObject(window.context, CreateCompatibleBitmap(window.device_context, window.width, window.height));
-    GetClientRect(window.hWnd, &r);
-
-}
 
 //void CreateMap()
 //{
@@ -38,32 +24,28 @@ void InitWindow()
 //
 //}
 
-void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool alpha)
+void ShowBitmap(int x, int y, int width, int height, int textureID)
 {
-    HBITMAP hbm, hOldbm;
-    HDC hMemDC;
-    BITMAP bm;
+    // Преобразование в NDC (Normalized Device Coordinates)
+    float screenWidth = static_cast<float>(window.width);
+    float screenHeight = static_cast<float>(window.height);
 
-    hMemDC = CreateCompatibleDC(hDC); 
-    hOldbm = (HBITMAP)SelectObject(hMemDC, hBitmapBall);
+    float left = (x * 2.0f / screenWidth) - 1.0f;
+    float right = ((x + width) * 2.0f / screenWidth) - 1.0f;
+    float top = 1.0f - (y * 2.0f / screenHeight);
+    float bottom = 1.0f - ((y + height) * 2.0f / screenHeight);
 
-    if (hOldbm) 
-    {
-        GetObject(hBitmapBall, sizeof(BITMAP), (LPSTR)&bm); 
+    ConstBuf::global[0] = XMFLOAT4(left, top, right, bottom);
+    ConstBuf::Update(5, ConstBuf::global);
+    ConstBuf::ConstToVertex(5);
+    context->PSSetShaderResources(0, 1, &Textures::Texture[textureID].TextureResView);
 
-        if (alpha)
-        {
-            TransparentBlt(window.context, x, y, x1, y1, hMemDC, 0, 0, x1, y1, RGB(0, 0, 0));//??? ??????? ??????? ????? ????? ??????????????? ??? ??????????
-        }
-        else
-        {
-            StretchBlt(hDC, x, y, x1, y1, hMemDC, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY); // ?????? ??????????? bitmap
-        }
+    ConstBuf::ConstToVertex(4);
+    ConstBuf::ConstToPixel(4);
+    Camera::Camera();
+    Draw::NullDrawer(1);
+    
 
-        SelectObject(hMemDC, hOldbm);// ??????????????? ???????? ??????
-    }
-
-    DeleteDC(hMemDC); // ??????? ???????? ??????
 }
 
 //void PrintBitblt()

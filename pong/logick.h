@@ -1,12 +1,21 @@
 ﻿ #pragma once
 #include "Structures.h"
 #include <memory>
+#include <playsoundapi.h>
 
 
 
 void InitGame()
 {
-
+    Textures::LoadTextureFromFile(2, L"C:/Users/artem/source/repos/FROG_PONG_CLEAR/Debug/racket.bmp");
+    Textures::LoadTextureFromFile(1, L"C:/Users/artem/source/repos/FROG_PONG_CLEAR/Debug/background_0.bmp");
+    Textures::LoadTextureFromFile(3, L"C:/Users/artem/source/repos/FROG_PONG_CLEAR/Debug/walls.bmp");
+    Textures::LoadTextureFromFile(4, L"C:/Users/artem/source/repos/FROG_PONG_CLEAR/Debug/ball.bmp");
+    Textures::LoadTextureFromFile(5, L"C:/Users/artem/source/repos/FROG_PONG_CLEAR/Debug/spike.bmp");
+    Textures::LoadTextureFromFile(6, L"C:/Users/artem/source/repos/FROG_PONG_CLEAR/Debug/health_full.bmp");
+    Textures::LoadTextureFromFile(7, L"C:/Users/artem/source/repos/FROG_PONG_CLEAR/Debug/health_empty.bmp");
+    Textures::LoadTextureFromFile(8, L"C:/Users/artem/source/repos/FROG_PONG_CLEAR/Debug/racket_enemy.bmp");
+    Textures::LoadTextureFromFile(10, L"C:/Users/artem/source/repos/FROG_PONG_CLEAR/Debug/background_1.bmp");
     //player_ health{ 40, 5, 3, "health_full", "health_empty" };
     //player = make_shared<character>(40, 5, 3, "health_full", "health_empty");
     player = new Hero(0.2, 0.25, 0.023, 0.032, "racket", 40, 5, 3, 0);
@@ -14,7 +23,7 @@ void InitGame()
     wolf2 = new Wolf(0.15, 0.25, 0.023, 0.05, "walls", 40, 5, 3, 0);
    
     //-----------------------------location0_______________
-    location[0].hBack.loadBitmapWithNativeSize("background_0");
+    location[0].hBack.loadBitmapWithNativeSize("background_0",1);
     location[0].walls.emplace_back(0, 0, 0.009, 0.99, "walls");//левая стена
     location[0].walls.emplace_back(0.98, 0, 0.02, 0.99, "walls");//правая стена
     location[0].walls.emplace_back(0, 0.98, 0.999, 0.02, "walls");//пол
@@ -24,13 +33,13 @@ void InitGame()
     location[0].locationObjects.emplace_back(0.3, 0.800, 0.02, 0.025, "ball", ObjectsTipe::healing);//хилки
     location[0].locationObjects.emplace_back(0.4, 0.955, 0.02, 0.025, "ball", ObjectsTipe::healing);
    
-    location[0].locationObjects.emplace_back(0.55, 0.955, 0.025, 0.025, "Sub", ObjectsTipe::subject);//предметы
-    location[0].locationObjects.emplace_back(0.5, 0.800, 0.025, 0.025, "Sub", ObjectsTipe::subject);
+    //location[0].locationObjects.emplace_back(0.55, 0.955, 0.025, 0.025, "Sub", ObjectsTipe::subject);//предметы
+   // location[0].locationObjects.emplace_back(0.5, 0.800, 0.025, 0.025, "Sub", ObjectsTipe::subject);
 
     location[0].locationObjects.emplace_back(0.5, 0.955, 0.025, 0.025, "spike", ObjectsTipe::spike);//шипы
 
-    location[0].locationTexture.emplace_back(0.8, 0.85, 0.15, 0.05, "racket_enemy");
-    location[0].locationTexture.emplace_back(0.4, 0.85, 0.15, 0.05, "racket_enemy");
+    location[0].locationTexture.emplace_back(0.8, 0.85, 0.15, 0.05, "racket_enemy",ObjectsTipe::texture);
+    location[0].locationTexture.emplace_back(0.4, 0.85, 0.15, 0.05, "racket_enemy",ObjectsTipe::texture);
     //location[0].locationTexture.emplace_back(0.6, 0.95, 0.15, 0.05, "racket_enemy");
     location[0].walls.emplace_back(0.1, 0.8, 0.15, 0.05, "walls");
     location[0].walls.emplace_back(0.05, 0.9, 0.15, 0.05, "walls");
@@ -48,7 +57,7 @@ void InitGame()
     
     //___________________________location1________________
 
-    location[1].hBack.loadBitmapWithNativeSize("background_1");
+    location[1].hBack.loadBitmapWithNativeSize("background_1",10);
     location[1].walls.emplace_back(0, 0, 0.02, 0.99, "walls");//левая стена
     location[1].walls.emplace_back(0.98, 0, 0.02, 0.99, "walls");//правая стена
     location[1].walls.emplace_back(0, 0.98, 0.999, 0.02, "walls");//пол
@@ -289,11 +298,11 @@ void CollisionGroup()
         
 
     }
-    if (spikeCollision && currenttime > lastDamageTime + 1000) {
+    if (spikeCollision && timer::GetCounter() > lastDamageTime + 1000) {
         player->current_lives--;
-        lastDamageTime = currenttime;
+        lastDamageTime = timer::GetCounter();
         player->Sprite.jump = 60;
-        player->Sprite.x += 20;
+        //player->Sprite.x += 20;
         player->inJump = true;
         //player->Sprite.loadBitmapWithNativeSize("walls");
         

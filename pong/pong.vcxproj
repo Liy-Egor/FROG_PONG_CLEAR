@@ -155,11 +155,30 @@
     <Media Include="..\Debug\music.mp3" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="dx11minimal.h" />
+    <ClInclude Include="HeroPS.h" />
+    <ClInclude Include="HeroVS.h" />
+    <ClInclude Include="Loop.h" />
+    <ClInclude Include="MainWindow.h" />
+    <ClInclude Include="PS.h" />
     <ClInclude Include="Structures.h" />
     <ClInclude Include="logick.h" />
     <ClInclude Include="paint.h" />
+    <ClInclude Include="timer.h" />
+    <ClInclude Include="VS.h" />
+    <ClInclude Include="WICTextureLoader.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="..\packages\directxtk_uwp.2025.7.10.1\build\native\directxtk_uwp.targets" Condition="Exists('..\packages\directxtk_uwp.2025.7.10.1\build\native\directxtk_uwp.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\directxtk_uwp.2025.7.10.1\build\native\directxtk_uwp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\directxtk_uwp.2025.7.10.1\build\native\directxtk_uwp.targets'))" />
+  </Target>
 </Project>

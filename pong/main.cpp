@@ -1,8 +1,27 @@
-﻿#include "Structures.h"
-#include "paint.h"
+﻿#define _CRT_SECURE_NO_WARNINGS
+
+const float PI = 3.1415926535897;
+#include "framework.h"
+#include "windows.h"
+#include "timer.h"
+#include "vector"
+
+
+
+HINSTANCE hInst;
+LRESULT CALLBACK WndProc(HWND, UINT, WPARAM, LPARAM);
+DWORD currentTime;
+
+HWND hWnd;
+
+#include "MainWindow.h"
+#include "dx11minimal.h"
+#include "Structures.h"
+#include "WICTextureLoader.h"
+#include "dx11.h"
+
 #include "logick.h"
-
-
+#include "paint.h"
 float lerp(float x1, float x2, float a)
 {
     return x1 * (1 - a) + x2 * a;
@@ -13,70 +32,166 @@ float length(float x1, float y1, float x2, float y2)
     return sqrt(pow(x1 - x2, 2) + pow(y1 - y2, 2));
 }
 
+#include "Loop.h"
+#define MAX_LOADSTRING 100
+// current instance
+WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
+WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
+
+// Forward declarations of functions included in this code module:
+ATOM                MyRegisterClass(HINSTANCE hInstance);
+BOOL                InitInstance(HINSTANCE, int);
+LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
+INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
-    _In_ LPWSTR lpCmdLine,
-    _In_ int nCmdShow)
+    _In_ LPWSTR    lpCmdLine,
+    _In_ int       nCmdShow)
 {
+    UNREFERENCED_PARAMETER(hPrevInstance);
+    UNREFERENCED_PARAMETER(lpCmdLine);
 
-    InitWindow();//здесь инициализируем все что нужно для рисования в окне
-  
+    // TODO: Place code here.
+
+    // Initialize global strings
+    LoadStringW(hInstance, IDS_APP_TITLE, szTitle, MAX_LOADSTRING);
+    LoadStringW(hInstance, IDC_DX11MINIMAL, szWindowClass, MAX_LOADSTRING);
+    MyRegisterClass(hInstance);
+
+    // Perform application initialization:
+    if (!InitInstance(hInstance, nCmdShow))
+    {
+        return FALSE;
+    }
+    //InitWindow();  
+    Dx11Init();
     InitGame();//здесь инициализируем переменные игры
     ShowCursor(FALSE);
-    
+    HACCEL hAccelTable = LoadAccelerators(hInstance, MAKEINTRESOURCE(IDC_DX11MINIMAL));
 
+    MSG msg = { 0 };
 
-    while (!GetAsyncKeyState(VK_ESCAPE))
+    timer::StartCounter();
+
+    // Main message loop:
+    while (msg.message != WM_QUIT)
     {
-        currenttime = timeGetTime();
+        double time = timer::GetCounter();
 
-        BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);
-        //PrintBitblt(); //копируем буфер в окно и отрисовывает окно за игроком
-        
-        Sleep(16);//ждем 16 милисекунд (1/количество кадров в секунду)
-        GetCursorPos(&mouse);
-        ScreenToClient(window.hWnd, &mouse);
-        int sz = 5;
-        
-
-        location[player->currentLocation].hBack.showBack();
-
-        for (int i = 0; i < location[player->currentLocation].Persona.size(); i++) {
-
-            location[player->currentLocation].Persona[i]->Sprite.show();
-            location[player->currentLocation].Persona[i]->move();
-        }
-        player->Sprite.show();
-        player->move();
-        Health_bar.Show();
-
-        //player->Sprite.showHealth()
-        //player.h
-        
-        ShowTexture();
-        ShowObjects();
-        //DrawHealth();
-        ProcessPortal();
-        CollisionGroup();
-        //ProcessDash();//рывок
-        Ellipse(window.context, mouse.x - sz, mouse.y - sz, mouse.x + sz, mouse.y + sz);
-
-        if (GetAsyncKeyState('A'))
+        while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
-            player_view.x++;
+            if (msg.message == WM_QUIT) break;
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
         }
 
-        if (GetAsyncKeyState('D'))
+        if (time >= timer::nextFrameTime)
         {
-            player_view.x--;
+            currentTime = timer::GetCounter();
+            timer::frameBeginTime = timer::GetCounter();
+
+
+            mainLoop();
+            timer::frameEndTime = timer::GetCounter();
+            timer::frameRenderingDuration = timer::frameEndTime - timer::frameBeginTime;
+            timer::nextFrameTime = timer::frameBeginTime + FRAME_LEN;
         }
 
-        float ls = .2* length(player_view.x, player->Sprite.x, player_view.y, player->Sprite.y)/500.;
-        ls = max(ls - .2, 0.1);
-        ls = min(ls, 1);
-        player_view.x = lerp(player_view.x, player->Sprite.x,ls);
-        player_view.y = lerp(player_view.y, player->Sprite.y,ls);
+        Sleep((DWORD)min(FRAME_LEN, max(FRAME_LEN - timer::frameRenderingDuration, 0)));
     }
 
+    return (int)msg.wParam;
+}
+
+ATOM MyRegisterClass(HINSTANCE hInstance)
+{
+    WNDCLASSEXW wcex;
+
+    wcex.cbSize = sizeof(WNDCLASSEX);
+
+    wcex.style = CS_HREDRAW | CS_VREDRAW;
+    wcex.lpfnWndProc = WndProc;
+    wcex.cbClsExtra = 0;
+    wcex.cbWndExtra = 0;
+    wcex.hInstance = hInstance;
+    wcex.hIcon = LoadIcon(hInstance, MAKEINTRESOURCE(IDI_DX11MINIMAL));
+    wcex.hCursor = LoadCursor(nullptr, IDC_ARROW);
+    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wcex.lpszMenuName = MAKEINTRESOURCEW(IDC_DX11MINIMAL);
+    wcex.lpszClassName = szWindowClass;
+    wcex.hIconSm = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_SMALL));
+
+    return RegisterClassExW(&wcex);
+}
+
+LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    switch (message)
+    {
+    case WM_KEYDOWN:
+        if (wParam == VK_ESCAPE)
+        {
+            PostQuitMessage(0);
+            return 0;
+        }
+        break;
+
+    case WM_MOUSEWHEEL:
+    {
+        float zDelta = GET_WHEEL_DELTA_WPARAM(wParam);
+        Camera::HandleMouseWheel(zDelta);
+        break;
+    }
+    case WM_COMMAND:
+    {
+        int wmId = LOWORD(wParam);
+        switch (wmId)
+        {
+        case IDM_ABOUT:
+            DialogBox(hInst, MAKEINTRESOURCE(IDD_ABOUTBOX), hWnd, About);
+            break;
+        case IDM_EXIT:
+            DestroyWindow(hWnd);
+            break;
+        default:
+            return DefWindowProc(hWnd, message, wParam, lParam);
+        }
+        break;
+    }
+    case WM_PAINT:
+    {
+        PAINTSTRUCT ps;
+        HDC hdc = BeginPaint(hWnd, &ps);
+        EndPaint(hWnd, &ps);
+        break;
+    }
+    case WM_CLOSE:
+    case WM_DESTROY:
+        PostQuitMessage(0);
+        break;
+    default:
+        return DefWindowProc(hWnd, message, wParam, lParam);
+    }
+    return 0;
+}
+
+// Message handler for about box.
+INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
+{
+    UNREFERENCED_PARAMETER(lParam);
+    switch (message)
+    {
+    case WM_INITDIALOG:
+        return (INT_PTR)TRUE;
+
+    case WM_COMMAND:
+        if (LOWORD(wParam) == IDOK || LOWORD(wParam) == IDCANCEL)
+        {
+            EndDialog(hDlg, LOWORD(wParam));
+            return (INT_PTR)TRUE;
+        }
+        break;
+    }
+    return (INT_PTR)FALSE;
 }

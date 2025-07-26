@@ -47,6 +47,9 @@
     <Image Include="..\Debug\enemy1.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="..\..\..\..\Desktop\FROG_PONG_CLEAR\Debug\Sub.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\Debug\bounce.wav">
@@ -67,5 +70,35 @@
     <ClInclude Include="paint.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="dx11minimal.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="timer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="MainWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="VS.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="PS.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Loop.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="WICTextureLoader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HeroPS.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HeroVS.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
