@@ -112,7 +112,7 @@ void LoadSVGDataMap(const string NameFileSVG) {
         else if (!nameObject.find("background")) {
 
             MapSizeW = stoi(bufferData[0][0]);
-            MapSizeH = stoi(bufferData[0][1]);
+            MapSizeH = stoi(bufferData[1][0]);
             location[0].hBack.loadBitmapWithNativeSize(nameObject);
         }
         else if (!nameObject.find("portal")) {
