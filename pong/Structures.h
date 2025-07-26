@@ -34,6 +34,8 @@ struct float2 {
     float y;
 };
 float scale = 2;
+int MapSizeW = window.width;
+int MapSizeH = window.height;
 struct sprite {
     float x, y, width, height, dx, dy, speed, jump, gravity;
     HBITMAP hBitmap;
