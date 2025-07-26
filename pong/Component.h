@@ -6,7 +6,7 @@ struct ALLCopmonents
 //Base Components
 struct CTransform
 {
-    int x, y, Width, Height, Dx, Dy, Scale;
+    int x, y, Width, Height, Dx = 0, Dy = 0, Scale = 2;
 };
 
 struct CBitmap
@@ -16,34 +16,48 @@ struct CBitmap
 
 struct CGravity
 {
-    int Gravity;
+    int Gravity = 30;
+};
+
+struct CSound
+{
+   const char* SoundNameFile;
+};
+
+struct CCollider
+{
+   bool CollXfound = false;
+   bool CollYfound = false;
+   int LastTracePlatformNum = -1;
+   int Direction = 1;
 };
 
 //—haracter Components
 struct CHealth
 {
-    int Health , MaxHealth;
+    int Health = 100, MaxHealth = 100;
 };
 
 struct CDamage
 {
-    int Damage;
+    int Damage = 10;
     string TypeDamage;
 };
 
 struct CDefense
 {
-    int Defense, ResistElements, ResistPhysics, ResistDistantDamage;
+    int Defense = 100;
+    float ResistElements = 0., ResistPhysics = 0., ResistDistantDamage = 0. ;
 };
 
 struct CSpeed
 {
-    int SpeedAttack, SpeedWalk;
+    int SpeedAttack = 10, SpeedWalk = 15;
 };
 
 struct —Rank
 {
-    int Rank;
+    int Rank = 0;
 };
 
 struct CGender
@@ -68,11 +82,14 @@ struct —Specialization
 
 struct CName—haracter
 {
-    string Name;
+    string NameChar;
 };
 
 struct CJump
 {
-    int Jump;
+    int Jump = 0;
+    bool InJumpBot = false;
+    bool InJump = false;
 };
+
 };

@@ -49,8 +49,6 @@ struct sprite {
 
     void show()
     {
-        
-
         float vx = (x - player_view.x) * scale + window.width / 2;
         float vy = (y - player_view.y) * scale + window.height / 2;
         float vw = width * scale;
@@ -70,7 +68,6 @@ struct sprite {
     {
         ShowBitmap(window.context, 0, 0, window.width, window.height, hBitmap, false);
     }
-
 };
 
 class StaticObjects
@@ -130,19 +127,12 @@ public:
 
 
 void tracer_collide(auto& Character);
-
-
-class ICharacterProperty {
-public:
-    ICharacterProperty(int SpeedAttack, int Defense, int Damage, int Health, int MaxHealth, float Resistens, const string TypeCharacter) {}
-
-    virtual void Kill() = 0;
-    int SpeedAttack = 0, Defense = 0, Damage = 0, Health = 0, MaxHealth = 0;
-    float Resistens = 0.;
-    string TypeCharacter;
-};
-
-
+void processGravity(auto& spriteName)
+{
+    spriteName.jump *= .9;
+    spriteName.dx *= .5;
+    spriteName.dy = spriteName.gravity - spriteName.jump;
+}
 
 
 class character //структура игрока
@@ -181,13 +171,6 @@ public:
 
 };
 
-void processGravity(auto& spriteName)
-{
-    spriteName.jump *= .9;
-    spriteName.dx *= .5;
-    spriteName.dy = spriteName.gravity - spriteName.jump;
-}
-
 
 struct Location_
 {
@@ -198,11 +181,7 @@ struct Location_
     vector<Spike> spike;
     vector<character*> Persona;
 
-};
-
-Location_ location[5];
-
-
+}location[5];
 class Hero : public character
 {
 public:
@@ -245,8 +224,7 @@ public:
 
 
     }
-};
-
+}*player;
 class Wolf : public character //структура врагов
 {
 public:
@@ -284,12 +262,7 @@ public:
             Sprite.dx = direction * Sprite.speed;
         }
     }
-};
-
-Hero* player;
-Wolf* wolf;
-Wolf* wolf2;
-
+}*wolf, *wolf2;
 class health_bar {
 public:
     sprite health_full, health_empty;
@@ -318,9 +291,8 @@ public:
         }
     }
 
-};
+}Health_bar;
 
-health_bar Health_bar;
 
 void portal_::Portal(auto& player)
 {
@@ -338,7 +310,6 @@ void portal_::Portal(auto& player)
         }
     }
 }
-
 void HealingFlask::healing(auto& player, int i)
 {
     if (CheckCollision(player->Sprite.x, player->Sprite.y, player->Sprite.width, player->Sprite.height, Sprite.x, Sprite.y, Sprite.width, Sprite.height))

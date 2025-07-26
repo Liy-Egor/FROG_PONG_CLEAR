@@ -11,7 +11,6 @@ string StrReplace(string* str, string namestr) {
 void LoadSVGDataMap(const string NameFileSVG) {
     ifstream file;
 
-    
     vector <vector<string>> dS{
         {},
         {},

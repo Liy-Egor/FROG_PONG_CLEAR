@@ -2,7 +2,7 @@
 #include "paint.h"
 #include "logick.h"
 #include "GameFileSystem.h"
-#include "ECSSoft.h"
+#include "ArcheType.h"
 
 float lerp(float x1, float x2, float a)
 {
@@ -26,9 +26,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     InitGame();//здесь инициализируем переменные игры
     ShowCursor(FALSE);
     
+    
     while (!GetAsyncKeyState(VK_ESCAPE))
     {
-
+        
         Serialization DataGame(location[0]);
         if (GetAsyncKeyState(VK_F1)) {
             DataGame.Ser();
@@ -47,7 +48,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         ScreenToClient(window.hWnd, &mouse);
         int sz = 5;
 
-
+        
         location[player->currentLocation].hBack.showBack();
 
         for (int i = 0; i < location[player->currentLocation].Persona.size(); i++) {
@@ -75,9 +76,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
 
 
-        //ProcessDash();//рывок
         Ellipse(window.context, mouse.x - sz, mouse.y - sz, mouse.x + sz, mouse.y + sz);
-
 
         float ls = .2 * length(player_view.x, player->Sprite.x, player_view.y, player->Sprite.y) / 500.;
         ls = max(ls - .2, 0.1);

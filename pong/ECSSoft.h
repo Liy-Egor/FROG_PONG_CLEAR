@@ -28,6 +28,7 @@ private:
         }
     };
     
+   
     void DeleteComp(size_t Mask, int id)
     {
         for (int i = 0; i < VComponentPool.size(); i++)
@@ -43,8 +44,6 @@ private:
                     break;
                 }
             }
-
-
         }
     }
 
@@ -97,7 +96,9 @@ public:
             if (i == id)
             {
                 for (int i = 0; i < VComponentPool.size(); i++)
-                {
+                { //////////////////// нужно обнулять итератор а то он продолжает накпливаться
+                    ///выше сделать еще бетот как гет только с *char = dasd new char[] return dasd delete dasd
+                    //это только для сравнения масок не более для точности крч
                     DeleteComp(false, id);
                 }
                 vector<Entity>::iterator it;

@@ -1,13 +1,10 @@
 #pragma once
 #include "Structures.h"
 
-
-
 void InitWindow()
 {
     SetProcessDPIAware();
     window.hWnd = CreateWindow("edit", 0, WS_POPUP | WS_VISIBLE | WS_MAXIMIZE, 0, 0, 0, 0, 0, 0, 0, 0);
-
     RECT r;
     GetClientRect(window.hWnd, &r);
     window.device_context = GetDC(window.hWnd);
@@ -16,9 +13,7 @@ void InitWindow()
     window.context = CreateCompatibleDC(window.device_context);
     SelectObject(window.context, CreateCompatibleBitmap(window.device_context, window.width, window.height));
     GetClientRect(window.hWnd, &r);
-
 }
-
 
 void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool alpha)
 {

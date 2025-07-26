@@ -3,15 +3,15 @@
 #include "Component.h"
 #include "ECSSoft.h"
 #define ECC ALLCopmonents
+//здесь выстраиваются конкретные типы сущностей и подключают к ним логику
 
-
-//здесь выстраиваются конкретные типы сущностей и подключают к ним системы
 class ATEnemy
-{   
+{
 private:
     int Enemy = ECS.NewEntity();
     ECC::CTransform* Transform = ECS.SetComponent<ECC::CTransform>(Enemy);
     ECC::CBitmap* Bitmap = ECS.SetComponent<ECC::CBitmap>(Enemy);
+    ECC::CSound* Sound = ECS.SetComponent<ECC::CSound>(Enemy);
     ECC::CHealth* Health = ECS.SetComponent<ECC::CHealth>(Enemy);
     ECC::CDamage* Damage = ECS.SetComponent<ECC::CDamage>(Enemy);
     ECC::CDefense* Defense = ECS.SetComponent<ECC::CDefense>(Enemy);
@@ -26,13 +26,34 @@ private:
     void DeleteAT()
     {
         ECS.DeleteEntity(Enemy);
+        delete this;
     }
 public:
 
+    ATEnemy(string BitmapNameFile)
+    {   
+        Bitmap->HBitMap = GetBitmap(BitmapNameFile);
+        LoadTransform(*Transform, GetTransformData());
+        CreateCharacter(*Transform);
+        AddCharacterModifier(*Health, *Defense, *Damage, *Speed, *Specialization, *Gender, *StatusBehavior, *TypeСharacter, *NameСharacter, *Rank,
+            "TypeDamage", "Status", "TypeСh", "Gendr", "NameChar", "Specialist", 0);
+    }
+    int Start()
+    {
+        Show(*ECS.GetComponent < ECC::CBitmap>(Enemy), *ECS.GetComponent < ECC::CTransform >(Enemy));
 
+        MoveCharacter(
+            *ECS.GetComponent<ECC::CJump>(Enemy),
+            *ECS.GetComponent<ECC::CTransform>(Enemy),
+            *ECS.GetComponent<ECC::CSpeed>(Enemy),
+            *ECS.GetComponent<ECC::CCollider>(Enemy),
+            *ECS.GetComponent<ECC::CGravity>(Enemy),
+            0);
+    }
 
-
-
-
-
-};
+    void Destroy()
+    {
+        DeleteAT();
+    }
+    
+}*Enemy;
