@@ -6,7 +6,7 @@
 
 void InitGame()
 {
-    LoadSVGDataMap("LVL0");
+    LoadSVGDataMap("LVL1");
 
     //player = new Hero(0.2, 0.25, 0.023, 0.032, "racket", 40, 5, 3, 0);
     //wolf = new Wolf(0.25, 0.25, 0.023, 0.02, "enemy1", 40, 5, 3, 0);
