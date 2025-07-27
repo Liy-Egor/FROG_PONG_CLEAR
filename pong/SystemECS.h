@@ -1,7 +1,7 @@
 #pragma once
 #include "Component.h"
 #include "Structures.h"
-#define ECC ALLCopmonents
+using namespace ECC;
 //Á‰ÂÒÚ¸ ‚Òˇ ÎÓ„ËÍ‡
 
 //‰Îˇ Á‡„ÛÁÍË ÁÌ‡˜ÂÌËÈ
@@ -12,7 +12,7 @@ HBITMAP GetBitmap(string BitmapNameFile)
     return hBitmap;
 }
 
-void LoadTransform(ECC::CTransform& CTransform, float arr[])
+void LoadTransform(CTransform& CTransform, float arr[])
 {
     CTransform.x = arr[0];
     CTransform.y = arr[1];
@@ -30,7 +30,7 @@ float* GetTransformData()
     return arr;
 }
 
-void CreateCharacter(ECC::CTransform& CTransform)
+void CreateCharacter(CTransform& CTransform)
 {
     CTransform.x *= window.width;
     CTransform.y *= window.height;
@@ -40,7 +40,7 @@ void CreateCharacter(ECC::CTransform& CTransform)
 
 
 //‰Û„‡ˇ ÎÓ„ËÍ‡
-void Show(ECC::CBitmap& CBitmap, ECC::CTransform& Transform)
+void Show(CBitmap& CBitmap, CTransform& Transform)
 {
     float vx = (Transform.x - player_view.x) * Transform.Scale + window.width / 2;
     float vy = (Transform.y - player_view.y) * Transform.Scale + window.height / 2;
@@ -57,24 +57,24 @@ void Show(ECC::CBitmap& CBitmap, ECC::CTransform& Transform)
     ShowBitmap(window.context, vx, vy, vw, vh, CBitmap.HBitMap, false);
 } // ÚÛÚ Ì‡‰Ó ÛÍ‡Á‡Ú¸ ËÏÂÌÌÓ Ë„ÓÍ‡
 
-void ShowWindow(ECC::CBitmap& CBitmap)
+void ShowWindow(CBitmap& CBitmap)
 {
     ShowBitmap(window.context, 0, 0, window.width, window.height, CBitmap.HBitMap, false);
 }
 
-void ProcessGravity(ECC::CJump& CJump, ECC::CTransform& Transform, ECC::CGravity& Gravity)
+void ProcessGravity(CJump& CJump, CTransform& Transform, CGravity& Gravity)
 {
     CJump.Jump *= .9;
     Transform.Dx *= .5;
     Transform.Dy = Gravity.Gravity - CJump.Jump;
 }
 
-void ProcessSound(ECC::CSound& CSound)
+void ProcessSound(CSound& CSound)
 {
     PlaySound(TEXT(CSound.SoundNameFile), NULL, SND_FILENAME | SND_ASYNC);
 }
 
-void TracerCollide(ECC::CCollider& CCollider, ECC::CTransform& CTransform, ECC::CJump& CJump, int MapLVL)
+void TracerCollide(CCollider& CCollider, CTransform& CTransform, CJump& CJump, int MapLVL)
 {
     CCollider.LastTracePlatformNum = -1;
     CCollider.CollXfound = false;
@@ -160,7 +160,7 @@ void TracerCollide(ECC::CCollider& CCollider, ECC::CTransform& CTransform, ECC::
     if (!CCollider.CollYfound) CTransform.y += CTransform.Dy;
 }
 
-void MovePlayer(ECC::CJump& CJump, ECC::CTransform& CTransform, ECC::CSpeed& CSpeed, ECC::CCollider& CCollider, ECC::CGravity& Gravity, int MapLVL)
+void MovePlayer(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, int MapLVL)
 {
     if (GetAsyncKeyState(VK_LEFT)) 
     {
@@ -181,7 +181,7 @@ void MovePlayer(ECC::CJump& CJump, ECC::CTransform& CTransform, ECC::CSpeed& CSp
     ProcessGravity(CJump, CTransform, Gravity);
 }
 
-void MoveCharacter(ECC::CJump& CJump, ECC::CTransform& CTransform, ECC::CSpeed& CSpeed, ECC::CCollider& CCollider, ECC::CGravity& Gravity, int MapLVL)
+void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, int MapLVL)
 {
     TracerCollide(CCollider, CTransform, CJump, MapLVL);
     ProcessGravity(CJump, CTransform, Gravity);
@@ -203,8 +203,8 @@ void MoveCharacter(ECC::CJump& CJump, ECC::CTransform& CTransform, ECC::CSpeed& 
 }
 
 void AddCharacterModifier(
-    ECC::CHealth& CHealth, ECC::CDefense& CDefense, ECC::CDamage& CDamage, ECC::CSpeed& CSpeed, ECC::—Specialization& —Specialization,
-    ECC::CGender& CGender, ECC::CStatusBehavior& CStatusBehavior, ECC::CType—haracter& CType—haracter, ECC::CName—haracter& CName—haracter, ECC::—Rank& —Rank,
+    CHealth& CHealth, CDefense& CDefense, CDamage& CDamage, CSpeed& CSpeed, —Specialization& —Specialization,
+    CGender& CGender, CStatusBehavior& CStatusBehavior, CType—haracter& CType—haracter, CName—haracter& CName—haracter, —Rank& —Rank,
     string TypeDamage, string Status, string Type—haracter, string Gender, string NameChar, string Specialization, int Rank)
 {
 

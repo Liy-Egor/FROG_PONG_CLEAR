@@ -9,7 +9,8 @@ void InitGame()
     LoadSVGDataMap("LVL0");
     
     Enemy = new ATEnemy("frog");
-    Enemy->Destroy();
+
+
 
     location[1].hBack.loadBitmapWithNativeSize("background_1");
     location[1].walls.emplace_back(0, 0, 0.02, 0.99, "walls");//левая стена

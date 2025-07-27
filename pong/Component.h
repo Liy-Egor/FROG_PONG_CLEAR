@@ -1,7 +1,7 @@
 #pragma once
 #include "Structures.h"
 
-struct ALLCopmonents
+namespace ECC
 {
 //Base Components
 struct CTransform

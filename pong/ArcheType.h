@@ -2,34 +2,37 @@
 #include "SystemECS.h"
 #include "Component.h"
 #include "ECSSoft.h"
-#define ECC ALLCopmonents
+using namespace ECC;
 //çäåñü âûñòğàèâàşòñÿ êîíêğåòíûå òèïû ñóùíîñòåé è ïîäêëş÷àşò ê íèì ëîãèêó
 
 class ATEnemy
 {
 private:
     int Enemy = ECS.NewEntity();
-    ECC::CTransform* Transform = ECS.SetComponent<ECC::CTransform>(Enemy);
-    ECC::CBitmap* Bitmap = ECS.SetComponent<ECC::CBitmap>(Enemy);
-    ECC::CSound* Sound = ECS.SetComponent<ECC::CSound>(Enemy);
-    ECC::CHealth* Health = ECS.SetComponent<ECC::CHealth>(Enemy);
-    ECC::CDamage* Damage = ECS.SetComponent<ECC::CDamage>(Enemy);
-    ECC::CDefense* Defense = ECS.SetComponent<ECC::CDefense>(Enemy);
-    ECC::CSpeed* Speed = ECS.SetComponent<ECC::CSpeed>(Enemy);
-    ECC::CStatusBehavior* StatusBehavior = ECS.SetComponent<ECC::CStatusBehavior>(Enemy);
-    ECC::CTypeÑharacter* TypeÑharacter = ECS.SetComponent<ECC::CTypeÑharacter>(Enemy);
-    ECC::CJump* Jump = ECS.SetComponent<ECC::CJump>(Enemy);
-    ECC::CGender* Gender = ECS.SetComponent<ECC::CGender>(Enemy);
-    ECC::CNameÑharacter* NameÑharacter = ECS.SetComponent<ECC::CNameÑharacter>(Enemy);
-    ECC::ÑSpecialization* Specialization = ECS.SetComponent<ECC::ÑSpecialization>(Enemy);
-    ECC::ÑRank* Rank = ECS.SetComponent<ECC::ÑRank>(Enemy);
+    CTransform* Transform = ECS.SetComponent<CTransform>(Enemy);
+    CBitmap* Bitmap = ECS.SetComponent<CBitmap>(Enemy);
+    CSound* Sound = ECS.SetComponent<CSound>(Enemy);
+    CHealth* Health = ECS.SetComponent<CHealth>(Enemy);
+    CDamage* Damage = ECS.SetComponent<CDamage>(Enemy);
+    CDefense* Defense = ECS.SetComponent<CDefense>(Enemy);
+    CSpeed* Speed = ECS.SetComponent<CSpeed>(Enemy);
+    CStatusBehavior* StatusBehavior = ECS.SetComponent<CStatusBehavior>(Enemy);
+    CTypeÑharacter* TypeÑharacter = ECS.SetComponent<CTypeÑharacter>(Enemy);
+    CJump* Jump = ECS.SetComponent<CJump>(Enemy);
+    CGender* Gender = ECS.SetComponent<CGender>(Enemy);
+    CNameÑharacter* NameÑharacter = ECS.SetComponent<CNameÑharacter>(Enemy);
+    ÑSpecialization* Specialization = ECS.SetComponent<ÑSpecialization>(Enemy);
+    ÑRank* Rank = ECS.SetComponent<ÑRank>(Enemy);
+    CCollider* Collider = ECS.SetComponent<CCollider>(Enemy);
+    CGravity* Gravity = ECS.SetComponent<CGravity>(Enemy);
     void DeleteAT()
     {
         ECS.DeleteEntity(Enemy);
         delete this;
     }
+    
 public:
-
+    
     ATEnemy(string BitmapNameFile)
     {   
         Bitmap->HBitMap = GetBitmap(BitmapNameFile);
@@ -40,14 +43,14 @@ public:
     }
     int Start()
     {
-        Show(*ECS.GetComponent < ECC::CBitmap>(Enemy), *ECS.GetComponent < ECC::CTransform >(Enemy));
+        Show(*ECS.GetComponent<CBitmap>(Enemy, Bitmap), *ECS.GetComponent<CTransform>(Enemy, Transform));
 
         MoveCharacter(
-            *ECS.GetComponent<ECC::CJump>(Enemy),
-            *ECS.GetComponent<ECC::CTransform>(Enemy),
-            *ECS.GetComponent<ECC::CSpeed>(Enemy),
-            *ECS.GetComponent<ECC::CCollider>(Enemy),
-            *ECS.GetComponent<ECC::CGravity>(Enemy),
+            *ECS.GetComponent<CJump>(Enemy, Jump),
+            *ECS.GetComponent<CTransform>(Enemy, Transform),
+            *ECS.GetComponent<CSpeed>(Enemy, Speed),
+            *ECS.GetComponent<CCollider>(Enemy, Collider),
+            *ECS.GetComponent<CGravity>(Enemy, Gravity),
             0);
     }
 

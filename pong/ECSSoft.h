@@ -10,12 +10,12 @@ private:
     };
 
     struct ComponentPool
-    {   
+    {
         int IDEntity;
         int IDComponent;
         size_t Mask;
-        char* pData = new char[Mask + IDEntity];
-        
+        char* pData = new char [Mask + IDEntity];
+
         inline char* get()
         {
             return pData;
@@ -28,14 +28,13 @@ private:
         }
     };
     
-   
-    void DeleteComp(size_t Mask, int id)
+    void DeleteComp(char* MaskTemp, int id)
     {
         for (int i = 0; i < VComponentPool.size(); i++)
         {
-            if (Mask == VComponentPool[i].Mask || Mask  == false)
+            if (id == VComponentPool[i].IDEntity)
             {
-                if (id == VComponentPool[i].IDEntity)
+                if (MaskTemp == VComponentPool[i].pData || MaskTemp == nullptr)
                 {
                     vector<ComponentPool>::iterator it;
                     it = VComponentPool.begin() + i;
@@ -68,14 +67,14 @@ public:
     }
 
     template <typename T>
-    T* GetComponent(int id)
+    T* GetComponent(int id,T* MaskBit)
     {
-        size_t Mask = sizeof(T);
+        char* MaskTemp = (char*)*&MaskBit;
         for (ComponentPool val : VComponentPool)
         {
-            if (Mask == val.Mask && id == val.IDEntity)
+            if (id == val.IDEntity && MaskTemp == val.pData)
             {
-                T* Comp = new (val.get()) T();
+                T* Comp = (T*)val.pData;
                 return Comp;
                 break;
             }
@@ -83,10 +82,10 @@ public:
     }
     
     template <typename T>
-    void DeleteComponent(int id)
+    void DeleteComponent(int id, T* MaskBit)
     {
-        size_t Mask = sizeof(T);
-        DeleteComp(Mask, id);
+        char* MaskTemp = (char*)*&MaskBit;
+        DeleteComp(MaskTemp, id);
     }
 
     void DeleteEntity(int id)
@@ -95,11 +94,9 @@ public:
         {
             if (i == id)
             {
-                for (int i = 0; i < VComponentPool.size(); i++)
-                { //////////////////// нужно обнулять итератор а то он продолжает накпливаться
-                    ///выше сделать еще бетот как гет только с *char = dasd new char[] return dasd delete dasd
-                    //это только для сравнения масок не более для точности крч
-                    DeleteComp(false, id);
+                while (VComponentPool.size() != 0)
+                {
+                    DeleteComp(nullptr, id);
                 }
                 vector<Entity>::iterator it;
                 it = VEntity.begin() + i;
