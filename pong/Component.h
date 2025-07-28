@@ -1,12 +1,14 @@
 #pragma once
-#include "Structures.h"
+#include "BaseStructures.h"
 
 namespace ECC
 {
+  
 //Base Components
 struct CTransform
 {
-    int x, y, Width, Height, Dx = 0, Dy = 0, Scale = 2;
+    float x, y, Width, Height, Dx = 0., Dy = 0.;
+    int Scale = 2;
 };
 
 struct CBitmap
@@ -16,7 +18,7 @@ struct CBitmap
 
 struct CGravity
 {
-    int Gravity = 30;
+    float Gravity = 3.;
 };
 
 struct CSound
@@ -32,6 +34,12 @@ struct CCollider
    int Direction = 1;
 };
 
+struct CNameObject
+{
+    const char* Name;
+    int Number;
+};
+
 //—haracter Components
 struct CHealth
 {
@@ -41,7 +49,7 @@ struct CHealth
 struct CDamage
 {
     int Damage = 10;
-    string TypeDamage;
+    const char* TypeDamage;
 };
 
 struct CDefense
@@ -52,7 +60,7 @@ struct CDefense
 
 struct CSpeed
 {
-    int SpeedAttack = 10, SpeedWalk = 15;
+    int SpeedAttack = 10, SpeedWalk = 2;
 };
 
 struct —Rank
@@ -62,32 +70,32 @@ struct —Rank
 
 struct CGender
 {
-    string Gender;
+    const char* Gender;
 };
 
 struct CType—haracter
 {
-    string Type—haracter;
+    const char* Type—haracter;
 };
 
 struct CStatusBehavior
 {
-    string Status;
+    const char* Status;
 };
 
 struct —Specialization
 {
-    string Specialization;
+    const char* Specialization;
 };
 
 struct CName—haracter
 {
-    string NameChar;
+    const char* NameChar;
 };
 
 struct CJump
 {
-    int Jump = 0;
+    float Jump = 0.;
     bool InJumpBot = false;
     bool InJump = false;
 };

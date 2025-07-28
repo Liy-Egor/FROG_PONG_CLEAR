@@ -1,5 +1,15 @@
 ﻿#pragma once
-#include "Structures.h"
+#include "ArcheType.h"
+
+struct VArcheType
+{
+    vector<ATLocation*>VLocation;
+    vector<ATWall*>VWall;
+    vector<ATSpike*>VSpike;
+    vector<ATHealFlack*>VHealFlack;
+    vector<ATPortal*>VPortal;
+    vector<ATEnemyFrog*>VEnemyFrog;
+}VArcheTypes;
 
 string StrReplace(string* str, string namestr) {
     return str->replace(str->find(namestr), namestr.length(), "");
@@ -97,188 +107,200 @@ void LoadSVGDataMap(const string NameFileSVG) {
         float width = stof(bufferData[0][i]) / window.width;
         float height = stof(bufferData[1][i]) / window.height;
         string nameObject = dS[0][i];
-
-
+        float arr[4]{x, y, width, height};
+        
         //создание объектов пока что только для уровня 0
         if (!nameObject.find("walls")) {
-            location[0].walls.emplace_back(x, y, width, height, "walls");
+            Wall = new ATWall("walls", arr);
+            VArcheTypes.VWall.push_back(Wall);
         }
         else if (!nameObject.find("enemy")) {
-            wolf = new Wolf(x, y, width, height, "enemy1", 40, 5, 3, 0);
+            EnemyFrog = new ATEnemyFrog("enemy1", arr);
+            VArcheTypes.VEnemyFrog.push_back(EnemyFrog);
         }
-        else if (!nameObject.find("racket")) {
-            player = new Hero(x, y, width, height, "racket", 40, 5, 3, 0);
+        else if (!nameObject.find("racket")) {       
+            Player = new ATPlayer("racket", arr);
         }
         else if (!nameObject.find("background")) {
-            
             MapSizeW = stoi(bufferData[0][0]);
             MapSizeH = stoi(bufferData[0][1]);
-            location[0].hBack.loadBitmapWithNativeSize(nameObject);
+            Location = new ATLocation(nameObject, arr);
+            VArcheTypes.VLocation.push_back(Location);
         }
         else if (!nameObject.find("portal")) {
-            location[0].portal.emplace_back(x, y, width, height, 1, "racket"); // пока реализациия работает на переход на 1 уровень
+            Portal = new ATPortal("racket", arr);
+            VArcheTypes.VPortal.push_back(Portal);
         }
         else if (!nameObject.find("heal")) {
-            location[0].healingFlask.emplace_back(x, y, width, height, "ball");
+            HealFlack = new ATHealFlack("ball", arr);
+            VArcheTypes.VHealFlack.push_back(HealFlack);
         }
         else if (!nameObject.find("spike")) {
-            location[0].spike.emplace_back(x, y, width, height, "spike");
+            Spike = new ATSpike("ball", arr);
+            VArcheTypes.VSpike.push_back(Spike);
         }
 
     }
     file.close();
+} //сделать мулти редактор карт
+
+void InitGame()
+{
+    
+    LoadSVGDataMap("LVL0");
 }
 
-class Serialization {
-public:
-    Serialization(Location_ container) { this->container = container;}
-    
 
-    /// добавить функцию создания сохранения с нуля и загрузка мира с нулевого сохранения
-    /// добавить функцию проверки на наличие изменения данных в файле чтобы создать мир с нуля и перезаписать данные на новые
-
-    void Ser() {
-        ofile.open("SaveData.txt", ios::trunc);
-        ofile.close();
-        ofile.open("SaveData.txt", ofstream::app);
-        if (ofile.is_open())
-        {
-            ///hardcode?!?!?!?!?!?
-            for (int i = 0; i < container.healingFlask.size(); i++) {
-                ofile << "<healingFlask>" << "index=" << i << " ";
-                SortSprite(container.healingFlask[i].Sprite);
-            }
-            for (int i = 0; i < container.spike.size(); i++) {
-                ofile << "<spike>" << "index=" << i << " ";
-                SortSprite(container.spike[i].Sprite);
-            }
-            for (int i = 0; i < container.Persona.size(); i++) {
-                ofile << "<Persona>" << "index=" << i << " ";
-                SortSprite(container.Persona[i]->Sprite);
-            }
-            for (int i = 0; i < container.portal.size(); i++) {
-                ofile << "<portal>" << "index=" << i << " ";
-                SortSprite(container.portal[i].Sprite);
-            }
-            for (int i = 0; i < container.walls.size(); i++) {
-                ofile << "<walls>" << "index=" << i << " ";
-                SortSprite(container.walls[i].Sprite);
-                
-            }
-        }
-        ofile.close();
-    }
-    void Deser() {
-        ifile.open("SaveData.txt");
-        if (ifile.is_open())
-        {
-            string StructureArr[]{"<healingFlask>", "<spike>", "<Persona>", "<portal>", "<walls>", "height", "width", "xpos", "ypos"};
-            string str;
-            while (!ifile.eof()) {
-                ifile >> str;
-                for (int i = 0; i < 9; i++) {
-                        ///определение объекта по его индексу и по экземляру стуктуры
-                        if (!str.find(StructureArr[i]) &&
-                            !str.find(StructureArr[i] + "index=")) {
-                            ReplaceStructure(str, StructureArr[i]);
-                            break;
-                        }
-                        else if (!str.find(StructureArr[i]) &&
-                             !str.find(StructureArr[i] + "==")) {
-                             ReplaceProperty(str);
-                             break;
-                             }
-                }
-            }
-        }
-        ifile.close();
-    }
-private:
-    string MarkerStructure;
-    int IndexStructure;
-    Location_ container;
-    ifstream ifile;
-    ofstream ofile;
-
-    void SortSprite(sprite SprData) {
-        ofile << "height==" << SprData.height << " "
-              << "width==" << SprData.width << " "
-              << "xpos==" << SprData.x << " "
-              << "ypos==" << SprData.y << "\n";
-    }
-    void ReplaceStructure(string str, string StructureArr) {
-        StrReplace(&str, StructureArr + "index=");
-        MarkerStructure = StructureArr;
-        IndexStructure = stoi(str);
-        
-    };
-    void ReplaceProperty(string StructureArr) {
-        float height = NULL;
-        float width = NULL;
-        float xpos = NULL;
-        float ypos = NULL;
-
-        if (!StructureArr.find("height")) {
-            StrReplace(&StructureArr, "height==");
-            height = stof(StructureArr);
-        }
-        else if (!StructureArr.find("width")) {
-            StrReplace(&StructureArr, "width==");
-            width = stof(StructureArr);
-        }
-        else if (!StructureArr.find("xpos")) {
-            StrReplace(&StructureArr, "xpos==");
-            xpos = stof(StructureArr);
-        }
-        else if (!StructureArr.find("ypos")) {
-            StrReplace(&StructureArr, "ypos==");
-            ypos = stof(StructureArr);
-        }
-
-        if (MarkerStructure == "<healingFlask>") {
-            if (container.healingFlask.size() != 0)
-            {
-            SwapProperty(&container.healingFlask[IndexStructure].Sprite, height, width, xpos, ypos);
-            }
-        }
-        else if (MarkerStructure == "<spike>") {
-            if (container.spike.size()!=0)
-            {
-            SwapProperty(&container.spike[IndexStructure].Sprite, height, width, xpos, ypos);
-            }
-        }
-        else if (MarkerStructure == "<Persona>") {
-            if (container.Persona.size() != 0)
-            {
-            SwapProperty(&container.Persona[IndexStructure]->Sprite, height, width, xpos, ypos);
-            }
-        }
-        else if (MarkerStructure == "<portal>") {
-            if (container.portal.size() != 0)
-            {
-            SwapProperty(&container.portal[IndexStructure].Sprite, height, width, xpos, ypos);
-            }
-        }
-        else if (MarkerStructure == "<walls>") {
-            if (container.walls.size() != 0)
-            {
-            SwapProperty(&location[0].walls[IndexStructure].Sprite, height, width, xpos, ypos);
-            }
-        }
-
-        height = NULL;
-        width = NULL;
-        xpos = NULL;
-        ypos = NULL;
-    };
-    void SwapProperty(sprite* Struct, float h, float w, float x, float y) {
-        if (h != NULL) { Struct->height = h; }
-        if (w != NULL) { Struct->width = w; }
-        if (x != NULL) { Struct->x = x; }
-        if (y != NULL) { Struct->y = y; }
-    };
-
-};
+//class Serialization {
+//public:
+//    Serialization(Location_ container) { this->container = container;}
+//    
+//
+//    /// добавить функцию создания сохранения с нуля и загрузка мира с нулевого сохранения
+//    /// добавить функцию проверки на наличие изменения данных в файле чтобы создать мир с нуля и перезаписать данные на новые
+//
+//    void Ser() {
+//        ofile.open("SaveData.txt", ios::trunc);
+//        ofile.close();
+//        ofile.open("SaveData.txt", ofstream::app);
+//        if (ofile.is_open())
+//        {
+//            ///hardcode?!?!?!?!?!?
+//            for (int i = 0; i < container.healingFlask.size(); i++) {
+//                ofile << "<healingFlask>" << "index=" << i << " ";
+//                SortSprite(container.healingFlask[i].Sprite);
+//            }
+//            for (int i = 0; i < container.spike.size(); i++) {
+//                ofile << "<spike>" << "index=" << i << " ";
+//                SortSprite(container.spike[i].Sprite);
+//            }
+//            for (int i = 0; i < container.Persona.size(); i++) {
+//                ofile << "<Persona>" << "index=" << i << " ";
+//                SortSprite(container.Persona[i]->Sprite);
+//            }
+//            for (int i = 0; i < container.portal.size(); i++) {
+//                ofile << "<portal>" << "index=" << i << " ";
+//                SortSprite(container.portal[i].Sprite);
+//            }
+//            for (int i = 0; i < container.walls.size(); i++) {
+//                ofile << "<walls>" << "index=" << i << " ";
+//                SortSprite(container.walls[i].Sprite);
+//                
+//            }
+//        }
+//        ofile.close();
+//    }
+//    void Deser() {
+//        ifile.open("SaveData.txt");
+//        if (ifile.is_open())
+//        {
+//            string StructureArr[]{"<healingFlask>", "<spike>", "<Persona>", "<portal>", "<walls>", "height", "width", "xpos", "ypos"};
+//            string str;
+//            while (!ifile.eof()) {
+//                ifile >> str;
+//                for (int i = 0; i < 9; i++) {
+//                        ///определение объекта по его индексу и по экземляру стуктуры
+//                        if (!str.find(StructureArr[i]) &&
+//                            !str.find(StructureArr[i] + "index=")) {
+//                            ReplaceStructure(str, StructureArr[i]);
+//                            break;
+//                        }
+//                        else if (!str.find(StructureArr[i]) &&
+//                             !str.find(StructureArr[i] + "==")) {
+//                             ReplaceProperty(str);
+//                             break;
+//                             }
+//                }
+//            }
+//        }
+//        ifile.close();
+//    }
+//private:
+//    string MarkerStructure;
+//    int IndexStructure;
+//    Location_ container;
+//    ifstream ifile;
+//    ofstream ofile;
+//
+//    void SortSprite(sprite SprData) {
+//        ofile << "height==" << SprData.height << " "
+//              << "width==" << SprData.width << " "
+//              << "xpos==" << SprData.x << " "
+//              << "ypos==" << SprData.y << "\n";
+//    }
+//    void ReplaceStructure(string str, string StructureArr) {
+//        StrReplace(&str, StructureArr + "index=");
+//        MarkerStructure = StructureArr;
+//        IndexStructure = stoi(str);
+//        
+//    };
+//    void ReplaceProperty(string StructureArr) {
+//        float height = NULL;
+//        float width = NULL;
+//        float xpos = NULL;
+//        float ypos = NULL;
+//
+//        if (!StructureArr.find("height")) {
+//            StrReplace(&StructureArr, "height==");
+//            height = stof(StructureArr);
+//        }
+//        else if (!StructureArr.find("width")) {
+//            StrReplace(&StructureArr, "width==");
+//            width = stof(StructureArr);
+//        }
+//        else if (!StructureArr.find("xpos")) {
+//            StrReplace(&StructureArr, "xpos==");
+//            xpos = stof(StructureArr);
+//        }
+//        else if (!StructureArr.find("ypos")) {
+//            StrReplace(&StructureArr, "ypos==");
+//            ypos = stof(StructureArr);
+//        }
+//
+//        if (MarkerStructure == "<healingFlask>") {
+//            if (container.healingFlask.size() != 0)
+//            {
+//            SwapProperty(&container.healingFlask[IndexStructure].Sprite, height, width, xpos, ypos);
+//            }
+//        }
+//        else if (MarkerStructure == "<spike>") {
+//            if (container.spike.size()!=0)
+//            {
+//            SwapProperty(&container.spike[IndexStructure].Sprite, height, width, xpos, ypos);
+//            }
+//        }
+//        else if (MarkerStructure == "<Persona>") {
+//            if (container.Persona.size() != 0)
+//            {
+//            SwapProperty(&container.Persona[IndexStructure]->Sprite, height, width, xpos, ypos);
+//            }
+//        }
+//        else if (MarkerStructure == "<portal>") {
+//            if (container.portal.size() != 0)
+//            {
+//            SwapProperty(&container.portal[IndexStructure].Sprite, height, width, xpos, ypos);
+//            }
+//        }
+//        else if (MarkerStructure == "<walls>") {
+//            if (container.walls.size() != 0)
+//            {
+//            SwapProperty(&location[0].walls[IndexStructure].Sprite, height, width, xpos, ypos);
+//            }
+//        }
+//
+//        height = NULL;
+//        width = NULL;
+//        xpos = NULL;
+//        ypos = NULL;
+//    };
+//    void SwapProperty(sprite* Struct, float h, float w, float x, float y) {
+//        if (h != NULL) { Struct->height = h; }
+//        if (w != NULL) { Struct->width = w; }
+//        if (x != NULL) { Struct->x = x; }
+//        if (y != NULL) { Struct->y = y; }
+//    };
+//
+//};
 
 
 

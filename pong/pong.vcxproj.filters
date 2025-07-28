@@ -67,7 +67,7 @@
     <ClInclude Include="logick.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="paint.h">
+    <ClInclude Include="PrimaryProcess.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Structures.h">
@@ -84,6 +84,9 @@
     </ClInclude>
     <ClInclude Include="ArcheType.h">
       <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="BaseStructures.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

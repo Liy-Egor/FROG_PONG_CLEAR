@@ -1,5 +1,5 @@
 #pragma once
-#include "Structures.h"
+#include "BaseStructures.h"
 
 class ЕntityComponentSystem
 {   
@@ -7,6 +7,7 @@ private:
     struct Entity
     {   
        unsigned int IDEntity;
+       unsigned int CountComponent = 0;
     };
 
     struct ComponentPool
@@ -22,7 +23,7 @@ private:
         }
 
         void del()
-        {
+        {   
             delete[] pData;
             pData = nullptr;
         }
@@ -36,6 +37,7 @@ private:
             {
                 if (MaskTemp == VComponentPool[i].pData || MaskTemp == nullptr)
                 {
+                    VEntity[id].CountComponent--;
                     vector<ComponentPool>::iterator it;
                     it = VComponentPool.begin() + i;
                     VComponentPool[i].del();
@@ -47,7 +49,7 @@ private:
     }
 
     vector<Entity> VEntity;
-    vector<ComponentPool> VComponentPool;
+    vector<ComponentPool> VComponentPool; //можно подумать над тем чтобы разделять типы компонентов на ранзные массивы для удобства нажоэдения обхектов с одним и тем же компонетом
 public:
 
     int NewEntity()
@@ -63,6 +65,7 @@ public:
         int IDComponent = VComponentPool.size();
             VComponentPool.push_back({ id , IDComponent, Mask });
             T* Comp = new (VComponentPool[IDComponent].get()) T();
+            VEntity[id].CountComponent++;
             return Comp;
     }
 
@@ -94,7 +97,7 @@ public:
         {
             if (i == id)
             {
-                while (VComponentPool.size() != 0)
+                while (VEntity[i].CountComponent != 0)
                 {
                     DeleteComp(nullptr, id);
                 }
@@ -105,5 +108,11 @@ public:
             }
         }
     }
+
+    void Observer()
+    {
+        //на будущее добавить паттерн Observer для общения между компонентами
+    }
+
 
 }ECS;

@@ -1,62 +1,203 @@
 #pragma once
-#include "SystemECS.h"
 #include "Component.h"
 #include "ECSSoft.h"
-using namespace ECC;
-//çäåñü âûñòðàèâàþòñÿ êîíêðåòíûå òèïû ñóùíîñòåé è ïîäêëþ÷àþò ê íèì ëîãèêó
+#include "SystemECS.h"
 
-class ATEnemy
+using namespace ECC;
+
+//áàçîâûå êëàññû
+class BaseArcheType
 {
-private:
-    int Enemy = ECS.NewEntity();
-    CTransform* Transform = ECS.SetComponent<CTransform>(Enemy);
-    CBitmap* Bitmap = ECS.SetComponent<CBitmap>(Enemy);
-    CSound* Sound = ECS.SetComponent<CSound>(Enemy);
-    CHealth* Health = ECS.SetComponent<CHealth>(Enemy);
-    CDamage* Damage = ECS.SetComponent<CDamage>(Enemy);
-    CDefense* Defense = ECS.SetComponent<CDefense>(Enemy);
-    CSpeed* Speed = ECS.SetComponent<CSpeed>(Enemy);
-    CStatusBehavior* StatusBehavior = ECS.SetComponent<CStatusBehavior>(Enemy);
-    CTypeÑharacter* TypeÑharacter = ECS.SetComponent<CTypeÑharacter>(Enemy);
-    CJump* Jump = ECS.SetComponent<CJump>(Enemy);
-    CGender* Gender = ECS.SetComponent<CGender>(Enemy);
-    CNameÑharacter* NameÑharacter = ECS.SetComponent<CNameÑharacter>(Enemy);
-    ÑSpecialization* Specialization = ECS.SetComponent<ÑSpecialization>(Enemy);
-    ÑRank* Rank = ECS.SetComponent<ÑRank>(Enemy);
-    CCollider* Collider = ECS.SetComponent<CCollider>(Enemy);
-    CGravity* Gravity = ECS.SetComponent<CGravity>(Enemy);
+protected:
+    int Entity = ECS.NewEntity();
+    CTransform* Transform = ECS.SetComponent<CTransform>(Entity);
+    CBitmap* Bitmap = ECS.SetComponent<CBitmap>(Entity);
+    CSound* Sound = ECS.SetComponent<CSound>(Entity);
+    CNameObject* NameObject = ECS.SetComponent<CNameObject>(Entity);
+
+    BaseArcheType(string BitmapNameFile, float arr[])
+    {
+        LoadTransform(*Transform, arr);
+        Bitmap->HBitMap = GetBitmap(BitmapNameFile);
+        CreateObject(*Transform);
+        NameObject->Number = Entity;
+    }
+
     void DeleteAT()
     {
-        ECS.DeleteEntity(Enemy);
-        delete this;
+      ECS.DeleteEntity(Entity);
+      delete this;
     }
-    
+
 public:
-    
-    ATEnemy(string BitmapNameFile)
-    {   
-        Bitmap->HBitMap = GetBitmap(BitmapNameFile);
-        LoadTransform(*Transform, GetTransformData());
-        CreateCharacter(*Transform);
-        AddCharacterModifier(*Health, *Defense, *Damage, *Speed, *Specialization, *Gender, *StatusBehavior, *TypeÑharacter, *NameÑharacter, *Rank,
-            "TypeDamage", "Status", "TypeÑh", "Gendr", "NameChar", "Specialist", 0);
-    }
-    int Start()
-    {
-        Show(*ECS.GetComponent<CBitmap>(Enemy, Bitmap), *ECS.GetComponent<CTransform>(Enemy, Transform));
-
-        MoveCharacter(
-            *ECS.GetComponent<CJump>(Enemy, Jump),
-            *ECS.GetComponent<CTransform>(Enemy, Transform),
-            *ECS.GetComponent<CSpeed>(Enemy, Speed),
-            *ECS.GetComponent<CCollider>(Enemy, Collider),
-            *ECS.GetComponent<CGravity>(Enemy, Gravity),
-            0);
-    }
-
-    void Destroy()
+    virtual void Destroy()
     {
         DeleteAT();
+    };
+};
+
+class BasePerson : public BaseArcheType
+{
+protected:
+    CDamage* Damage = ECS.SetComponent<CDamage>(Entity);
+    CHealth* Health = ECS.SetComponent<CHealth>(Entity);
+    CDefense* Defense = ECS.SetComponent<CDefense>(Entity);
+    CSpeed* Speed = ECS.SetComponent<CSpeed>(Entity);
+    CNameÑharacter* NameÑharacter = ECS.SetComponent<CNameÑharacter>(Entity);
+    CJump* Jump = ECS.SetComponent<CJump>(Entity);
+    CGravity* Gravity = ECS.SetComponent<CGravity>(Entity);
+    CCollider* Collider = ECS.SetComponent<CCollider>(Entity);
+
+    BasePerson(string BitmapNameFile, float arr[]) : BaseArcheType(BitmapNameFile, arr){}
+};
+
+//íàñëåäíèêè
+class ATLocation : public BaseArcheType
+{
+public:
+    ATLocation(string BitmapNameFile, float arr[]) : BaseArcheType(BitmapNameFile, arr)
+    {
+        NameObject->Name = "Level";
     }
-    
-}*Enemy;
+    void show()
+    {
+        ShowWindow(*Bitmap);
+    }
+    void go()
+    {
+        Show(*ECS.GetComponent<CBitmap>(Entity, Bitmap), *ECS.GetComponent<CTransform>(Entity, Transform));
+    }
+}*Location;
+
+class ATWall : public BaseArcheType
+{
+public:
+    ATWall(string BitmapNameFile, float arr[]) : BaseArcheType(BitmapNameFile, arr)
+    {
+        NameObject->Name = "Wall";
+    }
+    bool CheckCollision(float x1, float y1, float w1, float h1,
+        float x2, float y2, float w2, float h2)
+    {
+        return x1 < x2 + w2 &&
+            x1 + w1 > x2 &&
+            y1 < y2 + h2 &&
+            y1 + h1 > y2;
+    }
+    CTransform* GetPosition()
+    {
+        return ECS.GetComponent<CTransform>(Entity, Transform);
+    }
+    void go()
+    {
+        Show(*ECS.GetComponent<CBitmap>(Entity, Bitmap), *ECS.GetComponent<CTransform>(Entity, Transform));
+    }
+
+}*Wall;
+
+class ATHealFlack : public BaseArcheType
+{
+public:
+    ATHealFlack(string BitmapNameFile, float arr[]) : BaseArcheType(BitmapNameFile, arr)
+    {
+        NameObject->Name = "HealFlack";
+    }
+}*HealFlack;
+
+class ATSpike : public BaseArcheType
+{
+public:
+    ATSpike(string BitmapNameFile, float arr[]) : BaseArcheType(BitmapNameFile, arr)
+    {
+        NameObject->Name = "Spike";
+    }
+}*Spike;
+
+class ATPortal : public BaseArcheType
+{
+public:
+    ATPortal(string BitmapNameFile, float arr[]) : BaseArcheType(BitmapNameFile, arr)
+    {
+        NameObject->Name = "Portal";
+    }
+}*Portal;
+
+class ATEnemyFrog : public BasePerson
+{
+private:
+    CStatusBehavior* StatusBehavior = ECS.SetComponent<CStatusBehavior>(Entity);
+    CTypeÑharacter* TypeÑharacter = ECS.SetComponent<CTypeÑharacter>(Entity);
+    CGender* Gender = ECS.SetComponent<CGender>(Entity);
+    ÑSpecialization* Specialization = ECS.SetComponent<ÑSpecialization>(Entity);
+    ÑRank* Rank = ECS.SetComponent<ÑRank>(Entity);
+public:
+    ATEnemyFrog(string BitmapNameFile, float arr[]) : BasePerson(BitmapNameFile, arr)
+    {
+        NameObject->Name = "EnemyFrog";
+        AddCharacterModifier(*Health, *Defense, *Damage, *Speed, *Specialization, *Gender, *StatusBehavior, *TypeÑharacter, *NameÑharacter, *Rank,
+            "TypeDamage", "Status", "TypeÑh", "Gendr", "Frog", "Specialist", 0);
+
+        
+
+    }
+    void Start(CTransform *TransformWalls)
+    {
+        Show(*ECS.GetComponent<CBitmap>(Entity, Bitmap), *ECS.GetComponent<CTransform>(Entity, Transform));
+
+        MoveCharacter(
+            *TransformWalls,
+            *ECS.GetComponent<CJump>(Entity, Jump),
+            *ECS.GetComponent<CTransform>(Entity, Transform),
+            *ECS.GetComponent<CSpeed>(Entity, Speed),
+            *ECS.GetComponent<CCollider>(Entity, Collider),
+            *ECS.GetComponent<CGravity>(Entity, Gravity),
+            0);
+    }
+}*EnemyFrog;
+
+class ATPlayer : public BasePerson
+{
+public:
+    ATPlayer(string BitmapNameFile, float arr[]) : BasePerson(BitmapNameFile, arr)
+    {
+        NameObject->Name = "Player";
+        NameÑharacter->NameChar = "Komar";
+    }
+    void Start(CTransform *TransformWalls)
+    {
+       
+        
+        MovePlayer(
+            *TransformWalls,
+            *ECS.GetComponent<CJump>(Entity, Jump),
+            *ECS.GetComponent<CTransform>(Entity, Transform),
+            *ECS.GetComponent<CSpeed>(Entity, Speed),
+            *ECS.GetComponent<CCollider>(Entity, Collider),
+            *ECS.GetComponent<CGravity>(Entity, Gravity),
+            0);
+        
+        float cameraHalfWidth = (window.width / 2) / Transform->Scale;
+        float cameraHalfHeight = (window.height / 2) / Transform->Scale;
+
+        float targetX = Transform->x;
+        float targetY = Transform->y;
+
+        targetX = max(0 + cameraHalfWidth,
+            min(MapSizeW - cameraHalfWidth, targetX));
+        targetY = max(0 + cameraHalfHeight,
+            min(MapSizeH - cameraHalfHeight, targetY));
+
+        player_view.x = lerp(player_view.x, targetX, 0.1f);
+        player_view.y = lerp(player_view.y, targetY, 0.1f);
+    }
+
+    void go()
+    {
+        Show(*ECS.GetComponent<CBitmap>(Entity, Bitmap), *ECS.GetComponent<CTransform>(Entity, Transform));
+    }
+
+}*Player;
+
+
+
+
