@@ -60,7 +60,7 @@ struct CDefense
 
 struct CSpeed
 {
-    int SpeedAttack = 10, SpeedWalk = 2;
+    int SpeedAttack = 10, SpeedWalk = 15;
 };
 
 struct ÑRank
