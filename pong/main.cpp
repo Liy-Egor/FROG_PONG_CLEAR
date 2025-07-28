@@ -21,23 +21,26 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     InitWindow();//здесь инициализируем все что нужно для рисования в окне
     InitGame();
     ShowCursor(FALSE);
-    
+   
     while (!GetAsyncKeyState(VK_ESCAPE))
     {
         currenttime = timeGetTime();
-        
         BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);
-        Location->go();
+        Location->View();
         Sleep(16);//ждем 16 милисекунд (1/количество кадров в секунду)
         GetCursorPos(&mouse);
         ScreenToClient(window.hWnd, &mouse);
         
-        for (ATWall* var : VArcheTypes.VWall)
-        {
-            var->go();
-            Player->Start(var->GetPosition());
-            Player->go();
-        };
+            Location->VPlayer[0].go();
+            for (ATWall val : Location->VWall)
+            {
+            val.View();
+            Location->VPlayer[0].Start(val);
+            }
+            Location->VPlayer[0].View();
+            
+
+        
 
 
         Ellipse(window.context, mouse.x - 5, mouse.y - 5, mouse.x + 5, mouse.y + 5);

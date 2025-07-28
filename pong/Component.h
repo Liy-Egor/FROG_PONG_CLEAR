@@ -18,7 +18,7 @@ struct CBitmap
 
 struct CGravity
 {
-    float Gravity = 3.;
+    float Gravity = 3;
 };
 
 struct CSound

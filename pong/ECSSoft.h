@@ -49,9 +49,9 @@ private:
     }
 
     vector<Entity> VEntity;
-    vector<ComponentPool> VComponentPool; //можно подумать над тем чтобы разделять типы компонентов на ранзные массивы для удобства нажоэдения обхектов с одним и тем же компонетом
+    vector<ComponentPool> VComponentPool;
+    //можно подумать над тем чтобы разделять типы компонентов на ранзные массивы для удобства нажоэдения обхектов с одним и тем же компонетом
 public:
-
     int NewEntity()
     {
         VEntity.push_back({VEntity.size()});
@@ -107,6 +107,11 @@ public:
                 break;
             }
         }
+    }
+
+    int GetSizeEntity()
+    {
+        return VEntity.size();
     }
 
     void Observer()

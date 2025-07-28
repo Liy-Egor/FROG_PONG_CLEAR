@@ -1,16 +1,6 @@
 ﻿#pragma once
 #include "ArcheType.h"
 
-struct VArcheType
-{
-    vector<ATLocation*>VLocation;
-    vector<ATWall*>VWall;
-    vector<ATSpike*>VSpike;
-    vector<ATHealFlack*>VHealFlack;
-    vector<ATPortal*>VPortal;
-    vector<ATEnemyFrog*>VEnemyFrog;
-}VArcheTypes;
-
 string StrReplace(string* str, string namestr) {
     return str->replace(str->find(namestr), namestr.length(), "");
 }
@@ -109,35 +99,37 @@ void LoadSVGDataMap(const string NameFileSVG) {
         string nameObject = dS[0][i];
         float arr[4]{x, y, width, height};
         
+        
         //создание объектов пока что только для уровня 0
         if (!nameObject.find("walls")) {
             Wall = new ATWall("walls", arr);
-            VArcheTypes.VWall.push_back(Wall);
+            Location->VWall.push_back(*Wall);
         }
         else if (!nameObject.find("enemy")) {
             EnemyFrog = new ATEnemyFrog("enemy1", arr);
-            VArcheTypes.VEnemyFrog.push_back(EnemyFrog);
+            Location->VEnemyFrog.push_back(*EnemyFrog);
         }
         else if (!nameObject.find("racket")) {       
             Player = new ATPlayer("racket", arr);
+            Location->VPlayer.push_back(*Player);
         }
         else if (!nameObject.find("background")) {
             MapSizeW = stoi(bufferData[0][0]);
             MapSizeH = stoi(bufferData[0][1]);
             Location = new ATLocation(nameObject, arr);
-            VArcheTypes.VLocation.push_back(Location);
+            
         }
         else if (!nameObject.find("portal")) {
             Portal = new ATPortal("racket", arr);
-            VArcheTypes.VPortal.push_back(Portal);
+            Location->VPortal.push_back(*Portal);
         }
         else if (!nameObject.find("heal")) {
             HealFlack = new ATHealFlack("ball", arr);
-            VArcheTypes.VHealFlack.push_back(HealFlack);
+            Location->VHealFlack.push_back(*HealFlack);
         }
         else if (!nameObject.find("spike")) {
             Spike = new ATSpike("ball", arr);
-            VArcheTypes.VSpike.push_back(Spike);
+            Location->VSpike.push_back(*Spike);
         }
 
     }
@@ -146,8 +138,8 @@ void LoadSVGDataMap(const string NameFileSVG) {
 
 void InitGame()
 {
-    
     LoadSVGDataMap("LVL0");
+   
 }
 
 

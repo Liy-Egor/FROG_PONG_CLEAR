@@ -5,6 +5,7 @@
 
 using namespace ECC;
 
+
 //áàçîâûå êëàññû
 class BaseArcheType
 {
@@ -30,6 +31,10 @@ protected:
     }
 
 public:
+    virtual void View()
+    {
+        Show(*ECS.GetComponent<CBitmap>(Entity, Bitmap), *ECS.GetComponent<CTransform>(Entity, Transform));
+    }
     virtual void Destroy()
     {
         DeleteAT();
@@ -52,23 +57,6 @@ protected:
 };
 
 //íàñëåäíèêè
-class ATLocation : public BaseArcheType
-{
-public:
-    ATLocation(string BitmapNameFile, float arr[]) : BaseArcheType(BitmapNameFile, arr)
-    {
-        NameObject->Name = "Level";
-    }
-    void show()
-    {
-        ShowWindow(*Bitmap);
-    }
-    void go()
-    {
-        Show(*ECS.GetComponent<CBitmap>(Entity, Bitmap), *ECS.GetComponent<CTransform>(Entity, Transform));
-    }
-}*Location;
-
 class ATWall : public BaseArcheType
 {
 public:
@@ -88,11 +76,6 @@ public:
     {
         return ECS.GetComponent<CTransform>(Entity, Transform);
     }
-    void go()
-    {
-        Show(*ECS.GetComponent<CBitmap>(Entity, Bitmap), *ECS.GetComponent<CTransform>(Entity, Transform));
-    }
-
 }*Wall;
 
 class ATHealFlack : public BaseArcheType
@@ -140,18 +123,21 @@ public:
         
 
     }
-    void Start(CTransform *TransformWalls)
+    void Start()
     {
-        Show(*ECS.GetComponent<CBitmap>(Entity, Bitmap), *ECS.GetComponent<CTransform>(Entity, Transform));
+        
+        MoveCharacter(*Jump,*Transform,*Speed,*Collider,*Gravity, 0);
 
-        MoveCharacter(
-            *TransformWalls,
-            *ECS.GetComponent<CJump>(Entity, Jump),
-            *ECS.GetComponent<CTransform>(Entity, Transform),
-            *ECS.GetComponent<CSpeed>(Entity, Speed),
-            *ECS.GetComponent<CCollider>(Entity, Collider),
-            *ECS.GetComponent<CGravity>(Entity, Gravity),
-            0);
+        for (int i = 0; i < ECS.GetSizeEntity(); i++)
+        {
+            CNameObject* Names = ECS.GetComponent<CNameObject>(i, NameObject);
+            if (Names->Name = "Wall")
+            {
+                CTransform* Tran = ECS.GetComponent<CTransform>(i, Transform);
+               /* TracerCollide(*Tran, *Collider, *Transform, *Jump, 0);*/
+                ProcessGravity(*Jump, *Transform, *Gravity);
+            }
+        }
     }
 }*EnemyFrog;
 
@@ -163,41 +149,39 @@ public:
         NameObject->Name = "Player";
         NameÑharacter->NameChar = "Komar";
     }
-    void Start(CTransform *TransformWalls)
-    {
-       
-        
-        MovePlayer(
-            *TransformWalls,
-            *ECS.GetComponent<CJump>(Entity, Jump),
-            *ECS.GetComponent<CTransform>(Entity, Transform),
-            *ECS.GetComponent<CSpeed>(Entity, Speed),
-            *ECS.GetComponent<CCollider>(Entity, Collider),
-            *ECS.GetComponent<CGravity>(Entity, Gravity),
-            0);
-        
-        float cameraHalfWidth = (window.width / 2) / Transform->Scale;
-        float cameraHalfHeight = (window.height / 2) / Transform->Scale;
-
-        float targetX = Transform->x;
-        float targetY = Transform->y;
-
-        targetX = max(0 + cameraHalfWidth,
-            min(MapSizeW - cameraHalfWidth, targetX));
-        targetY = max(0 + cameraHalfHeight,
-            min(MapSizeH - cameraHalfHeight, targetY));
-
-        player_view.x = lerp(player_view.x, targetX, 0.1f);
-        player_view.y = lerp(player_view.y, targetY, 0.1f);
+    
+    void Start(ATWall VWall)
+    {      
+       CTransform* Tran = VWall.GetPosition();
+       TracerCollide(*Tran, *Collider, *Transform, *Jump, 0);
     }
-
     void go()
     {
-        Show(*ECS.GetComponent<CBitmap>(Entity, Bitmap), *ECS.GetComponent<CTransform>(Entity, Transform));
+       ProcessGravity(*Jump, *Transform, *Gravity);
+   
+       MovePlayer(*Jump, *Transform, *Speed, *Collider, *Gravity, 0);
+        
     }
 
 }*Player;
 
-
+class ATLocation : public BaseArcheType
+{
+public:
+    ATLocation(string BitmapNameFile, float arr[]) : BaseArcheType(BitmapNameFile, arr)
+    {
+        NameObject->Name = "Level";
+    }
+    void View() override
+    {
+        ShowWindow(*Bitmap);
+    }
+    vector<ATWall> VWall;
+    vector<ATHealFlack> VHealFlack;
+    vector<ATSpike> VSpike;
+    vector<ATPortal> VPortal;
+    vector<ATEnemyFrog> VEnemyFrog;
+    vector<ATPlayer> VPlayer;
+}*Location;
 
 
