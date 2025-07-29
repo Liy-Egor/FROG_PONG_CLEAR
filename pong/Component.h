@@ -1,5 +1,5 @@
 #pragma once
-#include "BaseStructures.h"
+#include"PrimaryProcess.h"
 
 namespace ECC
 {
@@ -18,7 +18,7 @@ struct CBitmap
 
 struct CGravity
 {
-    float Gravity = 3;
+    float Gravity = 30;
 };
 
 struct CSound

@@ -1,9 +1,24 @@
 #pragma once
 #include "Component.h"
-#include "ECSSoft.h"
-#include "SystemECS.h"
 
 using namespace ECC;
+HBITMAP GetBitmap(string BitmapNameFile);
+void LoadTransform(CTransform& CTransform, float arr[]);
+void CreateObject(CTransform& CTransform);
+void Show(CBitmap& CBitmap, CTransform& Transform);
+void ShowWindow(CBitmap& CBitmap);
+void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump, int MapLVL);
+void ProcessGravity(CJump& CJump, CTransform& Transform, CGravity& Gravity);
+void ProcessSound(CSound& CSound);
+void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, int MapLVL);
+void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, int MapLVL);
+void AddCharacterModifier(
+    CHealth& CHealth, CDefense& CDefense, CDamage& CDamage, CSpeed& CSpeed, ÑSpecialization& ÑSpecialization,
+    CGender& CGender, CStatusBehavior& CStatusBehavior, CTypeÑharacter& CTypeÑharacter, CNameÑharacter& CNameÑharacter, ÑRank& ÑRank,
+    string TypeDamage, string Status, string TypeÑharacter, string Gender, string NameChar, string Specialization, int Rank);
+void SwitchLotation();
+void Heal();
+void Spikes();
 
 
 //áàçîâûå êëàññû
@@ -150,21 +165,21 @@ public:
         NameÑharacter->NameChar = "Komar";
     }
     
-    void Start(ATWall VWall)
+    void Start()
     {      
-       CTransform* Tran = VWall.GetPosition();
-       TracerCollide(*Tran, *Collider, *Transform, *Jump, 0);
+       TracerCollide(*Collider, *Transform, *Jump, 0);
+       ProcessGravity(*Jump, *Transform, *Gravity);
     }
     void go()
     {
-       ProcessGravity(*Jump, *Transform, *Gravity);
-   
-       MovePlayer(*Jump, *Transform, *Speed, *Collider, *Gravity, 0);
-        
+       MovePlayer(*Jump, *Transform, *Speed, *Collider, *Gravity, 0); 
     }
 
 }*Player;
 
+
+
+//êîíåö âñåõ àğõåòèïîâ
 class ATLocation : public BaseArcheType
 {
 public:

@@ -1,6 +1,5 @@
 #pragma once
-#include "ArcheType.h"
-#include "PrimaryProcess.h"
+#include "GameFileSystem.h"
 
 using namespace ECC;
 //здесть вся логика
@@ -53,7 +52,7 @@ void ShowWindow(CBitmap& CBitmap)
     ShowBitmap(window.context, 0, 0, window.width, window.height, CBitmap.HBitMap, false);
 }
 
-void TracerCollide(CTransform& TransformWall, CCollider& CCollider, CTransform& Transform, CJump& CJump, int MapLVL)
+void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump, int MapLVL)
 {
     CCollider.LastTracePlatformNum = -1;
     CCollider.CollXfound = false;
@@ -66,11 +65,10 @@ void TracerCollide(CTransform& TransformWall, CCollider& CCollider, CTransform& 
 
         for (int k = 0; k < 4; k++)
         {
-           /* for (int j = 0; j < Location->VWall.size(); j++)
+            for (int j = 0; j < Location->VWall.size(); j++)
             {
-
-            }*/
-            int j = 0;
+                
+            
             float Bbox[] = {
                 Transform.x + Transform.Dx * i / Lenght, Transform.y + Transform.Dy * i / Lenght,
                 Transform.x + Transform.Width + Transform.Dx * i / Lenght - 1, Transform.y + Transform.Dy * i / Lenght,
@@ -81,17 +79,17 @@ void TracerCollide(CTransform& TransformWall, CCollider& CCollider, CTransform& 
             float pixel_y = Bbox[k * 2 + 1];
             SetPixel(window.context, (pixel_x - player_view.x) * 2 + window.width / 2, (pixel_y - player_view.y) * 2 + window.height / 2, RGB(255, 255, 255));
 
-            auto walls = TransformWall;
-            if ((pixel_x >= walls.x &&
-                pixel_x <= walls.x + walls.Width) &&
-                (pixel_y >= walls.y &&
-                    pixel_y <= walls.y + walls.Height)
+            auto walls = Location->VWall[j].GetPosition();
+            if ((pixel_x >= walls->x &&
+                pixel_x <= walls->x + walls->Width) &&
+                (pixel_y >= walls->y &&
+                    pixel_y <= walls->y + walls->Height)
                 )
             {
-                float top = pixel_y - walls.y;
-                float down = (walls.y + walls.Height) - pixel_y;
-                float left = pixel_x - walls.x;
-                float right = (walls.x + walls.Width) - pixel_x;
+                float top = pixel_y - walls->y;
+                float down = (walls->y + walls->Height) - pixel_y;
+                float left = pixel_x - walls->x;
+                float right = (walls->x + walls->Width) - pixel_x;
 
                 float minX = min(left, right);
                 float minY = min(top, down);
@@ -104,11 +102,11 @@ void TracerCollide(CTransform& TransformWall, CCollider& CCollider, CTransform& 
 
                     if (left < right)
                     {
-                        Transform.x = walls.x - Transform.Width - 1;
+                        Transform.x = walls->x - Transform.Width - 1;
                     }
                     else
                     {
-                        Transform.x = walls.x + walls.Width + 1;
+                        Transform.x = walls->x + walls->Width + 1;
                     }
 
                     j++;
@@ -121,22 +119,20 @@ void TracerCollide(CTransform& TransformWall, CCollider& CCollider, CTransform& 
 
                     if (down < top)
                     {
-                        Transform.y = walls.y + walls.Height + 1;
+                        Transform.y = walls->y + walls->Height + 1;
                         CJump.Jump = 30;
                     }
                     else
                     {
                         CCollider.LastTracePlatformNum = j;
-                        Transform.y = walls.y - Transform.Height - 1;
+                        Transform.y = walls->y - Transform.Height - 1;
                         CJump.InJumpBot = false;
                     }
                     j++;
                 }
             }
-            else
-            {
-                j++;
-            }
+
+           }
         }
     }
     if (!CCollider.CollXfound) Transform.x += Transform.Dx;

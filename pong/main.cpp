@@ -1,4 +1,4 @@
-﻿#include "GameFileSystem.h"
+﻿#include "SystemECS.h"
 
 
 float lerp(float x1, float x2, float a)
@@ -32,16 +32,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         ScreenToClient(window.hWnd, &mouse);
         
             Location->VPlayer[0].go();
+            Location->VPlayer[0].Start();
+            Location->VPlayer[0].View();
             for (ATWall val : Location->VWall)
             {
-            val.View();
-            Location->VPlayer[0].Start(val);
+                val.View();
             }
-            Location->VPlayer[0].View();
-            
-
-        
-
 
         Ellipse(window.context, mouse.x - 5, mouse.y - 5, mouse.x + 5, mouse.y + 5);
 
