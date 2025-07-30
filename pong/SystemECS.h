@@ -267,3 +267,36 @@ void Spikes()
     }*/
 }
 
+void UpdateView()
+{
+    for (int i = 0; i < VLocation.size(); i++)
+    {
+        if (Player->GetLocation() == i)
+        {
+            ShowWindow(*VLocation[i].GetBitmaps());
+            for (ATWall var : VLocation[i].VWall)
+            {
+                Show(*var.GetBitmaps(), *var.GetPosition());
+            }
+            for (ATEnemyFrog var : VLocation[i].VEnemyFrog)
+            {
+                Show(*var.GetBitmaps(), *var.GetPosition());
+            }
+            for (ATHealFlack var : VLocation[i].VHealFlack)
+            {
+                Show(*var.GetBitmaps(), *var.GetPosition());
+            }
+            for (ATPortal var : VLocation[i].VPortal)
+            {
+                Show(*var.GetBitmaps(), *var.GetPosition());
+            }
+            for (ATSpike var : VLocation[i].VSpike)
+            {
+                Show(*var.GetBitmaps(), *var.GetPosition());
+            }
+            break;
+        }
+    }
+
+
+}

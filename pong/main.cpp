@@ -26,25 +26,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     {
         currenttime = timeGetTime();
         BitBlt(window.device_context, 0, 0, window.width, window.height, window.context, 0, 0, SRCCOPY);
-        Location->View();
         Sleep(16);//ждем 16 милисекунд (1/количество кадров в секунду)
         GetCursorPos(&mouse);
         ScreenToClient(window.hWnd, &mouse);
         
-            Location->VPlayer[0].go();
-            Location->VPlayer[0].Start();
-            Location->VPlayer[0].View();
-            for (ATWall val : Location->VWall)
-            {
-                val.View();
-            }
+            Player->Start();
+            UpdateView();
 
         Ellipse(window.context, mouse.x - 5, mouse.y - 5, mouse.x + 5, mouse.y + 5);
-
     }
 }
-
-/* location[player->currentLocation].hBack.showBack();*/
 
 // for (int i = 0; i < location[player->currentLocation].Persona.size(); i++) {
 

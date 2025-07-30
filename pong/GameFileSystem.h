@@ -98,38 +98,43 @@ void LoadSVGDataMap(const string NameFileSVG) {
         float height = stof(bufferData[1][i]) / window.height;
         string nameObject = dS[0][i];
         float arr[4]{x, y, width, height};
-        
+        int IdLocation = 0;
         
         //создание объектов пока что только для уровня 0
         if (!nameObject.find("walls")) {
             Wall = new ATWall("walls", arr);
-            Location->VWall.push_back(*Wall);
+            Wall->SetLocation(IdLocation);
+            VLocation[IdLocation].VWall.push_back(*Wall);
         }
         else if (!nameObject.find("enemy")) {
             EnemyFrog = new ATEnemyFrog("enemy1", arr);
-            Location->VEnemyFrog.push_back(*EnemyFrog);
+            EnemyFrog->SetLocation(IdLocation);
+            VLocation[IdLocation].VEnemyFrog.push_back(*EnemyFrog);
         }
         else if (!nameObject.find("racket")) {       
             Player = new ATPlayer("racket", arr);
-            Location->VPlayer.push_back(*Player);
+            Player->SetLocation(IdLocation);
         }
         else if (!nameObject.find("background")) {
             MapSizeW = stoi(bufferData[0][0]);
             MapSizeH = stoi(bufferData[0][1]);
             Location = new ATLocation(nameObject, arr);
-            
+            VLocation.push_back(*Location);
         }
         else if (!nameObject.find("portal")) {
             Portal = new ATPortal("racket", arr);
-            Location->VPortal.push_back(*Portal);
+            Portal->SetLocation(IdLocation);
+            VLocation[IdLocation].VPortal.push_back(*Portal);
         }
         else if (!nameObject.find("heal")) {
             HealFlack = new ATHealFlack("ball", arr);
-            Location->VHealFlack.push_back(*HealFlack);
+            HealFlack->SetLocation(IdLocation);
+            VLocation[IdLocation].VHealFlack.push_back(*HealFlack);
         }
         else if (!nameObject.find("spike")) {
             Spike = new ATSpike("ball", arr);
-            Location->VSpike.push_back(*Spike);
+            Spike->SetLocation(IdLocation);
+            VLocation[IdLocation].VSpike.push_back(*Spike);
         }
 
     }

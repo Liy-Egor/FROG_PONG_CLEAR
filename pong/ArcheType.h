@@ -19,7 +19,7 @@ void AddCharacterModifier(
 void SwitchLotation();
 void Heal();
 void Spikes();
-
+void UpdateView();
 
 //базовые классы
 class BaseArcheType
@@ -30,6 +30,7 @@ protected:
     CBitmap* Bitmap = ECS.SetComponent<CBitmap>(Entity);
     CSound* Sound = ECS.SetComponent<CSound>(Entity);
     CNameObject* NameObject = ECS.SetComponent<CNameObject>(Entity);
+    int WhatLocation;
 
     BaseArcheType(string BitmapNameFile, float arr[])
     {
@@ -44,16 +45,28 @@ protected:
       ECS.DeleteEntity(Entity);
       delete this;
     }
-
 public:
-    virtual void View()
-    {
-        Show(*ECS.GetComponent<CBitmap>(Entity, Bitmap), *ECS.GetComponent<CTransform>(Entity, Transform));
-    }
     virtual void Destroy()
     {
         DeleteAT();
     };
+public:
+    void SetLocation(int IdLocation)
+    {
+        WhatLocation = IdLocation;
+    }
+    int GetLocation()
+    {
+        return WhatLocation;
+    }
+    CTransform* GetPosition()
+    {
+        return ECS.GetComponent<CTransform>(Entity, Transform);
+    }
+    CBitmap* GetBitmaps()
+    {
+        return ECS.GetComponent<CBitmap>(Entity, Bitmap);
+    }
 };
 
 class BasePerson : public BaseArcheType
@@ -86,10 +99,6 @@ public:
             x1 + w1 > x2 &&
             y1 < y2 + h2 &&
             y1 + h1 > y2;
-    }
-    CTransform* GetPosition()
-    {
-        return ECS.GetComponent<CTransform>(Entity, Transform);
     }
 }*Wall;
 
@@ -167,14 +176,12 @@ public:
     
     void Start()
     {      
+       MovePlayer(*Jump, *Transform, *Speed, *Collider, *Gravity, 0); 
        TracerCollide(*Collider, *Transform, *Jump, 0);
        ProcessGravity(*Jump, *Transform, *Gravity);
+       Show(*this->GetBitmaps(), *this->GetPosition());
     }
-    void go()
-    {
-       MovePlayer(*Jump, *Transform, *Speed, *Collider, *Gravity, 0); 
-    }
-
+    
 }*Player;
 
 
@@ -187,16 +194,11 @@ public:
     {
         NameObject->Name = "Level";
     }
-    void View() override
-    {
-        ShowWindow(*Bitmap);
-    }
     vector<ATWall> VWall;
     vector<ATHealFlack> VHealFlack;
     vector<ATSpike> VSpike;
     vector<ATPortal> VPortal;
     vector<ATEnemyFrog> VEnemyFrog;
-    vector<ATPlayer> VPlayer;
 }*Location;
-
+vector<ATLocation> VLocation;
 
