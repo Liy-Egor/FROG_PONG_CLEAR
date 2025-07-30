@@ -7,15 +7,15 @@
 
 void InitGame()
 {
-    Textures::LoadTextureFromFile(2, L"C:/Users/artem/source/repos/FROG_PONG_CLEAR/Debug/racket.bmp");
-    Textures::LoadTextureFromFile(1, L"C:/Users/artem/source/repos/FROG_PONG_CLEAR/Debug/background_0.bmp");
-    Textures::LoadTextureFromFile(3, L"C:/Users/artem/source/repos/FROG_PONG_CLEAR/Debug/walls.bmp");
-    Textures::LoadTextureFromFile(4, L"C:/Users/artem/source/repos/FROG_PONG_CLEAR/Debug/ball.bmp");
-    Textures::LoadTextureFromFile(5, L"C:/Users/artem/source/repos/FROG_PONG_CLEAR/Debug/spike.bmp");
-    Textures::LoadTextureFromFile(6, L"C:/Users/artem/source/repos/FROG_PONG_CLEAR/Debug/health_full.bmp");
-    Textures::LoadTextureFromFile(7, L"C:/Users/artem/source/repos/FROG_PONG_CLEAR/Debug/health_empty.bmp");
-    Textures::LoadTextureFromFile(8, L"C:/Users/artem/source/repos/FROG_PONG_CLEAR/Debug/racket_enemy.bmp");
-    Textures::LoadTextureFromFile(10, L"C:/Users/artem/source/repos/FROG_PONG_CLEAR/Debug/background_1.bmp");
+    Textures::LoadTextureFromFile(2, L"Debug/racket.bmp");
+    Textures::LoadTextureFromFile(1, L"Debug/background_0.bmp");
+    Textures::LoadTextureFromFile(3, L"Debug/walls.bmp");
+    Textures::LoadTextureFromFile(4, L"Debug/ball.bmp");
+    Textures::LoadTextureFromFile(5, L"Debug/spike.bmp");
+    Textures::LoadTextureFromFile(6, L"Debug/health_full.bmp");
+    Textures::LoadTextureFromFile(7, L"Debug/health_empty.bmp");
+    Textures::LoadTextureFromFile(8, L"Debug/racket_enemy.bmp");
+    Textures::LoadTextureFromFile(10, L"Debug/background_1.bmp");
     //player_ health{ 40, 5, 3, "health_full", "health_empty" };
     //player = make_shared<character>(40, 5, 3, "health_full", "health_empty");
     player = new Hero(0.2, 0.25, 0.023, 0.032, "racket", 40, 5, 3, 0);

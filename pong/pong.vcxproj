@@ -139,15 +139,9 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="..\..\..\..\Desktop\FROG_PONG_CLEAR\Debug\Sub.bmp" />
-    <Image Include="..\Debug\back.bmp" />
-    <Image Include="..\Debug\ball.bmp" />
     <Image Include="..\Debug\enemy1.bmp" />
-    <Image Include="..\Debug\health_empty.bmp" />
-    <Image Include="..\Debug\health_full.bmp" />
-    <Image Include="..\Debug\racket.bmp" />
-    <Image Include="..\Debug\racket_enemy.bmp" />
-    <Image Include="..\Debug\spike.bmp" />
-    <Image Include="..\Debug\walls.bmp" />
+    <Image Include="Debug\back.bmp" />
+    <Image Include="Debug\ball.bmp" />
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\Debug\bounce.wav" />
