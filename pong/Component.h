@@ -98,4 +98,9 @@ struct CJump
     bool InJump = false;
 };
 
+struct CPortalPàth
+{
+    int Pàth;
+};
+
 };

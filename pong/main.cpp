@@ -17,9 +17,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_ int nCmdShow)
 {
 
-    
-    InitWindow();//здесь инициализируем все что нужно для рисования в окне
-    InitGame();
+    InitWindow();//отрисовка окна windows
+    InitGame(); //загрузка карт
     ShowCursor(FALSE);
    
     while (!GetAsyncKeyState(VK_ESCAPE))
@@ -30,37 +29,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         GetCursorPos(&mouse);
         ScreenToClient(window.hWnd, &mouse);
         
-        UpdateView(); //отрисовка всей локации
-        UpdatePhysics(); //отработка физики
+        UpdateGame(); //обработка физики,отрисовка картинок, проверка ивентов
+
 
         Ellipse(window.context, mouse.x - 5, mouse.y - 5, mouse.x + 5, mouse.y + 5);
     }
 }
  
-// for (int i = 0; i < location[player->currentLocation].Persona.size(); i++) {
-
-//     location[player->currentLocation].Persona[i]->Sprite.show();
-//     location[player->currentLocation].Persona[i]->move();
-// }
-///* player->Sprite.show();
-// player->move();
-// Health_bar.Show();*/
-// for (int i = 0; i < location[player->currentLocation].walls.size(); i++) {
-//     location[player->currentLocation].walls[i].Sprite.show();
-// }
-// for (int i = 0; i < location[player->currentLocation].healingFlask.size(); i++) {
-//     location[player->currentLocation].healingFlask[i].Sprite.show();
-//     location[player->currentLocation].healingFlask[i].healing(player, i);
-// }
-// for (int i = 0; i < location[player->currentLocation].spike.size(); i++) {
-//     location[player->currentLocation].spike[i].Sprite.show();
-//     location[player->currentLocation].spike[i].damage(player);
-// }
-// for (int i = 0; i < location[player->currentLocation].portal.size(); i++) {
-//     location[player->currentLocation].portal[i].Sprite.show();
-//     location[player->currentLocation].portal[i].Portal(player);
-// }
-
-//float ls = .2 * length(player_view.x, player->Sprite.x, player_view.y, player->Sprite.y) / 500.;
+        //что это???!?!?
+        //float ls = .2 * length(player_view.x, player->Sprite.x, player_view.y, player->Sprite.y) / 500.;
         //ls = max(ls - .2, 0.1);
         //ls = min(ls, 1);

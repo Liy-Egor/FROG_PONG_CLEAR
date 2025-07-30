@@ -104,23 +104,26 @@ void LoadSVGDataMap(const string NameFileSVG) {
             VLocation[IdLocation].VWall.push_back(*Wall);
         }
         else if (!nameObject.find("enemy")) {
-            EnemyFrog = new ATEnemyFrog("enemy1", arr);
-            EnemyFrog->SetLocation(IdLocation);
-            VLocation[IdLocation].VEnemyFrog.push_back(*EnemyFrog);
+            Enemy = new ATEnemy("enemy1", arr);
+            Enemy->SetLocation(IdLocation);
+            VLocation[IdLocation].VEnemy.push_back(*Enemy);
         }
-        else if (!nameObject.find("racket")) {       
-            Player = new ATPlayer("racket", arr);
-            Player->SetLocation(IdLocation);
+        else if (!nameObject.find("racket")) {      
+            if (PlayerPlay == false)
+            {
+                PlayerPlay = true;
+                Player = new ATPlayer("racket", arr);
+                Player->SetLocation(IdLocation);
+            }
         }
         else if (!nameObject.find("background")) {
-            MapSizeW = stoi(bufferData[0][0]);
-            MapSizeH = stoi(bufferData[1][0]);
             Location = new ATLocation(nameObject, arr);
             IdLocation = VLocation.size();
             VLocation.push_back(*Location);
         }
         else if (!nameObject.find("portal")) {
-            Portal = new ATPortal("racket", arr);
+            StrReplace(&nameObject, "portal");
+            Portal = new ATPortal("racket", arr, stoi(nameObject));
             Portal->SetLocation(IdLocation);
             VLocation[IdLocation].VPortal.push_back(*Portal);
         }
@@ -142,7 +145,11 @@ void LoadSVGDataMap(const string NameFileSVG) {
 void InitGame()
 {
     LoadSVGDataMap("LVL0");
-   
+    LoadSVGDataMap("LVL1");
+
+    MapSizeW = VLocation[0].GetPosition()->Width;
+    MapSizeH = VLocation[0].GetPosition()->Height;
+
 }
 
 

@@ -2,6 +2,7 @@
 #include "Component.h"
 
 using namespace ECC;
+void SpikeEvent(CTransform& Transform, CDamage& Damage);
 HBITMAP GetBitmap(string BitmapNameFile);
 void LoadTransform(CTransform& CTransform, float arr[]);
 void CreateObject(CTransform& CTransform);
@@ -16,11 +17,12 @@ void AddCharacterModifier(
     CHealth& CHealth, CDefense& CDefense, CDamage& CDamage, CSpeed& CSpeed, ÑSpecialization& ÑSpecialization,
     CGender& CGender, CStatusBehavior& CStatusBehavior, CTypeÑharacter& CTypeÑharacter, CNameÑharacter& CNameÑharacter, ÑRank& ÑRank,
     string TypeDamage, string Status, string TypeÑharacter, string Gender, string NameChar, string Specialization, int Rank);
-void SwitchLotation();
-void Heal();
-void Spikes();
+void SwitchLotation(CPortalPàth& PortalPàth, CTransform& CTransform);
+bool HealEvent(CTransform& Transform, CHealth& Health);
+void SpikeEvent(CTransform& Transform,CDamage& Damage);
 void UpdateView();
 void UpdatePhysics();
+
 
 //áàçîâûå êëàññû
 class BaseArcheType
@@ -44,14 +46,13 @@ protected:
     void DeleteAT()
     {
       ECS.DeleteEntity(Entity);
-      delete this;
+      /*delete this;*/ //êğàøèò ïğîãó 
     }
 public:
     virtual void Destroy()
     {
         DeleteAT();
     };
-public:
     void SetLocation(int IdLocation)
     {
         WhatLocation = IdLocation;
@@ -83,59 +84,88 @@ protected:
     CCollider* Collider = ECS.SetComponent<CCollider>(Entity);
 
     BasePerson(string BitmapNameFile, float arr[]) : BaseArcheType(BitmapNameFile, arr){}
+public:
+    CDamage* GetDamage()
+    {
+        return ECS.GetComponent<CDamage>(Entity, Damage);
+    }
+    CHealth* GetHealth()
+    {
+        return ECS.GetComponent<CHealth>(Entity, Health);
+    }
+    CDefense* GetDefense()
+    {
+        return ECS.GetComponent<CDefense>(Entity, Defense);
+    }
+    CJump* GetJump()
+    {
+        return ECS.GetComponent<CJump>(Entity, Jump);
+    }
+    CSpeed* GetSpeed()
+    {
+        return ECS.GetComponent<CSpeed>(Entity, Speed);
+    }
+    CNameÑharacter* GetNameÑharacter()
+    {
+        return ECS.GetComponent<CNameÑharacter>(Entity, NameÑharacter);
+    }
 };
 
 //íàñëåäíèêè
 class ATWall : public BaseArcheType
 {
-    CCollider* Collider = ECS.SetComponent<CCollider>(Entity);
 public:
     ATWall(string BitmapNameFile, float arr[]) : BaseArcheType(BitmapNameFile, arr)
     {
         NameObject->Name = "Wall";
     }
-    bool CheckCollision(float x1, float y1, float w1, float h1,
-        float x2, float y2, float w2, float h2)
-    {
-        return x1 < x2 + w2 &&
-            x1 + w1 > x2 &&
-            y1 < y2 + h2 &&
-            y1 + h1 > y2;
-    }
 }*Wall;
-
-
 
 class ATHealFlack : public BaseArcheType
 {
+    CHealth* Health = ECS.SetComponent<CHealth>(Entity);
 public:
     ATHealFlack(string BitmapNameFile, float arr[]) : BaseArcheType(BitmapNameFile, arr)
     {
         NameObject->Name = "HealFlack";
     }
+    bool GoEvent()
+    {
+       return HealEvent(*Transform, *Health);
+    }
 }*HealFlack;
 
 class ATSpike : public BaseArcheType
 {
+    CDamage* Damage = ECS.SetComponent<CDamage>(Entity);
 public:
     ATSpike(string BitmapNameFile, float arr[]) : BaseArcheType(BitmapNameFile, arr)
     {
         NameObject->Name = "Spike";
     }
+    void GoEvent()
+    {
+        SpikeEvent(*Transform, *Damage);
+    }
 }*Spike;
 
 class ATPortal : public BaseArcheType
 {
+    CPortalPàth* PortalPàth = ECS.SetComponent<CPortalPàth>(Entity);
 public:
-    ATPortal(string BitmapNameFile, float arr[]) : BaseArcheType(BitmapNameFile, arr)
+    ATPortal(string BitmapNameFile, float arr[],int Paths) : BaseArcheType(BitmapNameFile, arr)
     {
         NameObject->Name = "Portal";
+        PortalPàth->Pàth = Paths;
+    }
+
+    void GoEvent()
+    {
+        SwitchLotation(*PortalPàth,*Transform);
     }
 }*Portal;
 
-
-
-class ATEnemyFrog : public BasePerson
+class ATEnemy : public BasePerson
 {
 private:
     CStatusBehavior* StatusBehavior = ECS.SetComponent<CStatusBehavior>(Entity);
@@ -144,14 +174,11 @@ private:
     ÑSpecialization* Specialization = ECS.SetComponent<ÑSpecialization>(Entity);
     ÑRank* Rank = ECS.SetComponent<ÑRank>(Entity);
 public:
-    ATEnemyFrog(string BitmapNameFile, float arr[]) : BasePerson(BitmapNameFile, arr)
+    ATEnemy(string BitmapNameFile, float arr[]) : BasePerson(BitmapNameFile, arr)
     {
-        NameObject->Name = "EnemyFrog";
+        NameObject->Name = "Enemy";
         AddCharacterModifier(*Health, *Defense, *Damage, *Speed, *Specialization, *Gender, *StatusBehavior, *TypeÑharacter, *NameÑharacter, *Rank,
             "TypeDamage", "Status", "TypeÑh", "Gendr", "Frog", "Specialist", 0);
-
-        
-
     }
     void Start()
     {
@@ -159,7 +186,7 @@ public:
         TracerCollide(*Collider, *Transform, *Jump, 0);
         ProcessGravity(*Jump, *Transform, *Gravity);
     }
-}*EnemyFrog;
+}*Enemy;
 
 class ATPlayer : public BasePerson
 {
@@ -178,6 +205,7 @@ public:
 }*Player;
 
 
+
 //êîíåö âñåõ àğõåòèïîâ
 class ATLocation : public BaseArcheType
 {
@@ -190,7 +218,7 @@ public:
     vector<ATHealFlack> VHealFlack;
     vector<ATSpike> VSpike;
     vector<ATPortal> VPortal;
-    vector<ATEnemyFrog> VEnemyFrog;
+    vector<ATEnemy> VEnemy;
 }*Location;
-vector<ATLocation> VLocation;
+vector<ATLocation> VLocation; // ïğè óäàëåíèè îò ñşäà òîæå íàäî áóäåò óäàëÿòü ıêçåìàëÿğû èíà÷å áóäåò óòå÷êà ïàìÿòè (íåáîëüøàÿ íî âñå æå)
 

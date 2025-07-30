@@ -29,7 +29,17 @@ void CreateObject(CTransform& CTransform)
     CTransform.Height *= window.height;
 }
 
+
 //другая логика
+bool CheckCollision(float x1, float y1, float w1, float h1,
+    float x2, float y2, float w2, float h2)
+{
+    return x1 < x2 + w2 &&
+        x1 + w1 > x2 &&
+        y1 < y2 + h2 &&
+        y1 + h1 > y2;
+}
+
 void Show(CBitmap& CBitmap, CTransform& Transform)
 {
     float vx = (Transform.x - player_view.x) * Transform.Scale + window.width / 2;
@@ -221,100 +231,131 @@ void AddCharacterModifier(
 
 }
 
-void SwitchLotation()
+void SwitchLotation(CPortalPаth& PortalPаth, CTransform& Transform)
 {
-   /* portal_(float p_x, float p_y, float p_width, float p_height, int p_destination, const string & filename)
-        : StaticObjects(p_x, p_y, p_width, p_height, filename)
+    if (CheckCollision(Player->GetPosition()->x, Player->GetPosition()->y, Player->GetPosition()->Width, Player->GetPosition()->Height, Transform.x, Transform.y, Transform.Width, Transform.Height))
     {
-        destination = p_destination;
-    }*/
-
-   /* if (CheckCollision(player->Sprite.x, player->Sprite.y, player->Sprite.width, player->Sprite.height, Sprite.x, Sprite.y, Sprite.width, Sprite.height))
-    {
-        if (destination > player->currentLocation)
+        if (VLocation.size() >= PortalPаth.Pаth)
         {
-            player->currentLocation = destination;
-            player->Sprite.x = location[player->currentLocation].walls[0].Sprite.x + location[player->currentLocation].walls[0].Sprite.width;
+            Player->SetLocation(PortalPаth.Pаth);
+            Player->GetPosition()->x = 300; //временное решение нужны заданные спавнеры
+            Player->GetPosition()->y = 800;
+            MapSizeW = VLocation[PortalPаth.Pаth].GetPosition()->Width;
+            MapSizeH = VLocation[PortalPаth.Pаth].GetPosition()->Height;
+        }
+    }
+}
+
+bool HealEvent(CTransform& Transform, CHealth& CHealth)
+{
+    CHealth.Health = 30;
+    if (CheckCollision(Player->GetPosition()->x, Player->GetPosition()->y, Player->GetPosition()->Width, Player->GetPosition()->Height, Transform.x, Transform.y, Transform.Width, Transform.Height))
+    {
+        if (Player->GetHealth()->Health < Player->GetHealth()->MaxHealth)
+        {
+            if (Player->GetHealth()->Health + CHealth.Health > Player->GetHealth()->MaxHealth)
+            {
+                Player->GetHealth()->Health += Player->GetHealth()->MaxHealth - (Player->GetHealth()->Health + CHealth.Health);
+                return true;
+            }
+            else if (Player->GetHealth()->Health == Player->GetHealth()->MaxHealth)
+            {
+                return false;
+            }
+            else
+            {
+                Player->GetHealth()->Health += CHealth.Health;
+                return true;
+            }
         }
         else
         {
-            player->currentLocation = destination;
-            player->Sprite.x = location[player->currentLocation].walls[1].Sprite.x - player->Sprite.width - Sprite.width - 60;
+            return false;
         }
-    }*/
-}
-
-void Heal()
-{
-   /* if (CheckCollision(player->Sprite.x, player->Sprite.y, player->Sprite.width, player->Sprite.height, Sprite.x, Sprite.y, Sprite.width, Sprite.height))
+    }
+    else
     {
-        location[player->currentLocation].healingFlask.erase(location[player->currentLocation].healingFlask.begin() + i);
-        player->current_lives++;
-    }*/
+        return false;
+    }
 }
 
-void Spikes()
-{
-   /* static int lastDamageTime = 0;
+void SpikeEvent(CTransform& Transform,CDamage& Damage)
+{   
+    static int lastDamageTime = 0;
     bool spikeCollision = false;
-    if (CheckCollision(player->Sprite.x, player->Sprite.y, player->Sprite.width, player->Sprite.height, Sprite.x, Sprite.y, Sprite.width, Sprite.height))
+    if (CheckCollision(Player->GetPosition()->x, Player->GetPosition()->y, Player->GetPosition()->Width, Player->GetPosition()->Height, Transform.x, Transform.y, Transform.Width, Transform.Height))
     {
         spikeCollision = true;
-
     }
     if (spikeCollision && currenttime > lastDamageTime + 1000) {
-        player->current_lives--;
+        Damage.Damage = 30;
+        if (Player->GetHealth()->Health > Damage.Damage)
+        {
+        Player->GetHealth()->Health -= Damage.Damage;
         lastDamageTime = currenttime;
-        player->Sprite.jump = 60;
-        player->Sprite.x += 20;
-        player->inJump = true;
-    }*/
+        Player->GetJump()->Jump = 60;
+        Player->GetPosition()->x += 20;
+        Player->GetJump()->InJump = true;
+        }
+        else
+        {
+           Player->Destroy();
+           exit(0); // выходим их программы потому что игра без игрока просто зависает
+        }
+    }
 }
 
-void UpdateView()
+void HealthBar()
+{
+    SetTextColor(window.context, RGB(50, 205, 50));
+    //SetBkMode(window.context, TRANSPARENT); //прозрачность
+    auto hFont = CreateFont(70, 0, 0, 0, FW_BOLD, 0, 0, 0, 0, 0, 0, 2, 0, "CALIBRI"); //шрифт
+    auto hTmp = (HFONT)SelectObject(window.context, hFont);
+
+    char txt[32];
+    _itoa_s(Player->GetHealth()->Health, txt, 10); // от куда считывает данные
+    TextOutA(window.context, window.width - 400, window.height - 1000, (LPCSTR)txt, strlen(txt));// куда пишет данные
+}
+
+void UpdateGame()
 {
     for (int i = 0; i < VLocation.size(); i++)
     {
         if (Player->GetLocation() == i)
         {
             ShowWindow(*VLocation[i].GetBitmaps());
+            //для уменьшения лагов нужно заменить все эти итерации одни итератором, либо при помощи паттерна Observer c подпиской на обновление игры но это нужно разработать
             for (ATWall var : VLocation[i].VWall)
             {
                 Show(*var.GetBitmaps(), *var.GetPosition());
             }
-            for (ATEnemyFrog var : VLocation[i].VEnemyFrog)
+            for (ATEnemy var : VLocation[i].VEnemy)
             {
                 Show(*var.GetBitmaps(), *var.GetPosition());
+                var.Start();
             }
             for (ATHealFlack var : VLocation[i].VHealFlack)
             {
                 Show(*var.GetBitmaps(), *var.GetPosition());
+                if (var.GoEvent())
+                {
+                    var.Destroy();
+                }
             }
             for (ATPortal var : VLocation[i].VPortal)
             {
                 Show(*var.GetBitmaps(), *var.GetPosition());
+                var.GoEvent();
             }
             for (ATSpike var : VLocation[i].VSpike)
             {
                 Show(*var.GetBitmaps(), *var.GetPosition());
+                var.GoEvent();
             }
             Show(*Player->GetBitmaps(), *Player->GetPosition());
+            Player->Start();
+            HealthBar();
             break;
-        }
-    }
-}
-
-void UpdatePhysics()
-{
-    Player->Start();
-    for (int i = 0; i < VLocation.size(); i++)
-    {
-        if (Player->GetLocation() == i)
-        {
-            for (ATEnemyFrog var : VLocation[i].VEnemyFrog)
-            {
-                var.Start();
-            }
         }
     }
 }
