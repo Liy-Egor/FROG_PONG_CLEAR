@@ -62,7 +62,7 @@ void ShowWindow(CBitmap& CBitmap)
     ShowBitmap(window.context, 0, 0, window.width, window.height, CBitmap.HBitMap, false);
 }
 
-void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump, int MapLVL)
+void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump)
 {
     CCollider.LastTracePlatformNum = -1;
     bool CollXfound = false;
@@ -162,7 +162,7 @@ void ProcessSound(CSound& CSound)
     PlaySound(TEXT(CSound.SoundNameFile), NULL, SND_FILENAME | SND_ASYNC);
 }
 
-void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, int MapLVL)
+void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity)
 {
     if (GetAsyncKeyState(VK_LEFT)) 
     {
@@ -194,7 +194,7 @@ void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& 
     player_view.y = lerp(player_view.y, targetY, 0.1f);
 }
 
-void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, int MapLVL)
+void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity)
 {
         CSpeed.SpeedWalk = 14;
         for (int i = 0; i < VLocation.size(); i++)

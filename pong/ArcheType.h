@@ -8,11 +8,11 @@ void LoadTransform(CTransform& CTransform, float arr[]);
 void CreateObject(CTransform& CTransform);
 void Show(CBitmap& CBitmap, CTransform& Transform);
 void ShowWindow(CBitmap& CBitmap);
-void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump, int MapLVL);
+void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump);
 void ProcessGravity(CJump& CJump, CTransform& Transform, CGravity& Gravity);
 void ProcessSound(CSound& CSound);
-void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, int MapLVL);
-void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, int MapLVL);
+void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity);
+void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity);
 void AddCharacterModifier(
     CHealth& CHealth, CDefense& CDefense, CDamage& CDamage, CSpeed& CSpeed, —Specialization& —Specialization,
     CGender& CGender, CStatusBehavior& CStatusBehavior, CType—haracter& CType—haracter, CName—haracter& CName—haracter, —Rank& —Rank,
@@ -182,8 +182,8 @@ public:
     }
     void Start()
     {
-        MoveCharacter(*Jump,*Transform,*Speed,*Collider,*Gravity, 0);
-        TracerCollide(*Collider, *Transform, *Jump, 0);
+        MoveCharacter(*Jump,*Transform,*Speed,*Collider,*Gravity);
+        TracerCollide(*Collider, *Transform, *Jump);
         ProcessGravity(*Jump, *Transform, *Gravity);
     }
 }*Enemy;
@@ -198,8 +198,8 @@ public:
     }
     void Start()
     {      
-       MovePlayer(*Jump, *Transform, *Speed, *Collider, *Gravity, 0); 
-       TracerCollide(*Collider, *Transform, *Jump, 0);
+       MovePlayer(*Jump, *Transform, *Speed, *Collider, *Gravity); 
+       TracerCollide(*Collider, *Transform, *Jump);
        ProcessGravity(*Jump, *Transform, *Gravity);
     }
 }*Player;
