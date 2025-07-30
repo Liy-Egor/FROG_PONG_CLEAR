@@ -5,10 +5,9 @@ string StrReplace(string* str, string namestr) {
     return str->replace(str->find(namestr), namestr.length(), "");
 }
 
-//новая фича создание, читалка файлов формата Svg и преобразование ее данных в игровой уровень 
-//создание карт можно делать в редакторе Adobe Photoshop (*2023 версия на которой я проверял)
-
+//создание карт можно делать в редакторе Adobe Photoshop любой версии
 void LoadSVGDataMap(const string NameFileSVG) {
+   
     ifstream file;
 
     vector <vector<string>> dS{
@@ -25,7 +24,6 @@ void LoadSVGDataMap(const string NameFileSVG) {
     string optionArr[]{ "id=", "x=", "y=" ,"width=", "height=","xlink:href=" };
 
     file.open(NameFileSVG + ".svg");
-
 
     //запуск чтения файла
     if (file.is_open()) {
@@ -88,8 +86,8 @@ void LoadSVGDataMap(const string NameFileSVG) {
         }
     }
 
-
     //загрузка уровня на основе собранных данных
+    int IdLocation;
     for (int i = 0; i < dS[0].size(); i++) {
         //интрепритация стоковых данных в числовые значения типа 0.1 от разрешения экрана пользователя
         float x = stof(dS[1][i]) / window.width;
@@ -98,9 +96,8 @@ void LoadSVGDataMap(const string NameFileSVG) {
         float height = stof(bufferData[1][i]) / window.height;
         string nameObject = dS[0][i];
         float arr[4]{x, y, width, height};
-        int IdLocation = 0;
         
-        //создание объектов пока что только для уровня 0
+        //создание объектов
         if (!nameObject.find("walls")) {
             Wall = new ATWall("walls", arr);
             Wall->SetLocation(IdLocation);
@@ -117,8 +114,9 @@ void LoadSVGDataMap(const string NameFileSVG) {
         }
         else if (!nameObject.find("background")) {
             MapSizeW = stoi(bufferData[0][0]);
-            MapSizeH = stoi(bufferData[0][1]);
+            MapSizeH = stoi(bufferData[1][0]);
             Location = new ATLocation(nameObject, arr);
+            IdLocation = VLocation.size();
             VLocation.push_back(*Location);
         }
         else if (!nameObject.find("portal")) {
@@ -132,14 +130,14 @@ void LoadSVGDataMap(const string NameFileSVG) {
             VLocation[IdLocation].VHealFlack.push_back(*HealFlack);
         }
         else if (!nameObject.find("spike")) {
-            Spike = new ATSpike("ball", arr);
+            Spike = new ATSpike("spike", arr);
             Spike->SetLocation(IdLocation);
             VLocation[IdLocation].VSpike.push_back(*Spike);
         }
 
     }
     file.close();
-} //сделать мулти редактор карт
+}
 
 void InitGame()
 {
@@ -299,5 +297,11 @@ void InitGame()
 //
 //};
 
-
+/* Serialization DataGame(location[0]);
+        if (GetAsyncKeyState(VK_F1)) {
+            DataGame.Ser();
+        }
+        if (GetAsyncKeyState(VK_F2)) {
+            DataGame.Deser();
+        }*/
 

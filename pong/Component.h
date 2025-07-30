@@ -28,8 +28,6 @@ struct CSound
 
 struct CCollider
 {
-   bool CollXfound = false;
-   bool CollYfound = false;
    int LastTracePlatformNum = -1;
    int Direction = 1;
 };

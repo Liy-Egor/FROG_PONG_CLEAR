@@ -30,13 +30,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         GetCursorPos(&mouse);
         ScreenToClient(window.hWnd, &mouse);
         
-            Player->Start();
-            UpdateView();
+        UpdateView(); //отрисовка всей локации
+        UpdatePhysics(); //отработка физики
 
         Ellipse(window.context, mouse.x - 5, mouse.y - 5, mouse.x + 5, mouse.y + 5);
     }
 }
-
+ 
 // for (int i = 0; i < location[player->currentLocation].Persona.size(); i++) {
 
 //     location[player->currentLocation].Persona[i]->Sprite.show();
@@ -60,19 +60,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 //     location[player->currentLocation].portal[i].Sprite.show();
 //     location[player->currentLocation].portal[i].Portal(player);
 // }
-
-
-/* Serialization DataGame(location[0]);
-        if (GetAsyncKeyState(VK_F1)) {
-            DataGame.Ser();
-        }
-        if (GetAsyncKeyState(VK_F2)) {
-            DataGame.Deser();
-        }*/
-
-
-/* PrintBitblt(); *///копируем буфер в окно и отрисовывает окно за игроком
-
 
 //float ls = .2 * length(player_view.x, player->Sprite.x, player_view.y, player->Sprite.y) / 500.;
         //ls = max(ls - .2, 0.1);

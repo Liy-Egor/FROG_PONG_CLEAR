@@ -20,6 +20,7 @@ void SwitchLotation();
 void Heal();
 void Spikes();
 void UpdateView();
+void UpdatePhysics();
 
 //базовые классы
 class BaseArcheType
@@ -87,6 +88,7 @@ protected:
 //наследники
 class ATWall : public BaseArcheType
 {
+    CCollider* Collider = ECS.SetComponent<CCollider>(Entity);
 public:
     ATWall(string BitmapNameFile, float arr[]) : BaseArcheType(BitmapNameFile, arr)
     {
@@ -101,6 +103,8 @@ public:
             y1 + h1 > y2;
     }
 }*Wall;
+
+
 
 class ATHealFlack : public BaseArcheType
 {
@@ -129,6 +133,8 @@ public:
     }
 }*Portal;
 
+
+
 class ATEnemyFrog : public BasePerson
 {
 private:
@@ -149,19 +155,9 @@ public:
     }
     void Start()
     {
-        
         MoveCharacter(*Jump,*Transform,*Speed,*Collider,*Gravity, 0);
-
-        for (int i = 0; i < ECS.GetSizeEntity(); i++)
-        {
-            CNameObject* Names = ECS.GetComponent<CNameObject>(i, NameObject);
-            if (Names->Name = "Wall")
-            {
-                CTransform* Tran = ECS.GetComponent<CTransform>(i, Transform);
-               /* TracerCollide(*Tran, *Collider, *Transform, *Jump, 0);*/
-                ProcessGravity(*Jump, *Transform, *Gravity);
-            }
-        }
+        TracerCollide(*Collider, *Transform, *Jump, 0);
+        ProcessGravity(*Jump, *Transform, *Gravity);
     }
 }*EnemyFrog;
 
@@ -173,17 +169,13 @@ public:
         NameObject->Name = "Player";
         NameСharacter->NameChar = "Komar";
     }
-    
     void Start()
     {      
        MovePlayer(*Jump, *Transform, *Speed, *Collider, *Gravity, 0); 
        TracerCollide(*Collider, *Transform, *Jump, 0);
        ProcessGravity(*Jump, *Transform, *Gravity);
-       Show(*this->GetBitmaps(), *this->GetPosition());
     }
-    
 }*Player;
-
 
 
 //конец всех архетипов

@@ -55,17 +55,18 @@ void ShowWindow(CBitmap& CBitmap)
 void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump, int MapLVL)
 {
     CCollider.LastTracePlatformNum = -1;
-    CCollider.CollXfound = false;
-    CCollider.CollYfound = false;
+    bool CollXfound = false;
+    bool CollYfound = false;
 
     float Lenght = sqrt(pow(Transform.Dx, 2) + pow(Transform.Dy, 2));
     for (float i = 0; i < Lenght; i++)
     {
-        if (CCollider.CollXfound && CCollider.CollYfound) return;
+        if (CollXfound && CollYfound) return;
 
         for (int k = 0; k < 4; k++)
         {
-            for (int j = 0; j < Location->VWall.size(); j++)
+            
+            for (int j = 0; j < VLocation[Player->GetLocation()].VWall.size(); j++)
             {
                 
             
@@ -79,7 +80,7 @@ void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump, in
             float pixel_y = Bbox[k * 2 + 1];
             SetPixel(window.context, (pixel_x - player_view.x) * 2 + window.width / 2, (pixel_y - player_view.y) * 2 + window.height / 2, RGB(255, 255, 255));
 
-            auto walls = Location->VWall[j].GetPosition();
+            auto walls = VLocation[Player->GetLocation()].VWall[j].GetPosition();
             if ((pixel_x >= walls->x &&
                 pixel_x <= walls->x + walls->Width) &&
                 (pixel_y >= walls->y &&
@@ -95,10 +96,10 @@ void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump, in
                 float minY = min(top, down);
                 CJump.InJump = false;
 
-                if (minX < minY && !CCollider.CollXfound)
+                if (minX < minY && !CollXfound)
                 {
                     Transform.Dx = 0;
-                    CCollider.CollXfound = true;
+                    CollXfound = true;
 
                     if (left < right)
                     {
@@ -112,10 +113,10 @@ void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump, in
                     j++;
                 }
 
-                if (minX >= minY && !CCollider.CollYfound)
+                if (minX >= minY && !CollYfound)
                 {
                     Transform.Dy = 0;
-                    CCollider.CollYfound = true;
+                    CollYfound = true;
 
                     if (down < top)
                     {
@@ -135,8 +136,8 @@ void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump, in
            }
         }
     }
-    if (!CCollider.CollXfound) Transform.x += Transform.Dx;
-    if (!CCollider.CollYfound) Transform.y += Transform.Dy;
+    if (!CollXfound) Transform.x += Transform.Dx;
+    if (!CollYfound) Transform.y += Transform.Dy;
 }
 
 void ProcessGravity(CJump& CJump, CTransform& Transform, CGravity& Gravity)
@@ -153,7 +154,6 @@ void ProcessSound(CSound& CSound)
 
 void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, int MapLVL)
 {
-
     if (GetAsyncKeyState(VK_LEFT)) 
     {
         Transform.Dx = -CSpeed.SpeedWalk;
@@ -169,7 +169,6 @@ void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& 
         CJump.InJump = true;
     }
 
-
     float cameraHalfWidth = (window.width / 2) / Transform.Scale;
     float cameraHalfHeight = (window.height / 2) / Transform.Scale;
 
@@ -183,28 +182,33 @@ void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& 
 
     player_view.x = lerp(player_view.x, targetX, 0.1f);
     player_view.y = lerp(player_view.y, targetY, 0.1f);
-
 }
 
 void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, int MapLVL)
 {
-    /*ProcessGravity(CJump, CTransform, Gravity);
-    TracerCollide(CCollider, CTransform, CJump, MapLVL);*/
-
-    //if (CCollider.LastTracePlatformNum >= 0)
-    //{
-    //    if (CTransform.x <= location[MapLVL].walls[CCollider.LastTracePlatformNum].Sprite.x)
-    //    {
-    //        CCollider.Direction = 1;
-    //    }
-
-    //    auto& platform = location[MapLVL].walls[CCollider.LastTracePlatformNum].Sprite; //здесть нужно получть потаформу стен нужно будте потом поменять
-    //    if (CTransform.x + CTransform.Width >= platform.x + platform.width)
-    //    {
-    //        CCollider.Direction = -1;
-    //    }
-    //    CTransform.Dx = CCollider.Direction * CSpeed.SpeedWalk;
-    //}
+        CSpeed.SpeedWalk = 14;
+        for (int i = 0; i < VLocation.size(); i++)
+        {
+            if (Player->GetLocation() == i)
+            {
+                for (int j = 0; j < VLocation[i].VWall.size();j++)
+                { 
+                    if (CCollider.LastTracePlatformNum >= 0)
+                    {
+                        auto& platform = *VLocation[i].VWall[CCollider.LastTracePlatformNum].GetPosition();
+                        if (CTransform.x <= platform.x)
+                        {
+                            CCollider.Direction = 1;
+                        }
+                        if (CTransform.x + CTransform.Width >= platform.x + platform.Width)
+                        {
+                            CCollider.Direction = -1;
+                        }
+                    }
+                }
+            }
+                        CTransform.Dx = CCollider.Direction * CSpeed.SpeedWalk;
+        }
 }
 
 void AddCharacterModifier(
@@ -294,9 +298,23 @@ void UpdateView()
             {
                 Show(*var.GetBitmaps(), *var.GetPosition());
             }
+            Show(*Player->GetBitmaps(), *Player->GetPosition());
             break;
         }
     }
+}
 
-
+void UpdatePhysics()
+{
+    Player->Start();
+    for (int i = 0; i < VLocation.size(); i++)
+    {
+        if (Player->GetLocation() == i)
+        {
+            for (ATEnemyFrog var : VLocation[i].VEnemyFrog)
+            {
+                var.Start();
+            }
+        }
+    }
 }
