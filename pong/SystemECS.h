@@ -57,6 +57,34 @@ void Show(CBitmap& CBitmap, CTransform& Transform)
     ShowBitmap(window.context, vx, vy, vw, vh, CBitmap.HBitMap, false);
 }
 
+void ShowAnimation(CBitmap& CBitmap, CTransform& Transform,int num)
+{
+    float vx = (Transform.x - player_view.x) * Transform.Scale + window.width / 2;
+    float vy = (Transform.y - player_view.y) * Transform.Scale + window.height / 2;
+    float vw = Transform.Width * Transform.Scale;
+    float vh = Transform.Height * Transform.Scale;
+
+    bool in = false;
+    static int lastDamageTime = 0;
+    if (vx + vw >= 0 && vx < window.width &&
+        vy + vh >= 0 && vy < window.height)
+        in = true;
+
+    if (!in) return;
+        HBITMAP hbm, hOldbm;
+        HDC hMemDC;
+        BITMAP bm;
+        hMemDC = CreateCompatibleDC(window.context);
+        hOldbm = (HBITMAP)SelectObject(hMemDC, CBitmap.HBitMap);
+        GetObject(CBitmap.HBitMap, sizeof(BITMAP), (LPSTR)&bm);
+        if (hOldbm)
+        {
+            StretchBlt(window.context, vx, vy, vw/4, vh, hMemDC, num, 0, 137, bm.bmHeight, SRCCOPY);
+            SelectObject(hMemDC, hOldbm);
+        }
+        DeleteDC(hMemDC); // ??????? ???????? ??????
+}
+
 void ShowWindow(CBitmap& CBitmap)
 {
     ShowBitmap(window.context, 0, 0, window.width, window.height, CBitmap.HBitMap, false);
@@ -317,6 +345,9 @@ void HealthBar()
     TextOutA(window.context, window.width - 400, window.height - 1000, (LPCSTR)txt, strlen(txt));// куда пишет данные
 }
 
+
+
+
 void UpdateGame()
 {
     for (int i = 0; i < VLocation.size(); i++)
@@ -352,7 +383,18 @@ void UpdateGame()
                 Show(*var.GetBitmaps(), *var.GetPosition());
                 var.GoEvent();
             }
-            Show(*Player->GetBitmaps(), *Player->GetPosition());
+            ShowAnimation(*Player->GetBitmaps(), *Player->GetPosition(), 0);
+            if (GetAsyncKeyState(0x30))
+            ShowAnimation(*Player->GetBitmaps(), *Player->GetPosition(), 0);
+            if (GetAsyncKeyState(0x31))
+            ShowAnimation(*Player->GetBitmaps(), *Player->GetPosition(), 137);
+            if (GetAsyncKeyState(0x32))
+            ShowAnimation(*Player->GetBitmaps(), *Player->GetPosition(), 137*2);
+            if (GetAsyncKeyState(0x33))
+            ShowAnimation(*Player->GetBitmaps(), *Player->GetPosition(), 137 * 3);
+            if (GetAsyncKeyState(0x34))
+            ShowAnimation(*Player->GetBitmaps(), *Player->GetPosition(), 137 * 4);
+
             Player->Start();
             HealthBar();
             break;

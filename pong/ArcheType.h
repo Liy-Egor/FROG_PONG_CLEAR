@@ -34,6 +34,7 @@ protected:
     CSound* Sound = ECS.SetComponent<CSound>(Entity);
     CNameObject* NameObject = ECS.SetComponent<CNameObject>(Entity);
     int WhatLocation;
+    
 
     BaseArcheType(string BitmapNameFile, float arr[])
     {
@@ -219,6 +220,7 @@ public:
     vector<ATSpike> VSpike;
     vector<ATPortal> VPortal;
     vector<ATEnemy> VEnemy;
+
 }*Location;
 vector<ATLocation> VLocation; // при удалении от сюда тоже надо будет удал€ть экземал€ры иначе будет утечка пам€ти (небольша€ но все же)
 
