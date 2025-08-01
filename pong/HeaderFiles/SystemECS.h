@@ -383,7 +383,7 @@ void UpdateGame()
                 Show(*var.GetBitmaps(), *var.GetPosition());
                 var.GoEvent();
             }
-            ShowAnimation(*Player->GetBitmaps(), *Player->GetPosition(), 0);
+            /*ShowAnimation(*Player->GetBitmaps(), *Player->GetPosition(), 0);
             if (GetAsyncKeyState(0x30))
             ShowAnimation(*Player->GetBitmaps(), *Player->GetPosition(), 0);
             if (GetAsyncKeyState(0x31))
@@ -393,8 +393,9 @@ void UpdateGame()
             if (GetAsyncKeyState(0x33))
             ShowAnimation(*Player->GetBitmaps(), *Player->GetPosition(), 137 * 3);
             if (GetAsyncKeyState(0x34))
-            ShowAnimation(*Player->GetBitmaps(), *Player->GetPosition(), 137 * 4);
+            ShowAnimation(*Player->GetBitmaps(), *Player->GetPosition(), 137 * 4);*/
 
+            Show(*Player->GetBitmaps(), *Player->GetPosition());
             Player->Start();
             HealthBar();
             break;

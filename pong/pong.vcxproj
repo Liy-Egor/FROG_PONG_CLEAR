@@ -70,6 +70,12 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>C:\Users\4224\source\repos\FROG_PONG_CLEAR_228\pong\HeaderFiles;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>C:\Users\4224\source\repos\FROG_PONG_CLEAR_228\pong\HeaderFiles;$(IncludePath)</IncludePath>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
@@ -77,6 +83,7 @@
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
+      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -94,6 +101,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <ShowIncludes>false</ShowIncludes>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -135,29 +143,32 @@
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\Debug\back.bmp" />
-    <Image Include="..\Debug\ball.bmp" />
-    <Image Include="..\Debug\enemy1.bmp" />
-    <Image Include="..\Debug\frog.bmp" />
-    <Image Include="..\Debug\health_empty.bmp" />
-    <Image Include="..\Debug\health_full.bmp" />
-    <Image Include="..\Debug\racket.bmp" />
-    <Image Include="..\Debug\racket_enemy.bmp" />
-    <Image Include="..\walls.bmp" />
-  </ItemGroup>
-  <ItemGroup>
-    <Media Include="..\Debug\bounce.wav" />
-    <Media Include="..\Debug\fail.wav" />
     <Media Include="..\Debug\music.mp3" />
+    <Media Include="Resoursces\Sound\bounce.wav" />
+    <Media Include="Resoursces\Sound\fail.wav" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ArcheType.h" />
-    <ClInclude Include="BaseStructures.h" />
-    <ClInclude Include="Component.h" />
-    <ClInclude Include="ECSSoft.h" />
-    <ClInclude Include="GameFileSystem.h" />
-    <ClInclude Include="PrimaryProcess.h" />
-    <ClInclude Include="SystemECS.h" />
+    <Image Include="Resoursces\Image\back.bmp" />
+    <Image Include="Resoursces\Image\background_0.bmp" />
+    <Image Include="Resoursces\Image\background_1.bmp" />
+    <Image Include="Resoursces\Image\ball.bmp" />
+    <Image Include="Resoursces\Image\enemy1.bmp" />
+    <Image Include="Resoursces\Image\frog.bmp" />
+    <Image Include="Resoursces\Image\health_empty.bmp" />
+    <Image Include="Resoursces\Image\health_full.bmp" />
+    <Image Include="Resoursces\Image\racket.bmp" />
+    <Image Include="Resoursces\Image\racket_enemy.bmp" />
+    <Image Include="Resoursces\Image\spike.bmp" />
+    <Image Include="Resoursces\Image\walls.bmp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="HeaderFiles\ArcheType.h" />
+    <ClInclude Include="HeaderFiles\BaseStructures.h" />
+    <ClInclude Include="HeaderFiles\Component.h" />
+    <ClInclude Include="HeaderFiles\ECSSoft.h" />
+    <ClInclude Include="HeaderFiles\GameFileSystem.h" />
+    <ClInclude Include="HeaderFiles\PrimaryProcess.h" />
+    <ClInclude Include="HeaderFiles\SystemECS.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

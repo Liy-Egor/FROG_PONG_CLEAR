@@ -23,63 +23,72 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\Debug\back.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\Debug\ball.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\Debug\racket.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\Debug\racket_enemy.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\Debug\enemy1.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\Debug\frog.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\Debug\health_empty.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\Debug\health_full.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="..\walls.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <Media Include="..\Debug\bounce.wav">
-      <Filter>Resource Files</Filter>
-    </Media>
-    <Media Include="..\Debug\fail.wav">
-      <Filter>Resource Files</Filter>
-    </Media>
     <Media Include="..\Debug\music.mp3" />
+    <Media Include="Resoursces\Sound\bounce.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
+    <Media Include="Resoursces\Sound\fail.wav">
+      <Filter>Resource Files</Filter>
+    </Media>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="GameFileSystem.h">
+    <Image Include="Resoursces\Image\back.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resoursces\Image\background_0.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resoursces\Image\background_1.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resoursces\Image\ball.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resoursces\Image\enemy1.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resoursces\Image\frog.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resoursces\Image\health_empty.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resoursces\Image\health_full.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resoursces\Image\racket.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resoursces\Image\racket_enemy.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resoursces\Image\spike.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="Resoursces\Image\walls.bmp">
+      <Filter>Resource Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="HeaderFiles\ArcheType.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="HeaderFiles\Component.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="HeaderFiles\ECSSoft.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="HeaderFiles\SystemECS.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="HeaderFiles\BaseStructures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PrimaryProcess.h">
+    <ClInclude Include="HeaderFiles\GameFileSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SystemECS.h">
-      <Filter>ECS</Filter>
-    </ClInclude>
-    <ClInclude Include="ECSSoft.h">
-      <Filter>ECS</Filter>
-    </ClInclude>
-    <ClInclude Include="Component.h">
-      <Filter>ECS</Filter>
-    </ClInclude>
-    <ClInclude Include="ArcheType.h">
-      <Filter>ECS</Filter>
-    </ClInclude>
-    <ClInclude Include="BaseStructures.h">
+    <ClInclude Include="HeaderFiles\PrimaryProcess.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
