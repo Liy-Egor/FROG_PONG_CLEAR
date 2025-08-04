@@ -70,26 +70,26 @@
     </Image>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="HeaderFiles\ArcheType.h">
-      <Filter>ECS</Filter>
-    </ClInclude>
-    <ClInclude Include="HeaderFiles\Component.h">
-      <Filter>ECS</Filter>
-    </ClInclude>
-    <ClInclude Include="HeaderFiles\ECSSoft.h">
-      <Filter>ECS</Filter>
-    </ClInclude>
-    <ClInclude Include="HeaderFiles\SystemECS.h">
-      <Filter>ECS</Filter>
-    </ClInclude>
-    <ClInclude Include="HeaderFiles\BaseStructures.h">
+    <ClInclude Include="BaseStructures.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HeaderFiles\GameFileSystem.h">
+    <ClInclude Include="GameFileSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="HeaderFiles\PrimaryProcess.h">
+    <ClInclude Include="PrimaryProcess.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ArcheType.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="Component.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="ECSSoft.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="SystemECS.h">
+      <Filter>ECS</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

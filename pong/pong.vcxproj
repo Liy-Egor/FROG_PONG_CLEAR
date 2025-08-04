@@ -70,9 +70,7 @@
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>C:\Users\4224\source\repos\FROG_PONG_CLEAR_228\pong\HeaderFiles;$(IncludePath)</IncludePath>
-  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>C:\Users\4224\source\repos\FROG_PONG_CLEAR_228\pong\HeaderFiles;$(IncludePath)</IncludePath>
   </PropertyGroup>
@@ -162,13 +160,13 @@
     <Image Include="Resoursces\Image\walls.bmp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="HeaderFiles\ArcheType.h" />
-    <ClInclude Include="HeaderFiles\BaseStructures.h" />
-    <ClInclude Include="HeaderFiles\Component.h" />
-    <ClInclude Include="HeaderFiles\ECSSoft.h" />
-    <ClInclude Include="HeaderFiles\GameFileSystem.h" />
-    <ClInclude Include="HeaderFiles\PrimaryProcess.h" />
-    <ClInclude Include="HeaderFiles\SystemECS.h" />
+    <ClInclude Include="ArcheType.h" />
+    <ClInclude Include="BaseStructures.h" />
+    <ClInclude Include="Component.h" />
+    <ClInclude Include="ECSSoft.h" />
+    <ClInclude Include="GameFileSystem.h" />
+    <ClInclude Include="PrimaryProcess.h" />
+    <ClInclude Include="SystemECS.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
