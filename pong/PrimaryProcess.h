@@ -42,3 +42,62 @@ void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool
 
     DeleteDC(hMemDC); // ??????? ???????? ??????
 }
+
+
+static LRESULT CALLBACK WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+	switch (msg)
+	{
+	case WM_CLOSE:
+		PostQuitMessage(0);
+		break;
+	default:
+		return DefWindowProc(hWnd, msg, wParam, lParam);
+	}
+};
+
+class Window
+{
+private:
+	const char* NameClass = "Window";
+	RECT rc;
+	HINSTANCE hIns;
+	HWND hWnd;
+public:
+	Window(int Width,int Height, const char* NameWind) 
+		{
+		rc = {0,0,Width,Height 
+		};
+
+		AdjustWindowRect(&rc, WS_CAPTION | WS_MINIMIZEBOX | WS_SYSMENU, FALSE);
+
+		WNDCLASSEX wc = { 0 };
+		wc.cbSize = sizeof(wc);
+		wc.lpszClassName = NameClass;
+		wc.hInstance = hIns;
+		wc.lpfnWndProc = &WindowProc;
+
+		auto NameClassId = RegisterClassEx(&wc);
+
+		hWnd = CreateWindowEx(
+			NULL,
+			MAKEINTATOM(NameClassId),
+			NameWind, 
+			WS_CAPTION| WS_MINIMIZEBOX | WS_SYSMENU, 
+			CW_USEDEFAULT, 
+			CW_USEDEFAULT,
+			rc.right-rc.left,
+			rc.bottom - rc.top,
+			NULL,
+			NULL,
+			hIns,
+			NULL
+			);
+
+		ShowWindow(hWnd, SW_SHOW);
+	};
+	~Window() 
+	{
+		DestroyWindow(hWnd);
+	};
+};
