@@ -2,10 +2,10 @@
 #include "GameFileSystem.h"
 
 using namespace ECC;
-//здесть вся логика
+//������ ��� ������
 
 
-//для загрузки значений
+//��� �������� ��������
 HBITMAP GetBitmap(string BitmapNameFile)
 {
     const string fullName = BitmapNameFile + ".bmp";
@@ -30,7 +30,7 @@ void CreateObject(CTransform& CTransform)
 }
 
 
-//другая логика
+//������ ������
 bool CheckCollision(float x1, float y1, float w1, float h1,
     float x2, float y2, float w2, float h2)
 {
@@ -250,26 +250,26 @@ void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollid
 }
 
 void AddCharacterModifier(
-    CHealth& CHealth, CDefense& CDefense, CDamage& CDamage, CSpeed& CSpeed, СSpecialization& СSpecialization,
-    CGender& CGender, CStatusBehavior& CStatusBehavior, CTypeСharacter& CTypeСharacter, CNameСharacter& CNameСharacter, СRank& СRank,
-    string TypeDamage, string Status, string TypeСharacter, string Gender, string NameChar, string Specialization, int Rank)
+    CHealth& CHealth, CDefense& CDefense, CDamage& CDamage, CSpeed& CSpeed, �Specialization& �Specialization,
+    CGender& CGender, CStatusBehavior& CStatusBehavior, CType�haracter& CType�haracter, CName�haracter& CName�haracter, �Rank& �Rank,
+    string TypeDamage, string Status, string Type�haracter, string Gender, string NameChar, string Specialization, int Rank)
 {
 
 
 
 }
 
-void SwitchLotation(CPortalPаth& PortalPаth, CTransform& Transform)
+void SwitchLotation(CPortalP�th& PortalP�th, CTransform& Transform)
 {
     if (CheckCollision(Player->GetPosition()->x, Player->GetPosition()->y, Player->GetPosition()->Width, Player->GetPosition()->Height, Transform.x, Transform.y, Transform.Width, Transform.Height))
     {
-        if (VLocation.size() >= PortalPаth.Pаth)
+        if (VLocation.size() >= PortalP�th.P�th)
         {
-            Player->SetLocation(PortalPаth.Pаth);
-            Player->GetPosition()->x = 300; //временное решение нужны заданные спавнеры
+            Player->SetLocation(PortalP�th.P�th);
+            Player->GetPosition()->x = 300; //��������� ������� ����� �������� ��������
             Player->GetPosition()->y = 800;
-            MapSizeW = VLocation[PortalPаth.Pаth].GetPosition()->Width;
-            MapSizeH = VLocation[PortalPаth.Pаth].GetPosition()->Height;
+            MapSizeW = VLocation[PortalP�th.P�th].GetPosition()->Width;
+            MapSizeH = VLocation[PortalP�th.P�th].GetPosition()->Height;
         }
     }
 }
@@ -328,7 +328,7 @@ void SpikeEvent(CTransform& Transform,CDamage& Damage)
         else
         {
            Player->Destroy();
-           exit(0); // выходим их программы потому что игра без игрока просто зависает
+           exit(0); // ������� �� ��������� ������ ��� ���� ��� ������ ������ ��������
         }
     }
 }
@@ -336,13 +336,13 @@ void SpikeEvent(CTransform& Transform,CDamage& Damage)
 void HealthBar()
 {
     SetTextColor(window.context, RGB(50, 205, 50));
-    //SetBkMode(window.context, TRANSPARENT); //прозрачность
-    auto hFont = CreateFont(70, 0, 0, 0, FW_BOLD, 0, 0, 0, 0, 0, 0, 2, 0, "CALIBRI"); //шрифт
+    //SetBkMode(window.context, TRANSPARENT); //������������
+    auto hFont = CreateFont(70, 0, 0, 0, FW_BOLD, 0, 0, 0, 0, 0, 0, 2, 0, "CALIBRI"); //�����
     auto hTmp = (HFONT)SelectObject(window.context, hFont);
 
     char txt[32];
-    _itoa_s(Player->GetHealth()->Health, txt, 10); // от куда считывает данные
-    TextOutA(window.context, window.width - 400, window.height - 1000, (LPCSTR)txt, strlen(txt));// куда пишет данные
+    _itoa_s(Player->GetHealth()->Health, txt, 10); // �� ���� ��������� ������
+    TextOutA(window.context, window.width - 400, window.height - 1000, (LPCSTR)txt, strlen(txt));// ���� ����� ������
 }
 
 
@@ -355,7 +355,7 @@ void UpdateGame()
         if (Player->GetLocation() == i)
         {
             ShowWindow(*VLocation[i].GetBitmaps());
-            //для уменьшения лагов нужно заменить все эти итерации одни итератором, либо при помощи паттерна Observer c подпиской на обновление игры но это нужно разработать
+            //��� ���������� ����� ����� �������� ��� ��� �������� ���� ����������, ���� ��� ������ �������� Observer c ��������� �� ���������� ���� �� ��� ����� �����������
             for (ATWall var : VLocation[i].VWall)
             {
                 Show(*var.GetBitmaps(), *var.GetPosition());
