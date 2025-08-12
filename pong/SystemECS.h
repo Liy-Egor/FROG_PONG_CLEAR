@@ -1,11 +1,11 @@
-#pragma once
+ï»¿#pragma once
 #include "GameFileSystem.h"
 
 using namespace ECC;
-//çäåñòü âñÿ ëîãèêà
+//Ð·Ð´ÐµÑÑ‚ÑŒ Ð²ÑÑ Ð»Ð¾Ð³Ð¸ÐºÐ°
 
 
-//äëÿ çàãðóçêè çíà÷åíèé
+//Ð´Ð»Ñ Ð·Ð°Ð³Ñ€ÑƒÐ·ÐºÐ¸ Ð·Ð½Ð°Ñ‡ÐµÐ½Ð¸Ð¹
 HBITMAP GetBitmap(string BitmapNameFile)
 {
     const string fullName = BitmapNameFile + ".bmp";
@@ -30,7 +30,7 @@ void CreateObject(CTransform& CTransform)
 }
 
 
-//äðóãàÿ ëîãèêà
+//Ð´Ñ€ÑƒÐ³Ð°Ñ Ð»Ð¾Ð³Ð¸ÐºÐ°
 bool CheckCollision(float x1, float y1, float w1, float h1,
     float x2, float y2, float w2, float h2)
 {
@@ -250,26 +250,26 @@ void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollid
 }
 
 void AddCharacterModifier(
-    CHealth& CHealth, CDefense& CDefense, CDamage& CDamage, CSpeed& CSpeed, ÑSpecialization& ÑSpecialization,
-    CGender& CGender, CStatusBehavior& CStatusBehavior, CTypeÑharacter& CTypeÑharacter, CNameÑharacter& CNameÑharacter, ÑRank& ÑRank,
-    string TypeDamage, string Status, string TypeÑharacter, string Gender, string NameChar, string Specialization, int Rank)
+    CHealth& CHealth, CDefense& CDefense, CDamage& CDamage, CSpeed& CSpeed, Ð¡Specialization& Ð¡Specialization,
+    CGender& CGender, CStatusBehavior& CStatusBehavior, CTypeÐ¡haracter& CTypeÐ¡haracter, CNameÐ¡haracter& CNameÐ¡haracter, Ð¡Rank& Ð¡Rank,
+    string TypeDamage, string Status, string TypeÐ¡haracter, string Gender, string NameChar, string Specialization, int Rank)
 {
 
 
 
 }
 
-void SwitchLotation(CPortalPàth& PortalPàth, CTransform& Transform)
+void SwitchLotation(CPortalPÐ°th& PortalPÐ°th, CTransform& Transform)
 {
     if (CheckCollision(Player->GetPosition()->x, Player->GetPosition()->y, Player->GetPosition()->Width, Player->GetPosition()->Height, Transform.x, Transform.y, Transform.Width, Transform.Height))
     {
-        if (VLocation.size() >= PortalPàth.Pàth)
+        if (VLocation.size() >= PortalPÐ°th.PÐ°th)
         {
-            Player->SetLocation(PortalPàth.Pàth);
-            Player->GetPosition()->x = 300; //âðåìåííîå ðåøåíèå íóæíû çàäàííûå ñïàâíåðû
+            Player->SetLocation(PortalPÐ°th.PÐ°th);
+            Player->GetPosition()->x = 300; //Ð²Ñ€ÐµÐ¼ÐµÐ½Ð½Ð¾Ðµ Ñ€ÐµÑˆÐµÐ½Ð¸Ðµ Ð½ÑƒÐ¶Ð½Ñ‹ Ð·Ð°Ð´Ð°Ð½Ð½Ñ‹Ðµ ÑÐ¿Ð°Ð²Ð½ÐµÑ€Ñ‹
             Player->GetPosition()->y = 800;
-            MapSizeW = VLocation[PortalPàth.Pàth].GetPosition()->Width;
-            MapSizeH = VLocation[PortalPàth.Pàth].GetPosition()->Height;
+            MapSizeW = VLocation[PortalPÐ°th.PÐ°th].GetPosition()->Width;
+            MapSizeH = VLocation[PortalPÐ°th.PÐ°th].GetPosition()->Height;
         }
     }
 }
@@ -328,7 +328,7 @@ void SpikeEvent(CTransform& Transform,CDamage& Damage)
         else
         {
            Player->Destroy();
-           exit(0); // âûõîäèì èõ ïðîãðàììû ïîòîìó ÷òî èãðà áåç èãðîêà ïðîñòî çàâèñàåò
+           exit(0); // Ð²Ñ‹Ñ…Ð¾Ð´Ð¸Ð¼ Ð¸Ñ… Ð¿Ñ€Ð¾Ð³Ñ€Ð°Ð¼Ð¼Ñ‹ Ð¿Ð¾Ñ‚Ð¾Ð¼Ñƒ Ñ‡Ñ‚Ð¾ Ð¸Ð³Ñ€Ð° Ð±ÐµÐ· Ð¸Ð³Ñ€Ð¾ÐºÐ° Ð¿Ñ€Ð¾ÑÑ‚Ð¾ Ð·Ð°Ð²Ð¸ÑÐ°ÐµÑ‚
         }
     }
 }
@@ -336,13 +336,13 @@ void SpikeEvent(CTransform& Transform,CDamage& Damage)
 void HealthBar()
 {
     SetTextColor(window.context, RGB(50, 205, 50));
-    //SetBkMode(window.context, TRANSPARENT); //ïðîçðà÷íîñòü
-    auto hFont = CreateFont(70, 0, 0, 0, FW_BOLD, 0, 0, 0, 0, 0, 0, 2, 0, "CALIBRI"); //øðèôò
+    //SetBkMode(window.context, TRANSPARENT); //Ð¿Ñ€Ð¾Ð·Ñ€Ð°Ñ‡Ð½Ð¾ÑÑ‚ÑŒ
+    auto hFont = CreateFont(70, 0, 0, 0, FW_BOLD, 0, 0, 0, 0, 0, 0, 2, 0, "CALIBRI"); //ÑˆÑ€Ð¸Ñ„Ñ‚
     auto hTmp = (HFONT)SelectObject(window.context, hFont);
 
     char txt[32];
-    _itoa_s(Player->GetHealth()->Health, txt, 10); // îò êóäà ñ÷èòûâàåò äàííûå
-    TextOutA(window.context, window.width - 400, window.height - 1000, (LPCSTR)txt, strlen(txt));// êóäà ïèøåò äàííûå
+    _itoa_s(Player->GetHealth()->Health, txt, 10); // Ð¾Ñ‚ ÐºÑƒÐ´Ð° ÑÑ‡Ð¸Ñ‚Ñ‹Ð²Ð°ÐµÑ‚ Ð´Ð°Ð½Ð½Ñ‹Ðµ
+    TextOutA(window.context, window.width - 400, window.height - 1000, (LPCSTR)txt, strlen(txt));// ÐºÑƒÐ´Ð° Ð¿Ð¸ÑˆÐµÑ‚ Ð´Ð°Ð½Ð½Ñ‹Ðµ
 }
 
 
@@ -355,7 +355,7 @@ void UpdateGame()
         if (Player->GetLocation() == i)
         {
             ShowWindow(*VLocation[i].GetBitmaps());
-            //äëÿ óìåíüøåíèÿ ëàãîâ íóæíî çàìåíèòü âñå ýòè èòåðàöèè îäíè èòåðàòîðîì, ëèáî ïðè ïîìîùè ïàòòåðíà Observer c ïîäïèñêîé íà îáíîâëåíèå èãðû íî ýòî íóæíî ðàçðàáîòàòü
+            //Ð´Ð»Ñ ÑƒÐ¼ÐµÐ½ÑŒÑˆÐµÐ½Ð¸Ñ Ð»Ð°Ð³Ð¾Ð² Ð½ÑƒÐ¶Ð½Ð¾ Ð·Ð°Ð¼ÐµÐ½Ð¸Ñ‚ÑŒ Ð²ÑÐµ ÑÑ‚Ð¸ Ð¸Ñ‚ÐµÑ€Ð°Ñ†Ð¸Ð¸ Ð¾Ð´Ð½Ð¸ Ð¸Ñ‚ÐµÑ€Ð°Ñ‚Ð¾Ñ€Ð¾Ð¼, Ð»Ð¸Ð±Ð¾ Ð¿Ñ€Ð¸ Ð¿Ð¾Ð¼Ð¾Ñ‰Ð¸ Ð¿Ð°Ñ‚Ñ‚ÐµÑ€Ð½Ð° Observer c Ð¿Ð¾Ð´Ð¿Ð¸ÑÐºÐ¾Ð¹ Ð½Ð° Ð¾Ð±Ð½Ð¾Ð²Ð»ÐµÐ½Ð¸Ðµ Ð¸Ð³Ñ€Ñ‹ Ð½Ð¾ ÑÑ‚Ð¾ Ð½ÑƒÐ¶Ð½Ð¾ Ñ€Ð°Ð·Ñ€Ð°Ð±Ð¾Ñ‚Ð°Ñ‚ÑŒ
             for (ATWall var : VLocation[i].VWall)
             {
                 Show(*var.GetBitmaps(), *var.GetPosition());
@@ -383,7 +383,7 @@ void UpdateGame()
                 Show(*var.GetBitmaps(), *var.GetPosition());
                 var.GoEvent();
             }
-            /*ShowAnimation(*Player->GetBitmaps(), *Player->GetPosition(), 0);
+           /* ShowAnimation(*Player->GetBitmaps(), *Player->GetPosition(), 0);
             if (GetAsyncKeyState(0x30))
             ShowAnimation(*Player->GetBitmaps(), *Player->GetPosition(), 0);
             if (GetAsyncKeyState(0x31))

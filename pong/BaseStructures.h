@@ -1,4 +1,4 @@
-#pragma once
+п»ї#pragma once
 #include "windows.h"
 #include "math.h"
 #include "ctime"
@@ -17,9 +17,9 @@ POINT mouse;
 
 struct 
 {
-    HWND hWnd;//хэндл окна
-    HDC device_context, context;// два контекста устройства (для буферизации)
-    int width, height;//сюда сохраним размеры окна которое создаст программа
+    HWND hWnd;//С…СЌРЅРґР» РѕРєРЅР°
+    HDC device_context, context;// РґРІР° РєРѕРЅС‚РµРєСЃС‚Р° СѓСЃС‚СЂРѕР№СЃС‚РІР° (РґР»СЏ Р±СѓС„РµСЂРёР·Р°С†РёРё)
+    int width, height;//СЃСЋРґР° СЃРѕС…СЂР°РЅРёРј СЂР°Р·РјРµСЂС‹ РѕРєРЅР° РєРѕС‚РѕСЂРѕРµ СЃРѕР·РґР°СЃС‚ РїСЂРѕРіСЂР°РјРјР°
 } window;
 
 struct 
