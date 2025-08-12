@@ -44,6 +44,7 @@ void ShowBitmap(HDC hDC, int x, int y, int x1, int y1, HBITMAP hBitmapBall, bool
 }
 
 
+//из этого нужно сделать класс приложения
 static LRESULT CALLBACK WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
 	switch (msg)
@@ -55,7 +56,6 @@ static LRESULT CALLBACK WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lP
 		return DefWindowProc(hWnd, msg, wParam, lParam);
 	}
 };
-
 class Window
 {
 private:
@@ -100,4 +100,14 @@ public:
 	{
 		DestroyWindow(hWnd);
 	};
+};
+
+
+
+//система проверки ошибок логер на основе терминала
+class Logger
+{
+public:
+	Logger() {};
+	~Logger() {};
 };
