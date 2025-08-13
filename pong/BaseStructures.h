@@ -111,5 +111,5 @@ public:
 	{
 		return hWnd;
 	}
-};
+}win(1280, 720, "GameFrog");
 
