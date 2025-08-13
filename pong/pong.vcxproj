@@ -163,6 +163,7 @@
     <ClInclude Include="ArcheType.h" />
     <ClInclude Include="BaseStructures.h" />
     <ClInclude Include="Component.h" />
+    <ClInclude Include="D3D11APP.h" />
     <ClInclude Include="ECSSoft.h" />
     <ClInclude Include="GameFileSystem.h" />
     <ClInclude Include="PrimaryProcess.h" />

@@ -91,5 +91,8 @@
     <ClInclude Include="SystemECS.h">
       <Filter>ECS</Filter>
     </ClInclude>
+    <ClInclude Include="D3D11APP.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>

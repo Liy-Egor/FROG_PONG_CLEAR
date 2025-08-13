@@ -1,30 +1,9 @@
 ﻿#include "SystemECS.h"
 
-
-
 int main()
 {
-	Window wnd(600, 600, "GameFrog");
-
-	MSG msg;
-	BOOL gbool = true;
-	while (gbool)
-	{
-		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-		{
-			if (msg.message == WM_QUIT)
-			{
-				gbool = false;
-				break;
-			}
-			
-			TranslateMessage(&msg);
-			DispatchMessage(&msg);
-		}Sleep(1);
-
-	}
+	App.FrameGo();
 	return 0;
-
 }
 
 
