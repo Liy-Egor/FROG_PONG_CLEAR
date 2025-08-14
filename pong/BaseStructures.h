@@ -9,7 +9,10 @@
 #include "vector"
 #include <fstream>
 #include <stdexcept>
+#include <chrono>
 #include <d3d11.h>
+#include <d3dcompiler.h>
+#pragma comment(lib,"d3dcompiler.lib")
 #pragma comment(lib,"d3d11.lib")
 
 using namespace std;
@@ -50,6 +53,25 @@ int MapSizeW = window.width;
 int MapSizeH = window.height;
 
 bool PlayerPlay = false;
+
+class ChronoTimer
+{
+public:
+	ChronoTimer() {
+		Begin = chrono::steady_clock::now();
+	}
+
+	float TimePeak()
+	{
+		return chrono::duration<float>(chrono::steady_clock::now() - Begin).count();
+	}
+
+private:
+	chrono::steady_clock::time_point Begin;
+}Timer;
+
+
+
 
 static LRESULT CALLBACK WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
