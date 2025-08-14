@@ -1,11 +1,13 @@
 #pragma once
 #include "BaseStructures.h"
 #include <wrl.h>
+#include "MathShaders.h"
 
 //ТУТОРИАЛЫ
 //https://www.youtube.com/@PardCode
 //https://www.rastertek.com/tutdx11win10.html
 //https://learn.microsoft.com/ru-ru/windows/win32/api/d3d11/
+//https://www.youtube.com/watch?v=YFrCrasocX8&list=PLqCJpWy5Fohd3S7ICFXwUomYW0Wv67pDD&index=19
 
 using namespace Microsoft::WRL;
 class GraphicEngine
@@ -48,75 +50,76 @@ public:
 
 		Logg.Log(pGISwapChain->GetBuffer(0, IID_PPV_ARGS(&pResource)), "GetBuffer");
 		Logg.Log(pDevice->CreateRenderTargetView(pResource.Get(), nullptr, &pRenderTargetView), "CreateRenderTargetView");
-
 	}
 
-	void CreateVertexShader(const wchar_t* namefile)
+	void Draw()
 	{
-		Logg.Log(D3DCompileFromFile(namefile, NULL, NULL, "main", "vs_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &pBlobVS, &pBlobError), "D3DCompileVS");
-		Logg.Log(pDevice->CreateVertexShader(pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), NULL, &pVertexShader), "CreateVertexShader");
-		ElenetDesc[0].SemanticName = "POSITION";
-		ElenetDesc[0].SemanticIndex = 0;
-		ElenetDesc[0].Format = DXGI_FORMAT_R32G32B32_FLOAT;
-		ElenetDesc[0].InputSlot = 0;
-		ElenetDesc[0].AlignedByteOffset = 0;
-		ElenetDesc[0].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		ElenetDesc[0].InstanceDataStepRate = 0;
-		pDeviceContext->VSSetShader(pVertexShader.Get(), nullptr, 0);
-		pDeviceContext->PSSetShader(pPixelShader.Get(), nullptr, 0);
+		//создание вершин
+		const VEC2 VertexList[] =
+		{
+				{-0.5f,-0.5f},
+				{-0.5f,0.5f},
+				{0.5f,0.5f},
+				{0.5f,0.5f},
+				{0.5f,-0.5f},
+				{-0.5f,-0.5f},
+		};
+		//дискриптор вершин
+		D3D11_BUFFER_DESC BD{};
+		BD.ByteWidth = sizeof(VertexList);
+		BD.StructureByteStride = sizeof(VEC2);
+		BD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+		BD.Usage = D3D11_USAGE_DEFAULT;
+		BD.CPUAccessFlags = 0u;
+		BD.MiscFlags = 0u;
+		D3D11_SUBRESOURCE_DATA SD{};
+		SD.pSysMem = VertexList;
 
+		//создание буфера
+		Logg.Log(pDevice->CreateBuffer(&BD, &SD, &pBuffer), "CreateBuffer");
+
+		//привязка вершин к буферу
+		const UINT stride = sizeof(VEC2);
+		const UINT offset = 0u;
+		pDeviceContext->IASetVertexBuffers(0u, 1u, pBuffer.GetAddressOf(), &stride, &offset);
+		Logg.Log(D3DReadFileToBlob(L"VertexShader.cso", &pBlobVS), "D3DReadFileToBlob");
+		Logg.Log(D3DReadFileToBlob(L"PixelShader.cso", &pBlobPS), "D3DReadFileToBlob");
+		//шейдеры
+		Logg.Log(pDevice->CreateVertexShader(pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), nullptr, &pVertexShader), "CreateVertexShader");
+		pDeviceContext->VSSetShader(pVertexShader.Get(), 0, 0);
+
+		Logg.Log(pDevice->CreatePixelShader(pBlobPS->GetBufferPointer(), pBlobPS->GetBufferSize(), nullptr, &pPixelShader), "CreatePixelShader");
+		pDeviceContext->PSSetShader(pPixelShader.Get(), 0, 0);
+
+		D3D11_VIEWPORT VP{};
+		VP.Width = 1280;
+		VP.Height = 720;
+		VP.MinDepth = 0.0f;
+		VP.MaxDepth = 1.0f;
+		VP.TopLeftX = 0;
+		VP.TopLeftY = 0;
+		pDeviceContext->RSSetViewports(1, &VP);
+
+		//входная разметка
+		const D3D11_INPUT_ELEMENT_DESC ide[] =
+		{ {"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}};
+
+		Logg.Log(pDevice->CreateInputLayout(ide, (UINT)size(ide), pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), &pInputLayout), "CreateInputLayout");
+		pDeviceContext->IASetInputLayout(pInputLayout.Get());
+
+		pDeviceContext->OMSetRenderTargets(1u, pRenderTargetView.GetAddressOf(), nullptr);
+		pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		//отрисовка триугольника
+		pDeviceContext->Draw((UINT)size(VertexList), 0u);
 	}
-	void CreatePixelShader(const wchar_t* namefile)
-	{
-		Logg.Log(D3DCompileFromFile(namefile, NULL, NULL, "main", "ps_5_0", D3D10_SHADER_ENABLE_STRICTNESS, 0, &pBlobPS, &pBlobError), "D3DCompilePS");
-		Logg.Log(pDevice->CreatePixelShader(pBlobPS->GetBufferPointer(), pBlobPS->GetBufferSize(), NULL, &pPixelShader), "CreatePixelShader");
-		ElenetDesc[1].SemanticName = "COLOR";
-		ElenetDesc[1].SemanticIndex = 0;
-		ElenetDesc[1].Format = DXGI_FORMAT_R32G32B32A32_FLOAT;
-		ElenetDesc[1].InputSlot = 0;
-		ElenetDesc[1].AlignedByteOffset = D3D11_APPEND_ALIGNED_ELEMENT;
-		ElenetDesc[1].InputSlotClass = D3D11_INPUT_PER_VERTEX_DATA;
-		ElenetDesc[1].InstanceDataStepRate = 0;
-
-		auto numElement = sizeof(ElenetDesc) / sizeof(ElenetDesc[0]);
-		Logg.Log(pDevice->CreateInputLayout(ElenetDesc, numElement, pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), &pInputLayout), "CreateInputLayout");
-
-			float VertexList[][3]
-			 {
-				{-0.5f,-0.5f,0.0f},
-				{0.0f,0.5f,0.0f},
-				{0.5f,-0.5f,0.0f}
-			 };
-			 const int SizeList = sizeof(VertexList)/sizeof(VertexList[0]);
-			 
-			 D3D11_BUFFER_DESC BufferDesc{};
-			 BufferDesc.CPUAccessFlags = 0;
-			 BufferDesc.MiscFlags = 0;
-			 BufferDesc.StructureByteStride = 0;
-			 BufferDesc.ByteWidth = sizeof(VertexList) * SizeList;
-			 BufferDesc.Usage = D3D11_USAGE_DEFAULT;
-			 
-
-			 D3D11_SUBRESOURCE_DATA SubData{};
-			 SubData.pSysMem = VertexList;
-
-			 unsigned int stride = sizeof(VertexList);
-
-			 Logg.Log(pDevice->CreateBuffer(&BufferDesc, &SubData, &pBuffer), "CreateBuffer");
-			 pDeviceContext->IASetVertexBuffers(0, 1, &pBuffer, &stride, 0);
-
-	}
-
 	void Present ()
 	{
-	Logg.Log(pGISwapChain->Present(1u, 0u), "Present");
+		Logg.Log(pGISwapChain->Present(1u, 0u), "Present");
 	}
-
 	void RenderClearBuffer(float red, float green,float blue)
 	{
 		const float color[] = { red,green,blue,1.0f };
 		pDeviceContext->ClearRenderTargetView(pRenderTargetView.Get(), color);
-		/*pDeviceContext->Draw(3u, 0u);*/
 	}
 	
 	~GraphicEngine()
@@ -139,12 +142,10 @@ private:
 	ComPtr<ID3DBlob> pBlob{};
 	ComPtr<ID3DBlob> pBlobVS{};
 	ComPtr<ID3DBlob> pBlobPS{};
-	ComPtr<ID3DBlob> pBlobError{};
 	ComPtr<ID3D11VertexShader> pVertexShader{};
 	ComPtr<ID3D11PixelShader> pPixelShader{};
 	ComPtr<ID3D11Buffer> pBuffer{};
 	ComPtr<ID3D11InputLayout> pInputLayout{};
-	D3D11_INPUT_ELEMENT_DESC ElenetDesc[2];
 }d3dx;
 
 class AppGame
@@ -182,15 +183,17 @@ private:
 
 void AppGame::Init()
 {
-	d3dx.CreateVertexShader(L"VertexShader.hlsl");
-	d3dx.CreatePixelShader(L"PixelShader.hlsl");
+	/*d3dx.CreateVertexShader(L"VertexShader.hlsl");
+	d3dx.CreatePixelShader(L"PixelShader.hlsl");*/
+	//d3dx.DrawTriangle();
 }
 
 void AppGame::Render()
 {
+	//	float sin_ = sin(Timer.TimePeak()) / 2.0f + 0.5f;
+	d3dx.RenderClearBuffer(0.0f, 1.0f, 1.0f);
+	d3dx.Draw();
 	d3dx.Present();
-	float sin_ = sin(Timer.TimePeak()) / 2.0f + 0.5f;
-	d3dx.RenderClearBuffer(sin_, sin_, 1.0f);
 }
 
 void AppGame::UpdateApp(MSG msg)
