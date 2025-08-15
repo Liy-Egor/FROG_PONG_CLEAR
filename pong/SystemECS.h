@@ -426,7 +426,4 @@ void AppGame::UpdateApp(MSG* msg) //это можно отправлять ра�
 	{
 		msg->message = WM_QUIT;
 	}
-
-
-
 }

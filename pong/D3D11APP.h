@@ -62,16 +62,16 @@ private:
 private:
 	HRESULT hr;
 	ComPtr<IDXGISwapChain> pGISwapChain{nullptr};
-	ComPtr<ID3D11Device> pDevice{};
-	ComPtr<ID3D11DeviceContext> pDeviceContext{};
+	ComPtr<ID3D11Device> pDevice{ nullptr };
+	ComPtr<ID3D11DeviceContext> pDeviceContext{ nullptr };
 	ComPtr<ID3D11RenderTargetView> pRenderTargetView{nullptr};
-	ComPtr<ID3D11Resource> pResource{};
-	ComPtr<ID3DBlob> pBlobVS{};
-	ComPtr<ID3DBlob> pBlobPS{};
-	ComPtr<ID3D11VertexShader> pVertexShader{};
-	ComPtr<ID3D11PixelShader> pPixelShader{};
-	ComPtr<ID3D11Buffer> pBuffer{};
-	ComPtr<ID3D11InputLayout> pInputLayout{};
+	ComPtr<ID3D11Resource> pResource{ nullptr };
+	ComPtr<ID3DBlob> pBlobVS{ nullptr };
+	ComPtr<ID3DBlob> pBlobPS{ nullptr };
+	ComPtr<ID3D11VertexShader> pVertexShader{ nullptr };
+	ComPtr<ID3D11PixelShader> pPixelShader{ nullptr };
+	ComPtr<ID3D11Buffer> pBuffer{ nullptr };
+	ComPtr<ID3D11InputLayout> pInputLayout{ nullptr };
 }d3dx;
 
 void GraphicEngine::RenderClearBuffer(float red, float green, float blue)
