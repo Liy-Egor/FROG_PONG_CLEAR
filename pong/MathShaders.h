@@ -8,3 +8,4 @@ public:
 private:
 	float x{}, y{};
 };
+

@@ -160,6 +160,7 @@
     <Image Include="Resoursces\Image\walls.bmp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="APPGame.h" />
     <ClInclude Include="ArcheType.h" />
     <ClInclude Include="BaseStructures.h" />
     <ClInclude Include="Component.h" />

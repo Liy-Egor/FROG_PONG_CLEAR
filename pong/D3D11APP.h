@@ -1,7 +1,7 @@
 #pragma once
 #include "BaseStructures.h"
-#include <wrl.h>
 #include "MathShaders.h"
+#include <wrl.h>
 
 //ТУТОРИАЛЫ
 //https://www.youtube.com/@PardCode
@@ -33,101 +33,28 @@ public:
 		SWdesc.Flags = 0;
 
 		Logg.Log(hr = D3D11CreateDeviceAndSwapChain
-		(
-			nullptr,
-			D3D_DRIVER_TYPE_HARDWARE,
-			nullptr,
-			0,
-			nullptr,
-			0,
-			D3D11_SDK_VERSION,
-			&SWdesc,
-			&pGISwapChain,
-			&pDevice,
-			nullptr,
-			&pDeviceContext
-		), "CreateDevice");
+		(nullptr,D3D_DRIVER_TYPE_HARDWARE,nullptr,0,nullptr,0,D3D11_SDK_VERSION,&SWdesc,&pGISwapChain,&pDevice,nullptr,&pDeviceContext), "CreateDevice");
 
 		Logg.Log(pGISwapChain->GetBuffer(0, IID_PPV_ARGS(&pResource)), "GetBuffer");
 		Logg.Log(pDevice->CreateRenderTargetView(pResource.Get(), nullptr, &pRenderTargetView), "CreateRenderTargetView");
 	}
-
-	void Draw()
-	{
-		//создание вершин
-		const VEC2 VertexList[] =
-		{
-				{-0.5f,-0.5f},
-				{-0.5f,0.5f},
-				{0.5f,0.5f},
-				{0.5f,0.5f},
-				{0.5f,-0.5f},
-				{-0.5f,-0.5f},
-		};
-		//дискриптор вершин
-		D3D11_BUFFER_DESC BD{};
-		BD.ByteWidth = sizeof(VertexList);
-		BD.StructureByteStride = sizeof(VEC2);
-		BD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		BD.Usage = D3D11_USAGE_DEFAULT;
-		BD.CPUAccessFlags = 0u;
-		BD.MiscFlags = 0u;
-		D3D11_SUBRESOURCE_DATA SD{};
-		SD.pSysMem = VertexList;
-
-		//создание буфера
-		Logg.Log(pDevice->CreateBuffer(&BD, &SD, &pBuffer), "CreateBuffer");
-
-		//привязка вершин к буферу
-		const UINT stride = sizeof(VEC2);
-		const UINT offset = 0u;
-		pDeviceContext->IASetVertexBuffers(0u, 1u, pBuffer.GetAddressOf(), &stride, &offset);
-		Logg.Log(D3DReadFileToBlob(L"VertexShader.cso", &pBlobVS), "D3DReadFileToBlob");
-		Logg.Log(D3DReadFileToBlob(L"PixelShader.cso", &pBlobPS), "D3DReadFileToBlob");
-		//шейдеры
-		Logg.Log(pDevice->CreateVertexShader(pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), nullptr, &pVertexShader), "CreateVertexShader");
-		pDeviceContext->VSSetShader(pVertexShader.Get(), 0, 0);
-
-		Logg.Log(pDevice->CreatePixelShader(pBlobPS->GetBufferPointer(), pBlobPS->GetBufferSize(), nullptr, &pPixelShader), "CreatePixelShader");
-		pDeviceContext->PSSetShader(pPixelShader.Get(), 0, 0);
-
-		D3D11_VIEWPORT VP{};
-		VP.Width = 1280;
-		VP.Height = 720;
-		VP.MinDepth = 0.0f;
-		VP.MaxDepth = 1.0f;
-		VP.TopLeftX = 0;
-		VP.TopLeftY = 0;
-		pDeviceContext->RSSetViewports(1, &VP);
-
-		//входная разметка
-		const D3D11_INPUT_ELEMENT_DESC ide[] =
-		{ {"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}};
-
-		Logg.Log(pDevice->CreateInputLayout(ide, (UINT)size(ide), pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), &pInputLayout), "CreateInputLayout");
-		pDeviceContext->IASetInputLayout(pInputLayout.Get());
-
-		pDeviceContext->OMSetRenderTargets(1u, pRenderTargetView.GetAddressOf(), nullptr);
-		pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-		//отрисовка триугольника
-		pDeviceContext->Draw((UINT)size(VertexList), 0u);
-	}
-	void Present ()
-	{
-		Logg.Log(pGISwapChain->Present(1u, 0u), "Present");
-	}
-	void RenderClearBuffer(float red, float green,float blue)
-	{
-		const float color[] = { red,green,blue,1.0f };
-		pDeviceContext->ClearRenderTargetView(pRenderTargetView.Get(), color);
-	}
-	
 	~GraphicEngine()
 	{
 
 
 	}
 
+	void RenderClearBuffer(float red, float green, float blue);
+	void Present(bool vSync);
+	void Draw2DBox(float x, float y, float width, float height);
+
+
+private:
+//модули для создания различных способов рисования
+
+
+
+private:
 	GraphicEngine(const GraphicEngine&) = delete;
 	GraphicEngine(GraphicEngine&) = delete;
 	GraphicEngine& operator = (const GraphicEngine) = delete;
@@ -139,7 +66,6 @@ private:
 	ComPtr<ID3D11DeviceContext> pDeviceContext{};
 	ComPtr<ID3D11RenderTargetView> pRenderTargetView{nullptr};
 	ComPtr<ID3D11Resource> pResource{};
-	ComPtr<ID3DBlob> pBlob{};
 	ComPtr<ID3DBlob> pBlobVS{};
 	ComPtr<ID3DBlob> pBlobPS{};
 	ComPtr<ID3D11VertexShader> pVertexShader{};
@@ -148,98 +74,79 @@ private:
 	ComPtr<ID3D11InputLayout> pInputLayout{};
 }d3dx;
 
-class AppGame
+void GraphicEngine::RenderClearBuffer(float red, float green, float blue)
 {
-public:
-	AppGame(){};
-	
-	void FrameGo()
+	const float color[] = { red,green,blue,1.0f };
+	pDeviceContext->ClearRenderTargetView(pRenderTargetView.Get(), color);
+}
+
+void GraphicEngine::Present(bool vSync)
+{
+	if (vSync)
 	{
-		MSG msg;
-		BOOL gbool = true;
-		Init();
-		while (gbool)
-		{
-			while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-			{
-				if (msg.message == WM_QUIT)
-				{
-					gbool = false;
-					break;
-				}
-				UpdateApp(msg);
-
-				TranslateMessage(&msg);
-				DispatchMessage(&msg);
-			}
-			Render();
-		}
+		Logg.Log(pGISwapChain->Present(1u, 0u), "Present + vSync");
 	}
-private:
-	void UpdateApp(MSG msg);
-	void Render();
-	void Init();
-}App;
-
-void AppGame::Init()
-{
-	/*d3dx.CreateVertexShader(L"VertexShader.hlsl");
-	d3dx.CreatePixelShader(L"PixelShader.hlsl");*/
-	//d3dx.DrawTriangle();
+	else
+	{
+		Logg.Log(pGISwapChain->Present(0u, 0u), "Present - vSync");
+	}
 }
 
-void AppGame::Render()
+void GraphicEngine::Draw2DBox(float x, float y, float width, float height)
 {
-	//	float sin_ = sin(Timer.TimePeak()) / 2.0f + 0.5f;
-	d3dx.RenderClearBuffer(0.0f, 1.0f, 1.0f);
-	d3dx.Draw();
-	d3dx.Present();
+	float xLeft = (window.width / 2 - x) / (window.width / 2);
+	float xRight = (x + width - window.width / 2) / (window.width / 2);
+	float yTop = (window.height / 2 - y) / (window.height / 2);
+	float yBottom = (y + height - window.height / 2) / (window.height / 2);
+	VEC2 VertexList[] =
+	{
+		{-xLeft,-yBottom},
+		{-xLeft,yTop},
+		{xRight,yTop},
+		{xRight,yTop},
+		{xRight,-yBottom},
+		{-xLeft,-yBottom},
+	};
+	D3D11_BUFFER_DESC BD{};
+	BD.ByteWidth = sizeof(VertexList);
+	BD.StructureByteStride = sizeof(VEC2);
+	BD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+	BD.Usage = D3D11_USAGE_DEFAULT;
+	BD.CPUAccessFlags = 0u;
+	BD.MiscFlags = 0u;
+	D3D11_SUBRESOURCE_DATA SD{};
+	SD.pSysMem = VertexList;
+	Logg.Log(pDevice->CreateBuffer(&BD, &SD, &pBuffer), "CreateBuffer");
+	const UINT stride = sizeof(VEC2);
+	const UINT offset = 0u;
+	pDeviceContext->IASetVertexBuffers(0u, 1u, pBuffer.GetAddressOf(), &stride, &offset);
+	Logg.Log(D3DReadFileToBlob(L"VertexShader.cso", &pBlobVS), "D3DReadFileToBlob");
+	Logg.Log(D3DReadFileToBlob(L"PixelShader.cso", &pBlobPS), "D3DReadFileToBlob");
+	Logg.Log(pDevice->CreateVertexShader(pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), nullptr, &pVertexShader), "CreateVertexShader");
+	pDeviceContext->VSSetShader(pVertexShader.Get(), 0, 0);
+	Logg.Log(pDevice->CreatePixelShader(pBlobPS->GetBufferPointer(), pBlobPS->GetBufferSize(), nullptr, &pPixelShader), "CreatePixelShader");
+	pDeviceContext->PSSetShader(pPixelShader.Get(), 0, 0);
+	D3D11_VIEWPORT VP{};
+	VP.Width = window.width;
+	VP.Height = window.height;
+	VP.MinDepth = 0.0f;
+	VP.MaxDepth = 1.0f;
+	VP.TopLeftX = 0;
+	VP.TopLeftY = 0;
+	pDeviceContext->RSSetViewports(1, &VP);
+	const D3D11_INPUT_ELEMENT_DESC ide[] =
+	{ {"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0} };
+	Logg.Log(pDevice->CreateInputLayout(ide, (UINT)size(ide), pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), &pInputLayout), "CreateInputLayout");
+	pDeviceContext->IASetInputLayout(pInputLayout.Get());
+	pDeviceContext->OMSetRenderTargets(1u, pRenderTargetView.GetAddressOf(), nullptr);
+	pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	pDeviceContext->Draw((UINT)size(VertexList), 0u);
 }
 
-void AppGame::UpdateApp(MSG msg)
-{
-	
 
 
 
 
-}
 
-	////установка шейдеров
- //	float VertexList[][3]
-	//{
-	//	{-0.5f,-0.5f,0.0f},
-	//	{0.0f,0.5f,0.0f},
-	//	{0.5f,-0.5f,0.0f}
-	//};
-	//const UINT SizeList = sizeof(VertexList);
 
-	//D3D11_BUFFER_DESC BufferDesc{};
-	//BufferDesc.ByteWidth = sizeof(BufferDesc);
-	//BufferDesc.Usage = D3D11_USAGE_DEFAULT;
 
-	//D3D11_SUBRESOURCE_DATA SubData{};
-	//SubData.pSysMem = VertexList;
-
-	//Logg.Log(pDevice->CreateBuffer(&BufferDesc, &SubData, &pBuffer), "CreateBuffer");
-	//pDeviceContext->IASetVertexBuffers(0u, 3u, &pBuffer, &SizeList, 0u);
-
-	////входная разметка для шейдера
-	//D3D11_INPUT_ELEMENT_DESC ElementDesc[] = {
-	//{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },};
-	//int sizeElementDesc = _countof(ElementDesc);
-	//auto VertexShaderLength = pBlob->GetBufferSize();
-	//Logg.Log(pDevice->CreateInputLayout(ElementDesc, sizeElementDesc, pBlob->GetBufferPointer(), VertexShaderLength, pInputLayout.ReleaseAndGetAddressOf()), "CreateInputLayout");//ошибка
-
-	////добавление слоя
-	//pDeviceContext->IASetInputLayout(pInputLayout.Get());
-
-	//D3D11_VIEWPORT ViewPort{};
-	//ViewPort.Width = 1280;
-	//ViewPort.Height = 720;
-	//ViewPort.MinDepth = 0.0f;
-	//ViewPort.MaxDepth = 1.0f;
-
-	//pDeviceContext->RSSetViewports(1, &ViewPort);
-
-	//pDeviceContext->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);

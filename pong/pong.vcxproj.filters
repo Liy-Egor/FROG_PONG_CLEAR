@@ -16,6 +16,15 @@
     <Filter Include="ECS">
       <UniqueIdentifier>{5e967a10-27c4-46ff-b051-64c71663a9ae}</UniqueIdentifier>
     </Filter>
+    <Filter Include="D3D11">
+      <UniqueIdentifier>{73c46f01-2c1a-4304-a8d0-9e083df4a7ac}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="D3D11\Shaders">
+      <UniqueIdentifier>{b69261c4-2070-4d40-b240-bcdb8f5355a6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="D3D11\Shaders\SH1">
+      <UniqueIdentifier>{bbee4c4f-ca36-46b0-99b3-79d83d406aca}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -92,7 +101,21 @@
       <Filter>ECS</Filter>
     </ClInclude>
     <ClInclude Include="D3D11APP.h">
-      <Filter>Header Files</Filter>
+      <Filter>D3D11</Filter>
     </ClInclude>
+    <ClInclude Include="MathShaders.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="APPGame.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="PixelShader.hlsl">
+      <Filter>D3D11\Shaders\SH1</Filter>
+    </FxCompile>
+    <FxCompile Include="VertexShader.hlsl">
+      <Filter>D3D11\Shaders\SH1</Filter>
+    </FxCompile>
   </ItemGroup>
 </Project>

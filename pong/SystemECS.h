@@ -26,8 +26,6 @@ void CreateObject(CTransform& CTransform)
     CTransform.Height *= window.height;
 }
 
-
-//аааааа аааааа
 bool CheckCollision(float x1, float y1, float w1, float h1,
     float x2, float y2, float w2, float h2)
 {
@@ -345,6 +343,7 @@ void HealthBar()
 
 
 
+
 void UpdateGame()
 {
     for (int i = 0; i < VLocation.size(); i++)
@@ -352,7 +351,7 @@ void UpdateGame()
         if (Player->GetLocation() == i)
         {
             ShowWindow(*VLocation[i].GetBitmaps());
-            //ааа аааааааааа ааааа ааааа аааааааа ааа ааа аааааааа аааа аааааааааа, аааа ааа аааааа аааааааа Observer c ааааааааа аа аааааааааа аааа аа ааа ааааа ааааааааааа
+          
             for (ATWall var : VLocation[i].VWall)
             {
                 Show(*var.GetBitmaps(), *var.GetPosition());
@@ -398,4 +397,36 @@ void UpdateGame()
             break;
         }
     }
+}
+
+//главный цикл работы приложения
+//это можно подгрузить 1 раз и больше не подгружать
+void AppGame::Init()
+{
+	LoadSVGDataMap("LVL0");
+	LoadSVGDataMap("LVL1");
+
+	MapSizeW = VLocation[0].GetPosition()->Width;
+	MapSizeH = VLocation[0].GetPosition()->Height;
+}
+
+//это грузит постоянно
+void AppGame::Render() //это грузит постоянно
+{
+	float sin_ = sin(Timer.TimePeak()) / 1.0f + 0.5f;
+	d3dx.RenderClearBuffer(sin_, 0.3f, 1.0f);
+	d3dx.Draw2DBox(552, 294, 878, 426);
+	d3dx.Present(true);
+}
+
+//это можно отправлять различные команды для системы или управлять нажатием кнопок
+void AppGame::UpdateApp(MSG* msg) //это можно отправлять различные команды для системы или управлять нажатием кнопок
+{
+	if (GetAsyncKeyState(VK_ESCAPE))
+	{
+		msg->message = WM_QUIT;
+	}
+
+
+
 }

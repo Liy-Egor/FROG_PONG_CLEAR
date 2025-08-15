@@ -1,7 +1,6 @@
 #pragma once
 #include "ECSSoft.h"
-#include "D3D11APP.h"
-
+#include "APPGame.h"
 
 void InitWindow()
 {

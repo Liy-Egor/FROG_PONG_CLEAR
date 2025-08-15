@@ -4,7 +4,6 @@
 string StrReplace(string* str, string namestr) {
     return str->replace(str->find(namestr), namestr.length(), "");
 }
-
 //создание карт можно делать в редакторе Adobe Photoshop любой версии
 void LoadSVGDataMap(const string NameFileSVG) {
    
@@ -60,7 +59,7 @@ void LoadSVGDataMap(const string NameFileSVG) {
                 }
             }
         }
-
+		
         //присвоение и пересборка массива новыми данными ширины и высоты объектов для тех объектов где эти данные записаны в шаблон #image
         for (int i = 0; i < dS[0].size(); i++) {
             if (dS[5][i] != "error image") {
@@ -142,17 +141,6 @@ void LoadSVGDataMap(const string NameFileSVG) {
     }
     file.close();
 }
-
-void InitGame()
-{
-    LoadSVGDataMap("LVL0");
-    LoadSVGDataMap("LVL1");
-
-    MapSizeW = VLocation[0].GetPosition()->Width;
-    MapSizeH = VLocation[0].GetPosition()->Height;
-
-}
-
 
 //class Serialization {
 //public:

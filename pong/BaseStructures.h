@@ -29,6 +29,12 @@ public:
 			throw std::runtime_error("0 ");
 		}
 	}
+
+	void Info(float data, const char* msg)
+	{
+		std::clog << endl << "INFO - "<< data << "; MSG - " << msg << endl;
+	}
+
 }Logg;
 
 int currenttime = 0;
@@ -38,7 +44,7 @@ struct
 {
     HWND hWnd;//хэндл окна
     HDC device_context, context;// два контекста устройства (для буферизации)
-    int width, height;//сюда сохраним размеры окна которое создаст программа
+    int width = GetSystemMetrics(SM_CXSCREEN), height = GetSystemMetrics(SM_CYSCREEN);//сюда сохраним размеры окна которое создаст программа
 } window;
 
 struct 
@@ -69,9 +75,6 @@ public:
 private:
 	chrono::steady_clock::time_point Begin;
 }Timer;
-
-
-
 
 static LRESULT CALLBACK WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
@@ -133,5 +136,5 @@ public:
 	{
 		return hWnd;
 	}
-}win(1280, 720, "GameFrog");
+}win(window.width, window.height, "GameFrog");
 
