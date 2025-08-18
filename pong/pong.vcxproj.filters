@@ -22,8 +22,11 @@
     <Filter Include="D3D11\Shaders">
       <UniqueIdentifier>{b69261c4-2070-4d40-b240-bcdb8f5355a6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="D3D11\Shaders\SH1">
+    <Filter Include="D3D11\Shaders\SH2D">
       <UniqueIdentifier>{bbee4c4f-ca36-46b0-99b3-79d83d406aca}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="D3D11\Shaders\SH3D">
+      <UniqueIdentifier>{7bdbb380-3d7e-4997-a862-b42616f929d1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -111,11 +114,23 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="PixelShader.hlsl">
-      <Filter>D3D11\Shaders\SH1</Filter>
+    <FxCompile Include="2DPixelShaderBlack.hlsl">
+      <Filter>D3D11\Shaders\SH2D</Filter>
     </FxCompile>
-    <FxCompile Include="VertexShader.hlsl">
-      <Filter>D3D11\Shaders\SH1</Filter>
+    <FxCompile Include="2DVertexShader.hlsl">
+      <Filter>D3D11\Shaders\SH2D</Filter>
+    </FxCompile>
+    <FxCompile Include="2DPixelShaderWhite.hlsl">
+      <Filter>D3D11\Shaders\SH2D</Filter>
+    </FxCompile>
+    <FxCompile Include="3DVertexShader.hlsl">
+      <Filter>D3D11\Shaders\SH3D</Filter>
+    </FxCompile>
+    <FxCompile Include="3DPixelShaderBlack.hlsl">
+      <Filter>D3D11\Shaders\SH3D</Filter>
+    </FxCompile>
+    <FxCompile Include="3DPixelShaderWhite.hlsl">
+      <Filter>D3D11\Shaders\SH3D</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>
