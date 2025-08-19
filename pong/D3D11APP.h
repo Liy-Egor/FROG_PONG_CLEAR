@@ -1,5 +1,4 @@
 #pragma once
-#include "BaseStructures.h"
 #include "MathShaders.h"
 #include <wrl.h>
 
@@ -46,173 +45,128 @@ public:
 
 	void RenderClearBuffer(float red, float green, float blue);
 	void Present(bool vSync);
-	void Draw2DBox(float x, float y, float width, float height, float colorDelta, float XAngle, float YAngle, float ZAngle);
-	void Draw2DLine(float x, float y, float width, float height, float colorDelta, float XAngle, float YAngle, float ZAngle);
-	void Draw3DBox(float x, float y, float z, float width, float height);
-	void Draw3DLine(float x, float y, float z, float width, float height);
-
+	void DrawObject(
+		float x, float y,float z, 
+		float width, float height, 
+		float colorDelta, 
+		float XAngle, float YAngle, float ZAngle,
+		const wchar_t* ShaderVS, const wchar_t* ShaderPS,
+		float MinDepth, float MaxDepth, float TopLeftX, float TopLeftY, UINT countViewports,
+		D3D_PRIMITIVE_TOPOLOGY MetodDraw,
+		TypeObject typeObject
+	);
 
 private:
-//модули для конкретных случаев
-	template <typename T>
-	UINT Create2DBuff(float x, float y, float width, float height,float colorDelta)
+	UINT IndexCount = 0u;
+	void SetBuffer(TypeBuffer TypeBuff, TypeObject TypeObj,
+		float xLeft, float xRight,
+		float yTop, float yBottom,
+		float zBack, float zFront)
 	{
-		float xLeft = (window.width / 2 - x) / (window.width / 2);
-		float xRight = (x + width - window.width / 2) / (window.width / 2);
-		float yTop = (window.height / 2 - y) / (window.height / 2);
-		float yBottom = (y + height - window.height / 2) / (window.height / 2);
-
-		T VertexList[] =
+		vector<VEC3>BUFF;
+		if(TypeBuff == TypeBuffer::Vertex)
 		{
-			{-xLeft,-yBottom,  1 * colorDelta,0.3,    1 / colorDelta},
-			{-xLeft,yTop,      1 / colorDelta,      1 * colorDelta,0.3},
-			{xRight,yTop,      1 / colorDelta,0.3,    1 / colorDelta},
-			{xRight,-yBottom,0.3,1 / colorDelta,      1 * colorDelta},
-		};
+			switch (TypeObj)
+			{
+			case TypeObject::Box2D:
+			{
+				BUFF.push_back({ -xLeft ,-yBottom ,zFront });
+				BUFF.push_back({ -xLeft ,yTop ,zFront });
+				BUFF.push_back({ xRight ,yTop ,zFront });
+				BUFF.push_back({ xRight ,-yBottom ,zFront });
+				break;
+			}
+			}
+		}
+		else if (TypeBuff == TypeBuffer::Index)
+		{
+			switch (TypeObj)
+			{
+			case TypeObject::Box2D:
+			{
+				BUFF.push_back({ 0 ,1 ,2 });
+				BUFF.push_back({ 2 ,3 ,0 });
+				IndexCount = BUFF.size();
+				break;
+			}
+
+			}
+
+		}
+		else if (TypeBuff == TypeBuffer::Constant)
+		{
+			switch (TypeObj)
+			{
+			case TypeObject::Box2D:
+			{
+				float PropScreen = (float)window.height / (float)window.width;
+				BUFF.push_back(
+					{		XMMatrixTranspose(
+							XMMatrixScaling(1,PropScreen,1) *
+							XMMatrixRotationX(xLeft) *
+							XMMatrixRotationY(xRight) *
+							XMMatrixRotationZ(yTop)
+							)
+							});
+				break;
+			}
+			}
+		}
+
+
+		D3D11_BUFFER_DESC BD{};
+		BD.ByteWidth = sizeof(BUFF);
+		BD.MiscFlags = 0u;
+		D3D11_SUBRESOURCE_DATA SD{};
+		SD.pSysMem = &BUFF;
+		switch (TypeBuff)
+		{
+		case TypeBuffer::Vertex:
+		{
+			BD.StructureByteStride = sizeof(BUFF);
+			BD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
+			BD.Usage = D3D11_USAGE_DEFAULT;
+			BD.CPUAccessFlags = 0u;
+			break;
+		}
+		case TypeBuffer::Constant:
+		{
+			BD.StructureByteStride = 0u;
+			BD.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
+			BD.Usage = D3D11_USAGE_DYNAMIC;
+			BD.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
+			break;
+		}
+		case TypeBuffer::Index:
+		{
+			BD.StructureByteStride = sizeof(BUFF);
+			BD.BindFlags = D3D11_BIND_INDEX_BUFFER;
+			BD.Usage = D3D11_USAGE_DEFAULT;
+			BD.CPUAccessFlags = 0u;
+			break;
+		}
+
+		}
 		
-		D3D11_BUFFER_DESC BD{};
-		BD.ByteWidth = sizeof(VertexList);
-		BD.StructureByteStride = sizeof(T);
-		BD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		BD.Usage = D3D11_USAGE_DEFAULT;
-		BD.CPUAccessFlags = 0u;
-		BD.MiscFlags = 0u;
-		D3D11_SUBRESOURCE_DATA SD{};
-		SD.pSysMem = VertexList;
 		Logg.Log(pDevice->CreateBuffer(&BD, &SD, &pBuffer), "CreateBuffer");
-		return (UINT)size(VertexList);
-	}
-	void Set2DInputLayer()
-	{
-		const D3D11_INPUT_ELEMENT_DESC ide[] =
-		{ 
-			{"POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}, 
-			{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 8u, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-		};
-		Logg.Log(pDevice->CreateInputLayout(ide, (UINT)size(ide), pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), &pInputLayout), "CreateInputLayout");
-		pDeviceContext->IASetInputLayout(pInputLayout.Get());
-	}
-
-	template <typename T>
-	UINT Set2DIndexBuff()
-	{
-		const unsigned short Indices[] =
+		if (TypeBuff == TypeBuffer::Vertex)
 		{
-			0,1,2,
-			2,3,0,
-		};
-		D3D11_BUFFER_DESC BD{};
-		BD.ByteWidth = sizeof(Indices);
-		BD.StructureByteStride = sizeof(T);
-		BD.BindFlags = D3D11_BIND_INDEX_BUFFER;
-		BD.Usage = D3D11_USAGE_DEFAULT;
-		BD.CPUAccessFlags = 0u;
-		BD.MiscFlags = 0u;
-		D3D11_SUBRESOURCE_DATA SD{};
-		SD.pSysMem = Indices;
-		Logg.Log(pDevice->CreateBuffer(&BD, &SD, &pIndexBuffer), "CreateBuffer");
-		pDeviceContext->IASetIndexBuffer(pIndexBuffer.Get(),DXGI_FORMAT_R16_UINT,0u);
-		return (UINT)size(Indices);
-	}
-	
-
-
-
-
-	template <typename T>
-	UINT Create3DBuff(float x, float y, float z, float width, float height)
-	{
-		float xLeft = (window.width / 2 - x) / (window.width / 2);
-		float xRight = ((x + width) - (window.width / 2)) / (window.width / 2);
-		float yTop = (window.height / 2 - y) / (window.height / 2);
-		float yBottom = (y + height - window.height / 2) / (window.height / 2);
-		float zBack = (z + width - window.width / 2) / (window.width / 2);
-		float zFront = (window.width / 2 - z) / (window.width / 2);
-		float fas = 0.05f;
-
-		T VertexList[] =
+			const UINT stride = sizeof(BUFF);
+			const UINT offside = 0u;
+			pDeviceContext->IASetVertexBuffers(0u, 1u, pBuffer.GetAddressOf(), &stride, &offside);
+		}
+		else if (TypeBuff == TypeBuffer::Constant)
 		{
-			//фронт
-		/*	{-xLeft,-yBottom,zFront},
-			{-xLeft,yTop,zFront},
-			{xRight,yTop,zFront},
-			{xRight,yTop,zFront},
-			{xRight,-yBottom,zFront},
-			{-xLeft,-yBottom,zFront},*/
-
-			//left
-			{-xLeft+fas,-yBottom-fas,zFront},
-			{-xLeft+fas,-yBottom-fas,-zBack},
-			{-xLeft+fas,yTop    -fas,-zBack},
-			{-xLeft+fas,yTop    -fas,-zBack},
-			{-xLeft+fas,yTop    -fas,zFront},
-			{-xLeft+fas,-yBottom-fas,zFront},
-
-			//////бэк
-			//{-xLeft,-yBottom,-zBack},
-			//{-xLeft,yTop,-zBack},
-			//{xRight,yTop,-zBack},
-			//{xRight,yTop,-zBack},
-			//{xRight,-yBottom,-zBack},
-			//{-xLeft,-yBottom,-zBack},
-
-			////right
-			//{xLeft,-yBottom,0.5f},
-			//{xLeft,yTop,0.5f},
-			//{xRight,yTop,0.5f},
-			//{xRight,yTop,0.5f},
-			//{xRight,-yBottom,0.5f},
-			//{xLeft,-yBottom,0.5f},
-
-			////вверх
-			//{-xLeft,yBottom,-0.5f},
-			//{-xLeft,yTop,-0.5f},
-			//{xRight,yTop,-0.5f},
-			//{xRight,yTop,-0.5f},
-			//{xRight,yBottom,-0.5f},
-			//{-xLeft,yBottom,-0.5f},
-
-			////низ
-			//{-xLeft,-yBottom,-0.5f},
-			//{-xLeft,-yTop,-0.5f},
-			//{xRight,-yTop,-0.5f},
-			//{xRight,-yTop,-0.5f},
-			//{xRight,-yBottom,-0.5f},
-			//{-xLeft,-yBottom,-0.5f},
-		};
-
-		D3D11_BUFFER_DESC BD{};
-		BD.ByteWidth = sizeof(VertexList);
-		BD.StructureByteStride = sizeof(T);
-		BD.BindFlags = D3D11_BIND_VERTEX_BUFFER;
-		BD.Usage = D3D11_USAGE_DEFAULT;
-		BD.CPUAccessFlags = 0u;
-		BD.MiscFlags = 0u;
-		D3D11_SUBRESOURCE_DATA SD{};
-		SD.pSysMem = VertexList;
-		Logg.Log(pDevice->CreateBuffer(&BD, &SD, &pBuffer), "CreateBuffer");
-		return (UINT)size(VertexList);
-	}
-	void Set3DInputLayer()
-	{
-		const D3D11_INPUT_ELEMENT_DESC ide[] =
+			pDeviceContext->VSSetConstantBuffers(0u, 1u, pConstBuffer.GetAddressOf());
+		}
+		else if (TypeBuff == TypeBuffer::Index)
 		{
-			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0}
-
-		};
-		Logg.Log(pDevice->CreateInputLayout(ide, (UINT)size(ide), pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), &pInputLayout), "CreateInputLayout");
-		pDeviceContext->IASetInputLayout(pInputLayout.Get());
+			pDeviceContext->IASetIndexBuffer(pIndexBuffer.Get(), DXGI_FORMAT_R16_UINT, 0u);
+		}
+		BUFF.clear();
 	}
-
-
-private:
-//универсальные модули
-	template <typename T>
-	void SetShadersVSPS(const wchar_t* VSNameFilecso, const wchar_t* PSNameFilecso)
+	void SetShaders(const wchar_t* VSNameFilecso, const wchar_t* PSNameFilecso)
 	{
-		const UINT stride = sizeof(T);
-		const UINT offset = 0u;
-		pDeviceContext->IASetVertexBuffers(0u, 1u, pBuffer.GetAddressOf(), &stride, &offset);
 		Logg.Log(D3DReadFileToBlob(VSNameFilecso, &pBlobVS), "D3DReadFileToBlobVS");
 		Logg.Log(D3DReadFileToBlob(PSNameFilecso, &pBlobPS), "D3DReadFileToBlobPS");
 		Logg.Log(pDevice->CreateVertexShader(pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), nullptr, &pVertexShader), "CreateVertexShader");
@@ -231,11 +185,44 @@ private:
 		VP.TopLeftY = TopLeftY;
 		pDeviceContext->RSSetViewports(countViewports, &VP);
 	}
-	void RenderDraw(D3D_PRIMITIVE_TOPOLOGY MetodDraw,UINT ListCount)
+	void SetInputLayer(TypeObject typeObject)
 	{
-		pDeviceContext->OMSetRenderTargets(1u, pRenderTargetView.GetAddressOf(), nullptr);
-		pDeviceContext->IASetPrimitiveTopology(MetodDraw);
-		pDeviceContext->Draw(ListCount, 0u);
+		switch (typeObject)
+		{
+		case TypeObject::Box2D:
+		{
+			const D3D11_INPUT_ELEMENT_DESC Layer[] =
+			{
+				{ "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+			};
+			Logg.Log(pDevice->CreateInputLayout(Layer, (UINT)size(Layer), pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), &pInputLayout), "CreateInputLayout");
+		break;
+		}
+		case TypeObject::Triangle2D:
+		{
+			const D3D11_INPUT_ELEMENT_DESC Layer[] =
+			{
+				{ "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+			};
+			Logg.Log(pDevice->CreateInputLayout(Layer, (UINT)size(Layer), pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), &pInputLayout), "CreateInputLayout");
+			break;
+		}
+		case TypeObject::Box3D:
+		{
+			const D3D11_INPUT_ELEMENT_DESC Layer[] =
+			{
+				{ "POSITION", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 },
+				{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+			};
+			Logg.Log(pDevice->CreateInputLayout(Layer, (UINT)size(Layer), pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), &pInputLayout), "CreateInputLayout");
+			break;
+		}
+
+		}
+
+		pDeviceContext->IASetInputLayout(pInputLayout.Get());
 	}
 	void RenderDrawIndex(D3D_PRIMITIVE_TOPOLOGY MetodDraw, UINT IndexCount)
 	{
@@ -244,65 +231,6 @@ private:
 		pDeviceContext->DrawIndexed(IndexCount, 0u, 0u);
 	}
 
-	void ModuleConstBuffer(ConstBuffer arr)
-	{
-		D3D11_BUFFER_DESC BD{};
-		BD.ByteWidth = sizeof(arr.Translation.matrx);
-		BD.StructureByteStride = 0u;
-		BD.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
-		BD.Usage = D3D11_USAGE_DYNAMIC;
-		BD.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
-		BD.MiscFlags = 0u;
-		D3D11_SUBRESOURCE_DATA SD{};
-		SD.pSysMem = arr.Translation.matrx;
-		Logg.Log(pDevice->CreateBuffer(&BD, &SD, &pConstBuffer), "CreateBuffer");
-		pDeviceContext->VSSetConstantBuffers(0u, 1u, pConstBuffer.GetAddressOf());
-	}
-	void CreateConstBuffer(float XAngle, float YAngle, float ZAngle)
-	{
-		float PropScreen = (3.0f / 4.0f);
-
-		const ConstBuffer Defult =
-		{
-			{
-				1.0f,				0.0f,				0.0f,				0.0f,
-				0.0f,				1.0f,				0.0f,				0.0f,
-				0.0f,				0.0f,				1.0f,				0.0f,
-				0.0f,				0.0f,				0.0f,				1.0f,
-			}
-		};
-		const ConstBuffer xRotate =
-		{
-			{
-				1.0f,				0.0f,								0.0f,				0.0f,
-				0.0f,				PropScreen* cos(XAngle),			sin(XAngle),		0.0f,
-				0.0f,				PropScreen * -sin(XAngle),			cos(XAngle),		0.0f,
-				0.0f,				0.0f,								0.0f,				1.0f,
-			}
-		};
-		const ConstBuffer yRotate =
-		{
-			{
-				PropScreen* cos(YAngle),			0.0f,				PropScreen * -sin(YAngle),		0.0f,
-				0.0f,								1.0f,				0.0f,				0.0f,
-				sin(YAngle),						0.0f,				cos(YAngle),		0.0f,
-				0.0f,								0.0f,				0.0f,				1.0f,
-			}
-		};
-		const ConstBuffer zRotate =
-		{
-			{
-				PropScreen* cos(ZAngle),			sin(ZAngle),		0.0f,				0.0f,
-				PropScreen * -sin(ZAngle),			cos(ZAngle),		0.0f,				0.0f,
-				0.0f,								0.0f,				1.0f,				0.0f,
-				0.0f,								0.0f,				0.0f,				1.0f,
-			}
-		};
-
-		/*ModuleConstBuffer(xRotate);
-		ModuleConstBuffer(yRotate);*/
-		ModuleConstBuffer(zRotate);
-	}
 private:
 	GraphicEngine(const GraphicEngine&) = delete;
 	GraphicEngine(GraphicEngine&) = delete;
@@ -343,47 +271,33 @@ void GraphicEngine::Present(bool vSync)
 	}
 }
 
-void GraphicEngine::Draw2DBox(float x, float y, float width, float height, float colorDelta, float XAngle, float YAngle, float ZAngle)
+void GraphicEngine::DrawObject(
+	float x, float y,float z, 
+	float width, float height, 
+	float colorDelta, 
+	float XAngle, float YAngle, float ZAngle,
+	const wchar_t* ShaderVS, const wchar_t* ShaderPS,
+	float MinDepth, float MaxDepth, float TopLeftX, float TopLeftY, UINT countViewports,
+	D3D_PRIMITIVE_TOPOLOGY MetodDraw,
+	TypeObject typeObject)
 {
-	UINT ListCount = Create2DBuff<VEC2>(x, y, width, height, colorDelta);
-	SetShadersVSPS<VEC2>(L"2DVertexShader.cso", L"2DPixelShaderBlack.cso");
-	SetViewports(0, 1, 0, 0, 1u);
-	Set2DInputLayer();
-	UINT IndexCount = Set2DIndexBuff<VEC2>();
-	CreateConstBuffer(XAngle, YAngle, ZAngle);
-	RenderDrawIndex(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, IndexCount);
+	float xLeft = (window.width / 2 - x) / (window.width / 2);
+	float xRight = ((x + width) - (window.width / 2)) / (window.width / 2);
+	float yTop = (window.height / 2 - y) / (window.height / 2);
+	float yBottom = (y + height - window.height / 2) / (window.height / 2);
+	float zBack = 0;
+	float zFront = 1;
+	/*if(typeObject != TypeObject::Box2D || typeObject != TypeObject::Triangle2D)
+	{
+		zBack = (z + width - window.width / 2) / (window.width / 2);
+		zFront = (window.width / 2 - z) / (window.width / 2);
+	}*/
+
+	SetBuffer(TypeBuffer::Vertex, typeObject, xLeft, xRight, yTop, yBottom, zBack, zFront);
+	SetBuffer(TypeBuffer::Index, typeObject, 0, 0, 0, 0, 0, 0);
+	SetBuffer(TypeBuffer::Constant, typeObject, XAngle, YAngle, ZAngle, 0, 0, 0);
+	SetShaders(ShaderVS, ShaderPS);
+	SetViewports(MinDepth, MaxDepth, TopLeftX, TopLeftY, countViewports);
+	SetInputLayer(typeObject);
+	RenderDrawIndex(MetodDraw, IndexCount);
 }
-
-void GraphicEngine::Draw2DLine(float x, float y, float width, float height, float colorDelta,float XAngle, float YAngle, float ZAngle)
-{
-	UINT ListCount = Create2DBuff<VEC2>(x, y, width, height, colorDelta);
-	SetShadersVSPS<VEC2>(L"2DVertexShader.cso", L"2DPixelShaderWhite.cso");
-	SetViewports(0, 1, 0, 0, 1u);
-	Set2DInputLayer();
-	UINT IndexCount = Set2DIndexBuff<VEC2>();
-	CreateConstBuffer(XAngle, YAngle, ZAngle);
-	RenderDrawIndex(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP, IndexCount);
-}
-
-void GraphicEngine::Draw3DBox(float x, float y, float z, float width, float height)
-{
-	UINT ListCount = Create3DBuff<VEC3>(x, y, z, width, height);
-	SetShadersVSPS<VEC3>(L"3DVertexShader.cso", L"3DPixelShaderBlack.cso");
-	SetViewports(0, 1, 0, 0, 1u);
-	Set3DInputLayer();
-	RenderDraw(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, ListCount);
-}
-
-void GraphicEngine::Draw3DLine(float x, float y, float z, float width, float height)
-{
-	UINT ListCount = Create3DBuff<VEC3>(x, y, z, width, height);
-	SetShadersVSPS<VEC3>(L"3DVertexShader.cso", L"3DPixelShaderWhite.cso");
-	SetViewports(0, 1, 0, 0, 1u);
-	Set3DInputLayer();
-	RenderDraw(D3D11_PRIMITIVE_TOPOLOGY_LINESTRIP, ListCount);
-}
-
-
-
-
-

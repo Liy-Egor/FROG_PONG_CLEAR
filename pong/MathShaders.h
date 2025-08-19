@@ -1,29 +1,26 @@
 #pragma once
+#include "BaseStructures.h"
 
-class VEC2
+enum TypeBuffer
 {
-public:
-	VEC2() = default;
-	VEC2(float x, float y, float r, float g, float b) : x(x), y(y), r(r), g(g), b(b) {};
-private:
-	float x{}, y{}, r{}, g{}, b{};
+	Index,
+	Constant,
+	Vertex,
+};
+
+enum TypeObject
+{
+	Box2D,
+	Triangle2D,
+	Box3D
 };
 
 class VEC3
 {
 public:
 	VEC3() = default;
-	VEC3(float x, float y,float z) : x(x), y(y), z(z) {}
+	VEC3(float x, float y, float z) : x(x), y(y), z(z) {}
+	VEC3(XMMATRIX) {};
 private:
 	float x{}, y{}, z{};
-
 };
-
-struct ConstBuffer
-{
-	struct
-	{
-		float matrx[4][4];
-	}Translation;
-};
-
