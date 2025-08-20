@@ -415,10 +415,22 @@ void AppGame::Render() //это грузит постоянно
 {
 	float sin_ = sin(Timer.TimePeak()) / 1.0f + 0.5f;
 	d3dx.RenderClearBuffer(sin_ /2, 0.2f, 1.0f);
-	d3dx.Draw2DBox(480, 270, 409, 409, sin_ * 1.1, 0, 0, Timer.TimePeak());
-	d3dx.Draw2DLine(480, 270, 409, 409, 1,0,0, Timer.TimePeak());
-	/*d3dx.Draw3DBox(480, 270, 480, 409, 409);*/
-	/*d3dx.Draw3DLine(480, 270, 480, 409, 409);*/
+
+
+	for (int i = 0; i < 30; i++)
+	{
+		srand(i);
+		int randa = rand() % 20;
+		d3dx.Draw2DBox(
+			480 * sin_ * randa, 270 * sin_ * randa, 1,
+			409 * sin_ * randa, 409 * sin_ * randa,
+			1.1 * sin_ * randa,
+			Timer.TimePeak()+ sin_ * randa);
+	}
+
+
+
+
 	d3dx.Present(true);
 }
 
