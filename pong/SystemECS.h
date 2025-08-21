@@ -370,7 +370,8 @@ void AppGame::Render()
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					1.1 * sin_,
 					0,
-					TypeObject::Box2D
+					TypeObject::Box2D,
+					Player->GetPosition()->x, Player->GetPosition()->y
 				);
 			}
 			for (ATEnemy var : VLocation[i].VEnemy)
@@ -380,7 +381,8 @@ void AppGame::Render()
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					1.1 * sin_,
 					0,
-					TypeObject::Box2D
+					TypeObject::Box2D,
+					Player->GetPosition()->x, Player->GetPosition()->y
 				);
 				var.Start();
 			}
@@ -391,7 +393,8 @@ void AppGame::Render()
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					1.1 * sin_,
 					0,
-					TypeObject::Box2D
+					TypeObject::Box2D,
+					Player->GetPosition()->x, Player->GetPosition()->y
 				);
 				if (var.GoEvent())
 				{
@@ -405,18 +408,20 @@ void AppGame::Render()
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					1.1 * sin_,
 					0,
-					TypeObject::Box2D
+					TypeObject::Box2D,
+					Player->GetPosition()->x, Player->GetPosition()->y
 				);
 				var.GoEvent();
 			}
 			for (ATSpike var : VLocation[i].VSpike)
 			{
 				d3dx.DrawObject(
-					var.GetPosition()->x, var.GetPosition()->y, 1,
-					var.GetPosition()->Width, var.GetPosition()->Height,
+					Player->GetPosition()->x, Player->GetPosition()->y, 1,
+					Player->GetPosition()->Width, Player->GetPosition()->Height,
 					1.1 * sin_,
 					0,
-					TypeObject::Box2D
+					TypeObject::Box2D,
+					Player->GetPosition()->x, Player->GetPosition()->y
 				);
 				var.GoEvent();
 			}
@@ -426,7 +431,8 @@ void AppGame::Render()
 				Player->GetPosition()->Width, Player->GetPosition()->Height,
 				1.1 * sin_,
 				0,
-				TypeObject::Box2D
+				TypeObject::Box2D,
+				Player->GetPosition()->x , Player->GetPosition()->y
 			);
 
 			Player->Start();

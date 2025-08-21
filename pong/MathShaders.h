@@ -30,7 +30,7 @@ vector<D3D11_INPUT_ELEMENT_DESC> ELEMENT_DESC;
 class BuildListBuffer
 {
 public:
-	BuildListBuffer(float x, float y, float z, float width, float height, float colorDelta,float ZAngle)
+	BuildListBuffer(float x, float y, float z, float width, float height, float colorDelta,float ZAngle, float xPlayer, float yPlayer)
 	{
 	 this -> xLeft = (window.width / 2 - x) / (window.width / 2);
 	 this -> xRight = (x + width - window.width / 2) / (window.width / 2);
@@ -38,6 +38,10 @@ public:
 	 this -> yBottom = (y + height - window.height / 2) / (window.height / 2);
 	 this -> zBack = (z + width - window.width / 2) / (window.width / 2);
 	 this -> zFront = (window.width / 2 - z) / (window.width / 2);
+
+	 this -> CameraPosX = (xPlayer - window.width / 2) / (window.width / 2);
+	 this -> CameraPosY = (yPlayer - window.height / 2) / (window.height / 2);
+
 	 this -> colorDelta = colorDelta;
 	 this -> ZAngle = ZAngle;
 	};
@@ -67,11 +71,15 @@ public:
 		float PropScreen = (float)window.height / (float)window.width;
 		if (typeObject == TypeObject::Box2D)
 		{
+			XMFLOAT3 CameraPos = { CameraPosX,-CameraPosY,-0.5f };
+			XMFLOAT3 CameraTarget = { CameraPosX,-CameraPosY,0 };
+			XMFLOAT3 Up = { 0,1,0 };
 			Matrx =
 			{
 				XMMatrixTranspose(
+					XMMatrixLookAtLH(XMLoadFloat3(&CameraPos),XMLoadFloat3(&CameraTarget),XMLoadFloat3(&Up)) *
 					XMMatrixTranslation(0,0,0) *
-					XMMatrixPerspectiveLH(1,1,0.5f,30.0f) *
+					XMMatrixPerspectiveLH(1,1,0.9f,30.0f) *
 					XMMatrixRotationZ(ZAngle)
 				)
 			};
@@ -118,4 +126,6 @@ private:
 	float xLeft, xRight, yBottom, yTop, zFront, zBack;
 	float colorDelta;
 	float ZAngle;
+	float CameraPosX;
+	float CameraPosY;
 };

@@ -45,7 +45,7 @@ public:
 
 	void RenderClearBuffer(float red, float green, float blue);
 	void Present(bool vSync);
-	void DrawObject(float x, float y, float z, float width, float height, float colorDelta,float ZAngle, TypeObject typeOBJ);
+	void DrawObject(float x, float y, float z, float width, float height, float colorDelta,float ZAngle, TypeObject typeOBJ, float xPlayer, float yPlayer);
 
 private:
 	void CreateInputLayer(vector<D3D11_INPUT_ELEMENT_DESC> ElementDesc)
@@ -190,9 +190,16 @@ void GraphicEngine::Present(bool vSync)
 	}
 }
 
-void GraphicEngine::DrawObject(float x, float y,float z, float width, float height, float colorDelta, float ZAngle, TypeObject typeOBJ)
+void GraphicEngine::DrawObject(
+	float x, float y, float z,
+	float width, float height,
+	float colorDelta,
+	float ZAngle,
+	TypeObject typeOBJ,
+	float xPlayer, float yPlayer
+)
 {
-	BuildListBuffer ListBuffer(x, y, z, width, height, colorDelta, ZAngle);
+	BuildListBuffer ListBuffer(x, y, z, width, height, colorDelta, ZAngle, xPlayer, yPlayer);
 	CreateVectorBuff(ListBuffer.GetVectorList(typeOBJ));
 	UINT IndexCount = CreateIndexBuff(ListBuffer.GetIndex(typeOBJ));
 	CreateMatrixBuffer(ListBuffer.GetMatrix(typeOBJ));
