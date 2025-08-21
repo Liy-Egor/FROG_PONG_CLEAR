@@ -16,22 +16,21 @@ public:
 private:
 	float x{}, y{}, z{}, r{}, g{}, b{};
 };
-vector<VEC3> vectors;
+vector<VEC3> Vectors;
 
-struct ConstBuffer
-{
-	struct
-	{
-		XMMATRIX matrx;
-	}Translation;
-};
+vector<XMMATRIX> Matrx;
+
+vector<unsigned short> Index;
+
+vector<D3D11_INPUT_ELEMENT_DESC> ELEMENT_DESC;
+
 
 
 
 class BuildListBuffer
 {
 public:
-	BuildListBuffer(float x, float y, float z, float width, float height, float colorDelta)
+	BuildListBuffer(float x, float y, float z, float width, float height, float colorDelta,float ZAngle)
 	{
 	 this -> xLeft = (window.width / 2 - x) / (window.width / 2);
 	 this -> xRight = (x + width - window.width / 2) / (window.width / 2);
@@ -40,6 +39,7 @@ public:
 	 this -> zBack = (z + width - window.width / 2) / (window.width / 2);
 	 this -> zFront = (window.width / 2 - z) / (window.width / 2);
 	 this -> colorDelta = colorDelta;
+	 this -> ZAngle = ZAngle;
 	};
 	~BuildListBuffer(){};
 
@@ -47,14 +47,14 @@ public:
 	{
 		if (typeObject == TypeObject::Box2D)
 		{
-			vectors =
+			Vectors =
 			{
 				{ -xLeft,-yBottom,zFront,  1 * colorDelta,0.3,      1 / colorDelta },
 				{ -xLeft,yTop,zFront,      1 / colorDelta,			1 * colorDelta,0.3 },
 				{ xRight,yTop,zFront,      1 / colorDelta,0.3,		1 / colorDelta },
 				{ xRight,-yBottom,zFront,  0.3,1 / colorDelta,      1 * colorDelta },
 			};
-			return vectors;
+			return Vectors;
 		}
 
 
@@ -62,7 +62,61 @@ public:
 
 	}
 
+	vector<XMMATRIX> GetMatrix(TypeObject typeObject)
+	{
+		float PropScreen = (float)window.height / (float)window.width;
+		if (typeObject == TypeObject::Box2D)
+		{
+			Matrx =
+			{
+				XMMatrixTranspose(
+					/*XMMatrixScaling(1,PropScreen,1) **/
+					XMMatrixTranslation(0,0,0) *
+					XMMatrixPerspectiveLH(PropScreen,1,0.1f,30.0f) *
+					XMMatrixRotationZ(ZAngle)
+				)
+			};
+			return Matrx;
+		}
+
+
+
+	}
+
+	vector<unsigned short> GetIndex(TypeObject typeObject)
+	{
+		if (typeObject == TypeObject::Box2D)
+		{
+			Index =
+			{
+				{
+				 0,1,2,
+				 2,3,0,
+				},
+			};
+			return Index;
+		}
+
+
+	}
+
+	vector<D3D11_INPUT_ELEMENT_DESC> GetElementDesc(TypeObject typeObject)
+	{
+		if (typeObject == TypeObject::Box2D)
+		{
+			ELEMENT_DESC =
+			{
+				{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+				{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12u, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+			};
+			return ELEMENT_DESC;
+		}
+
+
+	}
+
 private:
 	float xLeft, xRight, yBottom, yTop, zFront, zBack;
 	float colorDelta;
+	float ZAngle;
 };

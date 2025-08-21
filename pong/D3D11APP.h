@@ -45,77 +45,60 @@ public:
 
 	void RenderClearBuffer(float red, float green, float blue);
 	void Present(bool vSync);
-	void Draw2DBox(float x, float y, float z, float width, float height, float colorDelta,float ZAngle);
+	void DrawObject(float x, float y, float z, float width, float height, float colorDelta,float ZAngle, TypeObject typeOBJ);
 
 private:
-//модули для конкретных случаев
-	
-	template <typename T>
-	UINT Set2DIndexBuff()
+	void CreateInputLayer(vector<D3D11_INPUT_ELEMENT_DESC> ElementDesc)
 	{
-		const unsigned short Indices[] =
-		{
-			0,1,2,
-			2,3,0,
-		};
+		D3D11_INPUT_ELEMENT_DESC* arr = new D3D11_INPUT_ELEMENT_DESC[ElementDesc.size()];
+		for (int i = 0; i < ElementDesc.size(); ++i) {
+			arr[i] = ElementDesc[i];
+		}
+		Logg.Log(pDevice->CreateInputLayout(arr, ElementDesc.size(), pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), &pInputLayout), "CreateInputLayout");
+		pDeviceContext->IASetInputLayout(pInputLayout.Get());
+		delete[](arr);
+	}
+	UINT CreateIndexBuff(vector<unsigned short> Index)
+	{
+		unsigned short* arr = new unsigned short[Index.size()];
+		for (int i = 0; i < Index.size(); ++i) {
+			arr[i] = Index[i];
+		}
+
 		D3D11_BUFFER_DESC BD{};
-		BD.ByteWidth = sizeof(Indices);
-		BD.StructureByteStride = sizeof(T);
+		BD.ByteWidth = sizeof(Index[0]) * Index.size();
+		BD.StructureByteStride = sizeof(unsigned short);
 		BD.BindFlags = D3D11_BIND_INDEX_BUFFER;
 		BD.Usage = D3D11_USAGE_DEFAULT;
 		BD.CPUAccessFlags = 0u;
 		BD.MiscFlags = 0u;
 		D3D11_SUBRESOURCE_DATA SD{};
-		SD.pSysMem = Indices;
+		SD.pSysMem = arr;
 		Logg.Log(pDevice->CreateBuffer(&BD, &SD, &pIndexBuffer), "CreateBuffer");
 		pDeviceContext->IASetIndexBuffer(pIndexBuffer.Get(),DXGI_FORMAT_R16_UINT,0u);
-		return (UINT)size(Indices);
+		return Index.size();
+		delete[](arr);
 	}
-	
-	void Set2DInputLayer()
+	void CreateMatrixBuffer(vector<XMMATRIX> matrix)
 	{
-		const D3D11_INPUT_ELEMENT_DESC ide[] =
-		{ 
-			{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-			{ "COLOR", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 12u, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-		};
-		Logg.Log(pDevice->CreateInputLayout(ide, (UINT)size(ide), pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), &pInputLayout), "CreateInputLayout");
-		pDeviceContext->IASetInputLayout(pInputLayout.Get());
-	}
-
-	void CreateConstBuffer(float ZAngle)
-	{
-		float PropScreen = (float)window.height/(float)window.width;
-
-		const ConstBuffer matrix =
-		{
-			{
-				XMMatrixTranspose(
-					/*XMMatrixScaling(1,PropScreen,1) **/
-					XMMatrixTranslation(0,0,0) *
-					XMMatrixPerspectiveLH(PropScreen,1,0.1f,30.0f) *
-					/*XMMatrixRotationX(ZAngle) **/
-					/*XMMatrixRotationY(ZAngle) **/
-					XMMatrixRotationZ(ZAngle) 
-				)
-			}
-		};
+		XMMATRIX* arr = new XMMATRIX[matrix.size()];
+		for (int i = 0; i < matrix.size(); ++i) {
+			arr[i] = matrix[i];
+		}
 
 		D3D11_BUFFER_DESC BD{};
-		BD.ByteWidth = sizeof(matrix.Translation.matrx);
+		BD.ByteWidth = sizeof(matrix[0]) * matrix.size();
 		BD.StructureByteStride = 0u;
 		BD.BindFlags = D3D11_BIND_CONSTANT_BUFFER;
 		BD.Usage = D3D11_USAGE_DYNAMIC;
 		BD.CPUAccessFlags = D3D11_CPU_ACCESS_WRITE;
 		BD.MiscFlags = 0u;
 		D3D11_SUBRESOURCE_DATA SD{};
-		SD.pSysMem = static_cast<const void*>(&matrix.Translation.matrx);
+		SD.pSysMem = arr;
 		Logg.Log(pDevice->CreateBuffer(&BD, &SD, &pConstBuffer), "CreateBuffer");
 		pDeviceContext->VSSetConstantBuffers(0u, 1u, pConstBuffer.GetAddressOf());
+		delete[](arr);
 	}
-
-private:
-
 	void CreateVectorBuff(vector<VEC3> List)
 	{
 		VEC3* arr = new VEC3[List.size()];
@@ -138,6 +121,7 @@ private:
 		pDeviceContext->IASetVertexBuffers(0u, 1u, pBuffer.GetAddressOf(), &stride, &offset);
 		delete[](arr);
 	}
+
 	void SetShadersVSPS(const wchar_t* VSNameFilecso, const wchar_t* PSNameFilecso)
 	{
 		Logg.Log(D3DReadFileToBlob(VSNameFilecso, &pBlobVS), "D3DReadFileToBlobVS");
@@ -206,17 +190,18 @@ void GraphicEngine::Present(bool vSync)
 	}
 }
 
-void GraphicEngine::Draw2DBox(float x, float y,float z, float width, float height, float colorDelta, float ZAngle)
+void GraphicEngine::DrawObject(float x, float y,float z, float width, float height, float colorDelta, float ZAngle, TypeObject typeOBJ)
 {
-	BuildListBuffer ListBuffer(x, y, z, width, height, colorDelta);
-	CreateVectorBuff(ListBuffer.GetVectorList(TypeObject::Box2D));
+	BuildListBuffer ListBuffer(x, y, z, width, height, colorDelta, ZAngle);
+	CreateVectorBuff(ListBuffer.GetVectorList(typeOBJ));
+	UINT IndexCount = CreateIndexBuff(ListBuffer.GetIndex(typeOBJ));
+	CreateMatrixBuffer(ListBuffer.GetMatrix(typeOBJ));
+	if(typeOBJ == TypeObject::Box2D)
+	{SetShadersVSPS(L"2DVertexShader.cso", L"2DPixelShaderBlack.cso");}
+	
+	CreateInputLayer(ListBuffer.GetElementDesc(typeOBJ));
 
-	UINT IndexCount = Set2DIndexBuff<VEC3>(); //автоматизировать
-	CreateConstBuffer(ZAngle); //автоматизировать
-
-	SetShadersVSPS(L"2DVertexShader.cso", L"2DPixelShaderBlack.cso");
 	SetViewports(0, 1, 0, 0, 1u);
-	Set2DInputLayer(); //автоматизировать
 	RenderDrawIndex(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, IndexCount);
 }
 

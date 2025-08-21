@@ -379,18 +379,6 @@ void UpdateGame()
                 Show(*var.GetBitmaps(), *var.GetPosition());
                 var.GoEvent();
             }
-           /* ShowAnimation(*Player->GetBitmaps(), *Player->GetPosition(), 0);
-            if (GetAsyncKeyState(0x30))
-            ShowAnimation(*Player->GetBitmaps(), *Player->GetPosition(), 0);
-            if (GetAsyncKeyState(0x31))
-            ShowAnimation(*Player->GetBitmaps(), *Player->GetPosition(), 137);
-            if (GetAsyncKeyState(0x32))
-            ShowAnimation(*Player->GetBitmaps(), *Player->GetPosition(), 137*2);
-            if (GetAsyncKeyState(0x33))
-            ShowAnimation(*Player->GetBitmaps(), *Player->GetPosition(), 137 * 3);
-            if (GetAsyncKeyState(0x34))
-            ShowAnimation(*Player->GetBitmaps(), *Player->GetPosition(), 137 * 4);*/
-
             Show(*Player->GetBitmaps(), *Player->GetPosition());
             Player->Start();
             HealthBar();
@@ -411,34 +399,35 @@ void AppGame::Init()
 }
 
 //это грузит постоянно
-void AppGame::Render() //это грузит постоянно
+void AppGame::Render()
 {
 	float sin_ = sin(Timer.TimePeak()) / 1.0f + 0.5f;
 	d3dx.RenderClearBuffer(sin_ /2, 0.2f, 1.0f);
 
 
-	for (int i = 0; i < 30; i++)
-	{
-		srand(i);
-		int randa = rand() % 20;
-		d3dx.Draw2DBox(
-			480 * sin_ * randa, 270 * sin_ * randa, 1,
-			409 * sin_ * randa, 409 * sin_ * randa,
-			1.1 * sin_ * randa,
-			Timer.TimePeak()+ sin_ * randa);
-	}
-
-
-
-
+	
 	d3dx.Present(true);
 }
 
 //это можно отправлять различные команды для системы или управлять нажатием кнопок
-void AppGame::UpdateApp(MSG* msg) //это можно отправлять различные команды для системы или управлять нажатием кнопок
+void AppGame::UpdateApp(MSG* msg)
 {
 	if (GetAsyncKeyState(VK_ESCAPE))
 	{
 		msg->message = WM_QUIT;
 	}
 }
+
+
+/*for (int i = 0; i < 30; i++)
+	{
+		srand(i);
+		int randa = rand() % 20;
+		d3dx.DrawObject(
+			480 * sin_ * randa, 270 * sin_ * randa, 1,
+			409 * sin_ * randa, 409 * sin_ * randa,
+			1.1 * sin_ * randa,
+			Timer.TimePeak() + sin_ * randa,
+			TypeObject::Box2D
+			);
+	}*/
