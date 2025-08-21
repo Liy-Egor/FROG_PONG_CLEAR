@@ -1,14 +1,13 @@
 #pragma once
 #include "MathShaders.h"
-#include <wrl.h>
-
 //“”“Œ–»¿À€
 //https://www.youtube.com/@PardCode
 //https://www.rastertek.com/tutdx11win10.html
 //https://learn.microsoft.com/ru-ru/windows/win32/api/d3d11/
 //https://www.youtube.com/watch?v=YFrCrasocX8&list=PLqCJpWy5Fohd3S7ICFXwUomYW0Wv67pDD&index=19
+//https://github.com/planetchili/hw3d/blob/T27-End/hw3d/Surface.h
 
-using namespace Microsoft::WRL;
+
 class GraphicEngine
 {
 public:
@@ -48,6 +47,17 @@ public:
 	void DrawObject(float x, float y, float z, float width, float height, float colorDelta,float ZAngle, TypeObject typeOBJ, float xPlayer, float yPlayer);
 
 private:
+
+	void CreateTextureBuffer(const wchar_t NameFile)
+	{
+		
+
+
+
+	}
+
+
+
 	void CreateInputLayer(vector<D3D11_INPUT_ELEMENT_DESC> ElementDesc)
 	{
 		D3D11_INPUT_ELEMENT_DESC* arr = new D3D11_INPUT_ELEMENT_DESC[ElementDesc.size()];
@@ -85,7 +95,6 @@ private:
 		for (int i = 0; i < matrix.size(); ++i) {
 			arr[i] = matrix[i];
 		}
-
 		D3D11_BUFFER_DESC BD{};
 		BD.ByteWidth = sizeof(matrix[0]) * matrix.size();
 		BD.StructureByteStride = 0u;
@@ -121,7 +130,6 @@ private:
 		pDeviceContext->IASetVertexBuffers(0u, 1u, pBuffer.GetAddressOf(), &stride, &offset);
 		delete[](arr);
 	}
-
 	void SetShadersVSPS(const wchar_t* VSNameFilecso, const wchar_t* PSNameFilecso)
 	{
 		Logg.Log(D3DReadFileToBlob(VSNameFilecso, &pBlobVS), "D3DReadFileToBlobVS");
@@ -205,7 +213,7 @@ void GraphicEngine::DrawObject(
 	CreateMatrixBuffer(ListBuffer.GetMatrix(typeOBJ));
 	if(typeOBJ == TypeObject::Box2D)
 	{SetShadersVSPS(L"2DVertexShader.cso", L"2DPixelShaderBlack.cso");}
-	
+	ListBuffer.GetImage();
 	CreateInputLayer(ListBuffer.GetElementDesc(typeOBJ));
 
 	SetViewports(0, 1, 0, 0, 1u);

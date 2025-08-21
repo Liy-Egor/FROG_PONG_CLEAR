@@ -12,6 +12,8 @@
 #include <chrono>
 #include <d3d11.h>
 #include <d3dcompiler.h>
+#include <DirectXMath.h>
+#include <wrl.h>
 #pragma comment(lib,"d3dcompiler.lib")
 #pragma comment(lib,"d3d11.lib")
 
