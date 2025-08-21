@@ -70,9 +70,8 @@ public:
 			Matrx =
 			{
 				XMMatrixTranspose(
-					/*XMMatrixScaling(1,PropScreen,1) **/
 					XMMatrixTranslation(0,0,0) *
-					XMMatrixPerspectiveLH(PropScreen,1,0.1f,30.0f) *
+					XMMatrixPerspectiveLH(1,1,0.5f,30.0f) *
 					XMMatrixRotationZ(ZAngle)
 				)
 			};

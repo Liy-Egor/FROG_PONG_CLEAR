@@ -340,53 +340,6 @@ void HealthBar()
     TextOutA(window.context, window.width - 400, window.height - 1000, (LPCSTR)txt, strlen(txt));// аааа ааааа аааааа
 }
 
-
-
-
-
-void UpdateGame()
-{
-    for (int i = 0; i < VLocation.size(); i++)
-    {
-        if (Player->GetLocation() == i)
-        {
-            ShowWindow(*VLocation[i].GetBitmaps());
-          
-            for (ATWall var : VLocation[i].VWall)
-            {
-                Show(*var.GetBitmaps(), *var.GetPosition());
-            }
-            for (ATEnemy var : VLocation[i].VEnemy)
-            {
-                Show(*var.GetBitmaps(), *var.GetPosition());
-                var.Start();
-            }
-            for (ATHealFlack var : VLocation[i].VHealFlack)
-            {
-                Show(*var.GetBitmaps(), *var.GetPosition());
-                if (var.GoEvent())
-                {
-                    var.Destroy();
-                }
-            }
-            for (ATPortal var : VLocation[i].VPortal)
-            {
-                Show(*var.GetBitmaps(), *var.GetPosition());
-                var.GoEvent();
-            }
-            for (ATSpike var : VLocation[i].VSpike)
-            {
-                Show(*var.GetBitmaps(), *var.GetPosition());
-                var.GoEvent();
-            }
-            Show(*Player->GetBitmaps(), *Player->GetPosition());
-            Player->Start();
-            HealthBar();
-            break;
-        }
-    }
-}
-
 //главный цикл работы приложения
 //это можно подгрузить 1 раз и больше не подгружать
 void AppGame::Init()
@@ -404,7 +357,83 @@ void AppGame::Render()
 	float sin_ = sin(Timer.TimePeak()) / 1.0f + 0.5f;
 	d3dx.RenderClearBuffer(sin_ /2, 0.2f, 1.0f);
 
+	for (int i = 0; i < VLocation.size(); i++)
+	{
+		if (Player->GetLocation() == i)
+		{
+			ShowWindow(*VLocation[i].GetBitmaps());
 
+			for (ATWall var : VLocation[i].VWall)
+			{
+				d3dx.DrawObject(
+					var.GetPosition()->x, var.GetPosition()->y, 1,
+					var.GetPosition()->Width, var.GetPosition()->Height,
+					1.1 * sin_,
+					0,
+					TypeObject::Box2D
+				);
+			}
+			for (ATEnemy var : VLocation[i].VEnemy)
+			{
+				d3dx.DrawObject(
+					var.GetPosition()->x, var.GetPosition()->y, 1,
+					var.GetPosition()->Width, var.GetPosition()->Height,
+					1.1 * sin_,
+					0,
+					TypeObject::Box2D
+				);
+				var.Start();
+			}
+			for (ATHealFlack var : VLocation[i].VHealFlack)
+			{
+				d3dx.DrawObject(
+					var.GetPosition()->x, var.GetPosition()->y, 1,
+					var.GetPosition()->Width, var.GetPosition()->Height,
+					1.1 * sin_,
+					0,
+					TypeObject::Box2D
+				);
+				if (var.GoEvent())
+				{
+					var.Destroy();
+				}
+			}
+			for (ATPortal var : VLocation[i].VPortal)
+			{
+				d3dx.DrawObject(
+					var.GetPosition()->x, var.GetPosition()->y, 1,
+					var.GetPosition()->Width, var.GetPosition()->Height,
+					1.1 * sin_,
+					0,
+					TypeObject::Box2D
+				);
+				var.GoEvent();
+			}
+			for (ATSpike var : VLocation[i].VSpike)
+			{
+				d3dx.DrawObject(
+					var.GetPosition()->x, var.GetPosition()->y, 1,
+					var.GetPosition()->Width, var.GetPosition()->Height,
+					1.1 * sin_,
+					0,
+					TypeObject::Box2D
+				);
+				var.GoEvent();
+			}
+
+			d3dx.DrawObject(
+				Player->GetPosition()->x, Player->GetPosition()->y, 1,
+				Player->GetPosition()->Width, Player->GetPosition()->Height,
+				1.1 * sin_,
+				0,
+				TypeObject::Box2D
+			);
+
+			Player->Start();
+			HealthBar();
+			break;
+		}
+	}
 	
 	d3dx.Present(true);
 }
