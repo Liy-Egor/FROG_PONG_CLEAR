@@ -25,8 +25,11 @@
     <Filter Include="D3D11\Shaders\SH2D">
       <UniqueIdentifier>{bbee4c4f-ca36-46b0-99b3-79d83d406aca}</UniqueIdentifier>
     </Filter>
-    <Filter Include="D3D11\Shaders\SH3D">
-      <UniqueIdentifier>{7bdbb380-3d7e-4997-a862-b42616f929d1}</UniqueIdentifier>
+    <Filter Include="test">
+      <UniqueIdentifier>{a98345bb-9b64-4238-b1cd-9972123c0b7f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="D3D11\Shaders\TEX2D">
+      <UniqueIdentifier>{3b61850c-7bbd-46f2-a205-845b6c41cc83}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -80,6 +83,15 @@
     <Image Include="Resoursces\Image\walls.bmp">
       <Filter>Resource Files</Filter>
     </Image>
+    <Image Include="xxx.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="tnese.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="test22.png">
+      <Filter>Resource Files</Filter>
+    </Image>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="BaseStructures.h">
@@ -123,14 +135,11 @@
     <FxCompile Include="2DPixelShaderWhite.hlsl">
       <Filter>D3D11\Shaders\SH2D</Filter>
     </FxCompile>
-    <FxCompile Include="3DVertexShader.hlsl">
-      <Filter>D3D11\Shaders\SH3D</Filter>
+    <FxCompile Include="TexVertexShader.hlsl">
+      <Filter>D3D11\Shaders\TEX2D</Filter>
     </FxCompile>
-    <FxCompile Include="3DPixelShaderBlack.hlsl">
-      <Filter>D3D11\Shaders\SH3D</Filter>
-    </FxCompile>
-    <FxCompile Include="3DPixelShaderWhite.hlsl">
-      <Filter>D3D11\Shaders\SH3D</Filter>
+    <FxCompile Include="TexPixelShader.hlsl">
+      <Filter>D3D11\Shaders\TEX2D</Filter>
     </FxCompile>
   </ItemGroup>
 </Project>

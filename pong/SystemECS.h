@@ -344,6 +344,7 @@ void HealthBar()
 //это можно подгрузить 1 раз и больше не подгружать
 void AppGame::Init()
 {
+	
 	LoadSVGDataMap("LVL0");
 	LoadSVGDataMap("LVL1");
 
@@ -370,7 +371,7 @@ void AppGame::Render()
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					1.1 * sin_,
 					0,
-					TypeObject::Box2D,
+					TypeObject::Box2DTEX,
 					Player->GetPosition()->x, Player->GetPosition()->y
 				);
 			}
@@ -381,7 +382,7 @@ void AppGame::Render()
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					1.1 * sin_,
 					0,
-					TypeObject::Box2D,
+					TypeObject::Box2DTEX,
 					Player->GetPosition()->x, Player->GetPosition()->y
 				);
 				var.Start();
@@ -393,7 +394,7 @@ void AppGame::Render()
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					1.1 * sin_,
 					0,
-					TypeObject::Box2D,
+					TypeObject::Box2DTEX,
 					Player->GetPosition()->x, Player->GetPosition()->y
 				);
 				if (var.GoEvent())
@@ -408,7 +409,7 @@ void AppGame::Render()
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					1.1 * sin_,
 					0,
-					TypeObject::Box2D,
+					TypeObject::Box2DTEX,
 					Player->GetPosition()->x, Player->GetPosition()->y
 				);
 				var.GoEvent();
@@ -420,7 +421,7 @@ void AppGame::Render()
 					Player->GetPosition()->Width, Player->GetPosition()->Height,
 					1.1 * sin_,
 					0,
-					TypeObject::Box2D,
+					TypeObject::Box2DTEX,
 					Player->GetPosition()->x, Player->GetPosition()->y
 				);
 				var.GoEvent();
@@ -431,7 +432,7 @@ void AppGame::Render()
 				Player->GetPosition()->Width, Player->GetPosition()->Height,
 				1.1 * sin_,
 				0,
-				TypeObject::Box2D,
+				TypeObject::Box2DTEX,
 				Player->GetPosition()->x , Player->GetPosition()->y
 			);
 
@@ -463,6 +464,6 @@ void AppGame::UpdateApp(MSG* msg)
 			409 * sin_ * randa, 409 * sin_ * randa,
 			1.1 * sin_ * randa,
 			Timer.TimePeak() + sin_ * randa,
-			TypeObject::Box2D
+			TypeObject::Box2DTEX
 			);
 	}*/

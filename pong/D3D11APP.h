@@ -48,12 +48,25 @@ public:
 
 private:
 
-	void CreateTextureBuffer(const wchar_t NameFile)
+	void CreateTextureBuffer(ScratchImage IMAGE)
 	{
-		
+		DirectX::CreateTexture(pDevice.Get(), IMAGE.GetImages(), IMAGE.GetImageCount(), IMAGE.GetMetadata(), &pResource);
 
+		D3D11_SHADER_RESOURCE_VIEW_DESC SRVD{};
+		SRVD.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+		SRVD.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		SRVD.Texture2D.MostDetailedMip = 0;
+		SRVD.Texture2D.MipLevels = 1;
+		pDevice->CreateShaderResourceView(pResource.Get(), &SRVD, &pShaderResView);
+		pDeviceContext->PSSetShaderResources(0u, 1u, pShaderResView.GetAddressOf());
 
-
+		D3D11_SAMPLER_DESC SDC{};
+		SDC.Filter = D3D11_FILTER_MIN_MAG_MIP_POINT;
+		SDC.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+		SDC.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+		SDC.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+		pDevice->CreateSamplerState(&SDC, &pSampler);
+		pDeviceContext->PSSetSamplers(0, 1, pSampler.GetAddressOf());
 	}
 
 
@@ -177,6 +190,10 @@ private:
 	ComPtr<ID3D11InputLayout> pInputLayout{ nullptr };
 	ComPtr<ID3D11Buffer> pIndexBuffer{ nullptr };
 	ComPtr<ID3D11Buffer> pConstBuffer{ nullptr };
+	ComPtr<ID3D11Texture2D> pTex2D{ nullptr };
+	ComPtr<ID3D11ShaderResourceView> pShaderResView{ nullptr };
+	ComPtr<ID3D11SamplerState> pSampler{ nullptr };
+	
 }d3dx;
 
 //ðåàëèçàöèÿ
@@ -208,12 +225,19 @@ void GraphicEngine::DrawObject(
 )
 {
 	BuildListBuffer ListBuffer(x, y, z, width, height, colorDelta, ZAngle, xPlayer, yPlayer);
-	CreateVectorBuff(ListBuffer.GetVectorList(typeOBJ));
+
 	UINT IndexCount = CreateIndexBuff(ListBuffer.GetIndex(typeOBJ));
+	CreateVectorBuff(ListBuffer.GetVectorList(typeOBJ));
+	CreateTextureBuffer(ListBuffer.LoadImages(L"test22.png"));
+
 	CreateMatrixBuffer(ListBuffer.GetMatrix(typeOBJ));
 	if(typeOBJ == TypeObject::Box2D)
 	{SetShadersVSPS(L"2DVertexShader.cso", L"2DPixelShaderBlack.cso");}
-	ListBuffer.GetImage();
+	if (typeOBJ == TypeObject::Box2DTEX)
+	{
+		SetShadersVSPS(L"TexVertexShader.cso", L"TexPixelShader.cso");
+	}
+
 	CreateInputLayer(ListBuffer.GetElementDesc(typeOBJ));
 
 	SetViewports(0, 1, 0, 0, 1u);
@@ -222,7 +246,32 @@ void GraphicEngine::DrawObject(
 
 
 
+//for (int i = 0; i < DataImage.size(); ++i) {
+//	arr[i] = DataImage[i];
+//}
 
+//unsigned int rowPitch = (WidthImage * 4) * sizeof(unsigned char);
+//D3D11_TEXTURE2D_DESC TXDC{};
+//TXDC.Width = WidthImage; //ØÈÐÈÍÀ ÈÇÎÁÐÀÆÄÅÍÈß
+//TXDC.Height = HeightImage; //ÂÛÑÎÒÀ ÈÇÎÁÐÀÆÄÅÍÈß
+//TXDC.MipLevels = 0;
+//TXDC.ArraySize = 1;
+//TXDC.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+//TXDC.SampleDesc.Count = 1;
+//TXDC.SampleDesc.Quality = 0;
+//TXDC.Usage = D3D11_USAGE_DEFAULT;
+//TXDC.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+//TXDC.CPUAccessFlags = 0;
+//TXDC.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+//Logg.Log(pDevice->CreateTexture2D(&TXDC, NULL, &pTex2D), "CreateTexture2D");
+
+//pDeviceContext->UpdateSubresource(pTex2D.Get(), 0,NULL, static_cast<const void*>(&arr) , rowPitch, 0);
+
+
+//D3D11_SUBRESOURCE_DATA SD{};
+//SD.pSysMem = 0; //ËÈÑÒ ÈÇÎÁÐÀÆÅÍÈß
+//SD.SysMemPitch = 0; //ØÈÐÈÍÀ ÍÀ ÑÀÉÇ
+//pDevice->CreateTexture2D(&TXDC, &SD, &pTex2D);
 
 
 
