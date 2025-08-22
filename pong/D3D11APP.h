@@ -35,6 +35,7 @@ public:
 
 		Logg.Log(pGISwapChain->GetBuffer(0, IID_PPV_ARGS(&pResource)), "GetBuffer");
 		Logg.Log(pDevice->CreateRenderTargetView(pResource.Get(), nullptr, &pRenderTargetView), "CreateRenderTargetView");
+
 	}
 	~GraphicEngine()
 	{
@@ -48,16 +49,32 @@ public:
 
 private:
 
-	void CreateTextureBuffer(ScratchImage IMAGE)
+	///////!!!!!!
+	void CreateTextureBuffer()
 	{
-		DirectX::CreateTexture(pDevice.Get(), IMAGE.GetImages(), IMAGE.GetImageCount(), IMAGE.GetMetadata(), &pResource);
+		D3D11_TEXTURE2D_DESC TXDC{};
+		TXDC.Width = DATASAVE2[0].GetImages()->width;
+		TXDC.Height = DATASAVE2[0].GetImages()->height;
+		TXDC.MipLevels = 0;
+		TXDC.ArraySize = 1;
+		TXDC.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+		TXDC.SampleDesc.Count = 1;
+		TXDC.SampleDesc.Quality = 0;
+		TXDC.Usage = D3D11_USAGE_DEFAULT;
+		TXDC.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
+		TXDC.CPUAccessFlags = 0;
+		TXDC.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
+
+		Logg.Log(pDevice->CreateTexture2D(&TXDC, NULL, &pTex2D), "CreateTexture2D");
+
+		pDeviceContext->UpdateSubresource(pTex2D.Get(), 0,NULL, DATASAVE2[0].GetImages()->pixels, DATASAVE2[0].GetImages()->rowPitch, 0);
 
 		D3D11_SHADER_RESOURCE_VIEW_DESC SRVD{};
 		SRVD.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 		SRVD.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
 		SRVD.Texture2D.MostDetailedMip = 0;
 		SRVD.Texture2D.MipLevels = 1;
-		pDevice->CreateShaderResourceView(pResource.Get(), &SRVD, &pShaderResView);
+		pDevice->CreateShaderResourceView(pTex2D.Get(), &SRVD, &pShaderResView); //ÈÇÌÅÍÈË
 		pDeviceContext->PSSetShaderResources(0u, 1u, pShaderResView.GetAddressOf());
 
 		D3D11_SAMPLER_DESC SDC{};
@@ -68,7 +85,7 @@ private:
 		pDevice->CreateSamplerState(&SDC, &pSampler);
 		pDeviceContext->PSSetSamplers(0, 1, pSampler.GetAddressOf());
 	}
-
+	///////!!!!!!
 
 
 	void CreateInputLayer(vector<D3D11_INPUT_ELEMENT_DESC> ElementDesc)
@@ -102,6 +119,7 @@ private:
 		return Index.size();
 		delete[](arr);
 	}
+
 	void CreateMatrixBuffer(vector<XMMATRIX> matrix)
 	{
 		XMMATRIX* arr = new XMMATRIX[matrix.size()];
@@ -181,7 +199,6 @@ private:
 	ComPtr<ID3D11Device> pDevice{ nullptr };
 	ComPtr<ID3D11DeviceContext> pDeviceContext{ nullptr };
 	ComPtr<ID3D11RenderTargetView> pRenderTargetView{nullptr};
-	ComPtr<ID3D11Resource> pResource{ nullptr };
 	ComPtr<ID3DBlob> pBlobVS{ nullptr };
 	ComPtr<ID3DBlob> pBlobPS{ nullptr };
 	ComPtr<ID3D11VertexShader> pVertexShader{ nullptr };
@@ -193,7 +210,7 @@ private:
 	ComPtr<ID3D11Texture2D> pTex2D{ nullptr };
 	ComPtr<ID3D11ShaderResourceView> pShaderResView{ nullptr };
 	ComPtr<ID3D11SamplerState> pSampler{ nullptr };
-	
+	ComPtr<ID3D11Resource> pResource{ nullptr };
 }d3dx;
 
 //ðåàëèçàöèÿ
@@ -228,7 +245,10 @@ void GraphicEngine::DrawObject(
 
 	UINT IndexCount = CreateIndexBuff(ListBuffer.GetIndex(typeOBJ));
 	CreateVectorBuff(ListBuffer.GetVectorList(typeOBJ));
-	CreateTextureBuffer(ListBuffer.LoadImages(L"test22.png"));
+
+	
+	CreateTextureBuffer();
+	/*ListBuffer.GetImages(L"xxx.png")*/
 
 	CreateMatrixBuffer(ListBuffer.GetMatrix(typeOBJ));
 	if(typeOBJ == TypeObject::Box2D)

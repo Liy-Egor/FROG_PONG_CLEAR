@@ -240,6 +240,7 @@
     <Media Include="Resoursces\Sound\fail.wav" />
   </ItemGroup>
   <ItemGroup>
+    <Image Include="kamennaa-poverhnost-fona.png" />
     <Image Include="Resoursces\Image\back.bmp" />
     <Image Include="Resoursces\Image\background_0.bmp" />
     <Image Include="Resoursces\Image\background_1.bmp" />
@@ -252,9 +253,6 @@
     <Image Include="Resoursces\Image\racket_enemy.bmp" />
     <Image Include="Resoursces\Image\spike.bmp" />
     <Image Include="Resoursces\Image\walls.bmp" />
-    <Image Include="test22.png" />
-    <Image Include="tnese.png" />
-    <Image Include="xxx.png" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="APPGame.h" />

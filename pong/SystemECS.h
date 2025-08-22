@@ -344,7 +344,7 @@ void HealthBar()
 //это можно подгрузить 1 раз и больше не подгружать
 void AppGame::Init()
 {
-	
+	LoadImages(L"kamennaa-poverhnost-fona.png"); ///////!!!!!!
 	LoadSVGDataMap("LVL0");
 	LoadSVGDataMap("LVL1");
 

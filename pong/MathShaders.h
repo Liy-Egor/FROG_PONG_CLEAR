@@ -10,7 +10,6 @@ enum TypeObject
 	Box2DTEX
 };
 
-
 class VEC3
 {
 public:
@@ -19,13 +18,31 @@ public:
 private:
 	float x{}, y{}, z{}, r{}, g{};
 };
+
+struct Imagge
+{
+	size_t   width;
+	size_t   height;
+	DXGI_FORMAT format;
+	size_t   rowPitch;
+	size_t   slicePitch;
+	uint8_t* pixels;
+};
+
 vector<VEC3> Vectors;
-
 vector<XMMATRIX> Matrx;
-
 vector<unsigned short> Index;
-
 vector<D3D11_INPUT_ELEMENT_DESC> ELEMENT_DESC;
+
+
+///////!!!!!!
+ScratchImage DATASAVE2[1]; ///////!!!!!!
+void LoadImages(const wchar_t* filename)
+{
+	DirectX::LoadFromWICFile(filename, DirectX::WIC_FLAGS_NONE, nullptr, DATASAVE2[0]);
+} ///////!!!!!!
+ ///////!!!!!!
+
 
 class BuildListBuffer
 {
@@ -44,6 +61,7 @@ public:
 
 	 this -> colorDelta = colorDelta;
 	 this -> ZAngle = ZAngle;
+	 
 	};
 	~BuildListBuffer(){};
 
@@ -71,7 +89,6 @@ public:
 			};
 			return Vectors;
 		}
-
 	}
 
 	vector<XMMATRIX> GetMatrix(TypeObject typeObject)
@@ -137,13 +154,6 @@ public:
 		}
 	}
 
-	ScratchImage LoadImages(const wchar_t* filename)
-	{	
-		DirectX::ScratchImage image_data;
-		DirectX::LoadFromWICFile(filename, DirectX::WIC_FLAGS_NONE, nullptr, image_data);
-		return image_data;
-	}
-
 private:
 	float xLeft, xRight, yBottom, yTop, zFront, zBack;
 	float colorDelta;
@@ -151,7 +161,4 @@ private:
 	float CameraPosX;
 	float CameraPosY;
 };
-
-//https://learn.microsoft.com/ru-ru/windows/win32/direct3d11/overviews-direct3d-11-resources-textures-how-to
-
 
