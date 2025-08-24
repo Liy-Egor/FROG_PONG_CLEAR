@@ -253,6 +253,10 @@
     <Image Include="Resoursces\Image\racket_enemy.bmp" />
     <Image Include="Resoursces\Image\spike.bmp" />
     <Image Include="Resoursces\Image\walls.bmp" />
+    <Image Include="test1.png" />
+    <Image Include="test2.png" />
+    <Image Include="test3.png" />
+    <Image Include="test4.png" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="APPGame.h" />

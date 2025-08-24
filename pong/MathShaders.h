@@ -19,30 +19,54 @@ private:
 	float x{}, y{}, z{}, r{}, g{};
 };
 
-struct Imagge
-{
-	size_t   width;
-	size_t   height;
-	DXGI_FORMAT format;
-	size_t   rowPitch;
-	size_t   slicePitch;
-	uint8_t* pixels;
-};
-
 vector<VEC3> Vectors;
 vector<XMMATRIX> Matrx;
 vector<unsigned short> Index;
 vector<D3D11_INPUT_ELEMENT_DESC> ELEMENT_DESC;
 
-
 ///////!!!!!!
-ScratchImage DATASAVE2[1]; ///////!!!!!!
+ScratchImage DATASAVE2[1];
+vector<D3D11_TEXTURE2D_DESC> TDESC;
+vector<D3D11_SUBRESOURCE_DATA> SDATA;
+vector<D3D11_SHADER_RESOURCE_VIEW_DESC> VDESC;
+vector<D3D11_SAMPLER_DESC> SDESC;
 void LoadImages(const wchar_t* filename)
 {
 	DirectX::LoadFromWICFile(filename, DirectX::WIC_FLAGS_NONE, nullptr, DATASAVE2[0]);
-} ///////!!!!!!
- ///////!!!!!!
+	D3D11_TEXTURE2D_DESC TXDC{};
+	TXDC.Width = DATASAVE2[0].GetImages()->width;
+	TXDC.Height = DATASAVE2[0].GetImages()->height;
+	TXDC.MipLevels = 1;
+	TXDC.ArraySize = 1;
+	TXDC.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	TXDC.SampleDesc.Count = 1;
+	TXDC.SampleDesc.Quality = 0;
+	TXDC.Usage = D3D11_USAGE_DEFAULT;
+	TXDC.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+	TXDC.CPUAccessFlags = 0;
+	TXDC.MiscFlags = 0;
+	TDESC.push_back(TXDC);
 
+	D3D11_SUBRESOURCE_DATA SD{};
+	SD.pSysMem = DATASAVE2[0].GetImages()->pixels;
+	SD.SysMemPitch = DATASAVE2[0].GetImages()->rowPitch;
+	SDATA.push_back(SD);
+
+	D3D11_SHADER_RESOURCE_VIEW_DESC SRVD{};
+	SRVD.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+	SRVD.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+	SRVD.Texture2D.MostDetailedMip = 0;
+	SRVD.Texture2D.MipLevels = 1;
+	VDESC.push_back(SRVD);
+
+	D3D11_SAMPLER_DESC SDC{};
+	SDC.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+	SDC.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+	SDC.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+	SDC.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+	SDESC.push_back(SDC);
+}
+///////!!!!!!
 
 class BuildListBuffer
 {
@@ -153,6 +177,26 @@ public:
 			return ELEMENT_DESC;
 		}
 	}
+
+	///////!!!!!!
+	D3D11_TEXTURE2D_DESC GetTEXTURE2D_DESC()
+	{
+		return TDESC[0];
+	}
+	D3D11_SUBRESOURCE_DATA GetSUBRESOURCE_DATA()
+	{
+		return SDATA[0];
+	}
+	D3D11_SHADER_RESOURCE_VIEW_DESC GetRESOURCE_VIEW_DESC()
+	{
+		return VDESC[0];
+	}
+	D3D11_SAMPLER_DESC GetSAMPLER_DESC()
+	{
+		return SDESC[0];
+	}
+	///////!!!!!!
+
 
 private:
 	float xLeft, xRight, yBottom, yTop, zFront, zBack;

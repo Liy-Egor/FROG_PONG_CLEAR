@@ -343,8 +343,9 @@ void HealthBar()
 //главный цикл работы приложения
 //это можно подгрузить 1 раз и больше не подгружать
 void AppGame::Init()
-{
-	LoadImages(L"kamennaa-poverhnost-fona.png"); ///////!!!!!!
+{	///////!!!!!!
+	LoadImages(L"test4.png"); ///////!!!!!!
+	///////!!!!!!
 	LoadSVGDataMap("LVL0");
 	LoadSVGDataMap("LVL1");
 
