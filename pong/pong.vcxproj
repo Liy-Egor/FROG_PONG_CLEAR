@@ -240,7 +240,6 @@
     <Media Include="Resoursces\Sound\fail.wav" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="kamennaa-poverhnost-fona.png" />
     <Image Include="Resoursces\Image\back.bmp" />
     <Image Include="Resoursces\Image\background_0.bmp" />
     <Image Include="Resoursces\Image\background_1.bmp" />

@@ -344,7 +344,7 @@ void HealthBar()
 //это можно подгрузить 1 раз и больше не подгружать
 void AppGame::Init()
 {	///////!!!!!!
-	LoadImages(L"test4.png"); ///////!!!!!!
+	LoadImages(L"image2.png"); ///////!!!!!!
 	///////!!!!!!
 	LoadSVGDataMap("LVL0");
 	LoadSVGDataMap("LVL1");

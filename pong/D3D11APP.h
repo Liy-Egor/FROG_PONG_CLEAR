@@ -164,6 +164,8 @@ private:
 		Logg.Log(pDevice->CreatePixelShader(pBlobPS->GetBufferPointer(), pBlobPS->GetBufferSize(), nullptr, &pPixelShader), "CreatePixelShader");
 		pDeviceContext->PSSetShader(pPixelShader.Get(), 0, 0);
 	}
+
+
 	void SetViewports(float MinDepth, float MaxDepth,float TopLeftX, float TopLeftY,UINT countViewports)
 	{
 		D3D11_VIEWPORT VP{};

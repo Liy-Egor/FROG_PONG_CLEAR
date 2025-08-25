@@ -83,9 +83,6 @@
     <Image Include="Resoursces\Image\walls.bmp">
       <Filter>Resource Files</Filter>
     </Image>
-    <Image Include="kamennaa-poverhnost-fona.png">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="test1.png">
       <Filter>Resource Files</Filter>
     </Image>

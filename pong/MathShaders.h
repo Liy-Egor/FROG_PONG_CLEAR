@@ -19,6 +19,7 @@ private:
 	float x{}, y{}, z{}, r{}, g{};
 };
 
+
 vector<VEC3> Vectors;
 vector<XMMATRIX> Matrx;
 vector<unsigned short> Index;
@@ -51,7 +52,7 @@ void LoadImages(const wchar_t* filename)
 	SD.pSysMem = DATASAVE2[0].GetImages()->pixels;
 	SD.SysMemPitch = DATASAVE2[0].GetImages()->rowPitch;
 	SDATA.push_back(SD);
-
+	
 	D3D11_SHADER_RESOURCE_VIEW_DESC SRVD{};
 	SRVD.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
 	SRVD.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
