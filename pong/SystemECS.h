@@ -340,33 +340,21 @@ void HealthBar()
     TextOutA(window.context, window.width - 400, window.height - 1000, (LPCSTR)txt, strlen(txt));// аааа ааааа аааааа
 }
 
-//главный цикл работы приложения
-//это можно подгрузить 1 раз и больше не подгружать
 void AppGame::Init()
-{	///////!!!!!!
-
-	GraphicsLoader test(1000, 500, 1, 200, 200, TypeObject::BOX2DTEX, L"test4.png", 0, d3dx.GetDEV());
-
-
-	///////!!!!!!
+{
 	LoadSVGDataMap("LVL0");
 	LoadSVGDataMap("LVL1");
 
 	MapSizeW = VLocation[0].GetPosition()->Width;
 	MapSizeH = VLocation[0].GetPosition()->Height;
-
-
-
-	//LoadImages(L"test4.png"); ///////!!!!!!
 }
 
-//это грузит постоянно
 void AppGame::Render()
 {
 	float sin_ = sin(Timer.TimePeak()) / 1.0f + 0.5f;
 	d3dx.RenderClearBuffer(sin_ /2, 0.2f, 1.0f);
 
-	/*for (int i = 0; i < VLocation.size(); i++)
+	for (int i = 0; i < VLocation.size(); i++)
 	{
 		if (Player->GetLocation() == i)
 		{
@@ -377,10 +365,9 @@ void AppGame::Render()
 				d3dx.DrawObject(
 					var.GetPosition()->x, var.GetPosition()->y, 1,
 					var.GetPosition()->Width, var.GetPosition()->Height,
-					1.1 * sin_,
 					0,
 					TypeObject::BOX2DTEX,
-					Player->GetPosition()->x, Player->GetPosition()->y
+					L"test4.png"
 				);
 			}
 			for (ATEnemy var : VLocation[i].VEnemy)
@@ -388,10 +375,9 @@ void AppGame::Render()
 				d3dx.DrawObject(
 					var.GetPosition()->x, var.GetPosition()->y, 1,
 					var.GetPosition()->Width, var.GetPosition()->Height,
-					1.1 * sin_,
 					0,
 					TypeObject::BOX2DTEX,
-					Player->GetPosition()->x, Player->GetPosition()->y
+					L"test2.png"
 				);
 				var.Start();
 			}
@@ -400,10 +386,9 @@ void AppGame::Render()
 				d3dx.DrawObject(
 					var.GetPosition()->x, var.GetPosition()->y, 1,
 					var.GetPosition()->Width, var.GetPosition()->Height,
-					1.1 * sin_,
 					0,
 					TypeObject::BOX2DTEX,
-					Player->GetPosition()->x, Player->GetPosition()->y
+					L"test2.png"
 				);
 				if (var.GoEvent())
 				{
@@ -415,10 +400,9 @@ void AppGame::Render()
 				d3dx.DrawObject(
 					var.GetPosition()->x, var.GetPosition()->y, 1,
 					var.GetPosition()->Width, var.GetPosition()->Height,
-					1.1 * sin_,
 					0,
 					TypeObject::BOX2DTEX,
-					Player->GetPosition()->x, Player->GetPosition()->y
+					L"test2.png"
 				);
 				var.GoEvent();
 			}
@@ -427,10 +411,9 @@ void AppGame::Render()
 				d3dx.DrawObject(
 					Player->GetPosition()->x, Player->GetPosition()->y, 1,
 					Player->GetPosition()->Width, Player->GetPosition()->Height,
-					1.1 * sin_,
 					0,
 					TypeObject::BOX2DTEX,
-					Player->GetPosition()->x, Player->GetPosition()->y
+					L"test2.png"
 				);
 				var.GoEvent();
 			}
@@ -438,23 +421,23 @@ void AppGame::Render()
 			d3dx.DrawObject(
 				Player->GetPosition()->x, Player->GetPosition()->y, 1,
 				Player->GetPosition()->Width, Player->GetPosition()->Height,
-				1.1 * sin_,
 				0,
 				TypeObject::BOX2DTEX,
-				Player->GetPosition()->x , Player->GetPosition()->y
+				L"test1.png"
 			);
+			
 
 			Player->Start();
 			HealthBar();
 			break;
 		}
-	}*/
+	}
 
-	d3dx.UpdateDraw(TypeObject::BOX2DTEX);
+	d3dx.SetCamera(Player->GetPosition()->x, Player->GetPosition()->y);
+
 	d3dx.Present(true);
 }
 
-//это можно отправлять различные команды для системы или управлять нажатием кнопок
 void AppGame::UpdateApp(MSG* msg)
 {
 	if (GetAsyncKeyState(VK_ESCAPE))
@@ -463,16 +446,3 @@ void AppGame::UpdateApp(MSG* msg)
 	}
 }
 
-
-/*for (int i = 0; i < 30; i++)
-	{
-		srand(i);
-		int randa = rand() % 20;
-		d3dx.DrawObject(
-			480 * sin_ * randa, 270 * sin_ * randa, 1,
-			409 * sin_ * randa, 409 * sin_ * randa,
-			1.1 * sin_ * randa,
-			Timer.TimePeak() + sin_ * randa,
-			TypeObject::Box2DTEX
-			);
-	}*/

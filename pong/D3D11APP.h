@@ -44,40 +44,130 @@ public:
 
 	void RenderClearBuffer(float red, float green, float blue);
 	void Present(bool vSync);
-	void DrawObject(float x, float y, float z, float width, float height, float colorDelta,float ZAngle, TypeObject typeOBJ, float xPlayer, float yPlayer);
-
-	void UpdateDraw(TypeObject typeobject);
-
-	ID3D11Device* GetDEV()
+	void DrawObject(float x, float y, float z, float width, float height,float ZAngle, TypeObject typeOBJ, const wchar_t* filename);
+	void SetCamera(float LookAtX, float LookAtY)
 	{
-		return pDevice.Get();
-	}
-	
+		this->LookAtX = LookAtX;
+		this->LookAtY = LookAtY;
+	};
 private:
 
-	bool create = false;
-	vector<ID3D11ShaderResourceView**> psrv;
-	vector<ID3D11SamplerState**> ss;
-	void CreateTextureBuffer(D3D11_TEXTURE2D_DESC TXDC, D3D11_SUBRESOURCE_DATA SD , D3D11_SHADER_RESOURCE_VIEW_DESC SRVD, D3D11_SAMPLER_DESC SDC)
+	vector<ID3D11ShaderResourceView**> pSRV;
+	vector<ID3D11SamplerState**> pSST;
+	ScratchImage TexList[500];
+
+	vector<const wchar_t*> TexNameList;
+	void CreateTextureBuffer(const wchar_t* filename)
 	{
-		///////!!!!!!
-		if (create == false)
+		int IndexTex = 0;
+		if (TexNameList.size() == 0)
 		{
-		create = true;
+		DirectX::LoadFromWICFile(filename, DirectX::WIC_FLAGS_NONE, nullptr, TexList[TexNameList.size()]);
+
+		D3D11_TEXTURE2D_DESC TXDC{};
+		TXDC.Width = TexList[TexNameList.size()].GetImages()->width;
+		TXDC.Height = TexList[TexNameList.size()].GetImages()->height;
+		TXDC.MipLevels = 1;
+		TXDC.ArraySize = 1;
+		TXDC.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+		TXDC.SampleDesc.Count = 1;
+		TXDC.SampleDesc.Quality = 0;
+		TXDC.Usage = D3D11_USAGE_DEFAULT;
+		TXDC.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+		TXDC.CPUAccessFlags = 0;
+		TXDC.MiscFlags = 0;
+
+		D3D11_SUBRESOURCE_DATA SD{};
+		SD.pSysMem = TexList[TexNameList.size()].GetImages()->pixels;
+		SD.SysMemPitch = TexList[TexNameList.size()].GetImages()->rowPitch;
+
+		D3D11_SHADER_RESOURCE_VIEW_DESC SRVD{};
+		SRVD.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+		SRVD.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+		SRVD.Texture2D.MostDetailedMip = 0;
+		SRVD.Texture2D.MipLevels = 1;
+
+		D3D11_SAMPLER_DESC SDC{};
+		SDC.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+		SDC.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+		SDC.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+		SDC.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+
 		pDevice->CreateTexture2D(&TXDC, &SD, &pTex2D);
 		pDevice->CreateShaderResourceView(pTex2D.Get(), &SRVD, &pShaderResView);
 		pDevice->CreateSamplerState(&SDC, &pSampler);
-		psrv.push_back(pShaderResView.GetAddressOf());
-		ss.push_back(pSampler.GetAddressOf());
 
+		ID3D11ShaderResourceView** pSrv = new ID3D11ShaderResourceView*;
+		ID3D11SamplerState** pSs = new ID3D11SamplerState*;
+
+		pDevice->CreateTexture2D(&TXDC, &SD, &pTex2D);
+		pDevice->CreateShaderResourceView(pTex2D.Get(), &SRVD, pSrv);
+		pDevice->CreateSamplerState(&SDC, pSs);
+
+		pSRV.push_back(pSrv);
+		pSST.push_back(pSs);
+		IndexTex = 0;
+		TexNameList.push_back(filename);
 		}
-		///////!!!!!!
+		else
+		{
+		for (int i = 0; i < TexNameList.size(); i++)
+		{
+			if (TexNameList[i] == filename)
+			{
+				IndexTex = i;
+				break;
+			}
+			else if (TexNameList[i] != filename && i == TexNameList.size() - 1)
+			{
+				DirectX::LoadFromWICFile(filename, DirectX::WIC_FLAGS_NONE, nullptr, TexList[TexNameList.size()]);
 
+				D3D11_TEXTURE2D_DESC TXDC{};
+				TXDC.Width = TexList[TexNameList.size()].GetImages()->width;
+				TXDC.Height = TexList[TexNameList.size()].GetImages()->height;
+				TXDC.MipLevels = 1;
+				TXDC.ArraySize = 1;
+				TXDC.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+				TXDC.SampleDesc.Count = 1;
+				TXDC.SampleDesc.Quality = 0;
+				TXDC.Usage = D3D11_USAGE_DEFAULT;
+				TXDC.BindFlags = D3D11_BIND_SHADER_RESOURCE;
+				TXDC.CPUAccessFlags = 0;
+				TXDC.MiscFlags = 0;
 
+				D3D11_SUBRESOURCE_DATA SD{};
+				SD.pSysMem = TexList[TexNameList.size()].GetImages()->pixels;
+				SD.SysMemPitch = TexList[TexNameList.size()].GetImages()->rowPitch;
 
-		pDeviceContext->PSSetShaderResources(0u, 1u, psrv[0]);
-		pDeviceContext->PSSetSamplers(0, 1, ss[0]);
+				D3D11_SHADER_RESOURCE_VIEW_DESC SRVD{};
+				SRVD.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
+				SRVD.ViewDimension = D3D11_SRV_DIMENSION_TEXTURE2D;
+				SRVD.Texture2D.MostDetailedMip = 0;
+				SRVD.Texture2D.MipLevels = 1;
 
+				D3D11_SAMPLER_DESC SDC{};
+				SDC.Filter = D3D11_FILTER_MIN_MAG_MIP_LINEAR;
+				SDC.AddressU = D3D11_TEXTURE_ADDRESS_WRAP;
+				SDC.AddressV = D3D11_TEXTURE_ADDRESS_WRAP;
+				SDC.AddressW = D3D11_TEXTURE_ADDRESS_WRAP;
+
+				ID3D11ShaderResourceView** pSrv = new ID3D11ShaderResourceView*;
+				ID3D11SamplerState** pSs = new ID3D11SamplerState*;
+
+				pDevice->CreateTexture2D(&TXDC, &SD, &pTex2D);
+				pDevice->CreateShaderResourceView(pTex2D.Get(), &SRVD, pSrv);
+				pDevice->CreateSamplerState(&SDC, pSs);
+
+				pSRV.push_back(pSrv);
+				pSST.push_back(pSs);
+				IndexTex = TexNameList.size();
+				TexNameList.push_back(filename);
+			}
+		}
+		}
+
+		pDeviceContext->PSSetShaderResources(0u, 1u, pSRV[IndexTex]);
+		pDeviceContext->PSSetSamplers(0, 1, pSST[IndexTex]);
 	}
 	void CreateInputLayer(vector<D3D11_INPUT_ELEMENT_DESC> ElementDesc)
 	{
@@ -109,8 +199,8 @@ private:
 
 		pDeviceContext->IASetIndexBuffer(pIndexBuffer.Get(),DXGI_FORMAT_R16_UINT,0u);
 
-		return Index.size();
 		delete[](arr);
+		return Index.size();
 	}
 	void CreateMatrixBuffer(vector<XMMATRIX> matrix)
 	{
@@ -154,8 +244,16 @@ private:
 		pDeviceContext->IASetVertexBuffers(0u, 1u, pBuffer.GetAddressOf(), &stride, &offset);
 		delete[](arr);
 	} 
-	void SetShadersVSPS(const wchar_t* VSNameFilecso, const wchar_t* PSNameFilecso)
+	void SetShadersVSPS(TypeObject typeOBJ)
 	{
+		const wchar_t* VSNameFilecso = L"";
+		const wchar_t* PSNameFilecso = L"";
+		if (TypeObject::BOX2DTEX == typeOBJ)
+		{
+			VSNameFilecso = L"TexVertexShader.cso";
+			PSNameFilecso = L"TexPixelShader.cso";
+		}
+
 		Logg.Log(D3DReadFileToBlob(VSNameFilecso, &pBlobVS), "D3DReadFileToBlobVS");
 		Logg.Log(D3DReadFileToBlob(PSNameFilecso, &pBlobPS), "D3DReadFileToBlobPS");
 		Logg.Log(pDevice->CreateVertexShader(pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), nullptr, &pVertexShader), "CreateVertexShader");
@@ -163,7 +261,6 @@ private:
 		Logg.Log(pDevice->CreatePixelShader(pBlobPS->GetBufferPointer(), pBlobPS->GetBufferSize(), nullptr, &pPixelShader), "CreatePixelShader");
 		pDeviceContext->PSSetShader(pPixelShader.Get(), 0, 0);
 	}
-
 	void SetViewports(float MinDepth, float MaxDepth,float TopLeftX, float TopLeftY,UINT countViewports)
 	{
 		D3D11_VIEWPORT VP{};
@@ -205,7 +302,8 @@ private:
 	ComPtr<ID3D11ShaderResourceView> pShaderResView{ nullptr };
 	ComPtr<ID3D11SamplerState> pSampler{ nullptr };
 	ComPtr<ID3D11Resource> pResource{ nullptr };
-	int countObj = 0;
+	float LookAtX = 0;
+	float LookAtY = 0;
 }d3dx;
 
 //реализация
@@ -227,83 +325,15 @@ void GraphicEngine::Present(bool vSync)
 	}
 }
 
-void GraphicEngine::DrawObject(
-	float x, float y, float z,
-	float width, float height,
-	float colorDelta,
-	float ZAngle,
-	TypeObject typeOBJ,
-	float xPlayer, float yPlayer
-)
+void GraphicEngine::DrawObject(float x, float y, float z,float width, float height,float ZAngle,TypeObject typeOBJ,const wchar_t* filename)
 {
-	BuildListBuffer ListBuffer(x, y, z, width, height, colorDelta, ZAngle, xPlayer, yPlayer);
-	CreateTextureBuffer(ListBuffer.GetTEXTURE2D_DESC(), ListBuffer.GetSUBRESOURCE_DATA(),ListBuffer.GetRESOURCE_VIEW_DESC(),ListBuffer.GetSAMPLER_DESC());
+	BuildListBuffer ListBuffer(x, y, z, width, height, ZAngle, LookAtX, LookAtY);
+	CreateTextureBuffer(filename);
 	CreateMatrixBuffer(ListBuffer.GetMatrix(typeOBJ));
 	CreateVectorBuff(ListBuffer.GetVectorList(typeOBJ));
 	UINT IndexCount = CreateIndexBuff(ListBuffer.GetIndex(typeOBJ));
-	if (typeOBJ == TypeObject::BOX2DTEX)
-	{
-		SetShadersVSPS(L"TexVertexShader.cso", L"TexPixelShader.cso");
-	}
+	SetShadersVSPS(typeOBJ);
 	CreateInputLayer(ListBuffer.GetElementDesc(typeOBJ));
 	SetViewports(0, 1, 0, 0, 1u);
 	RenderDrawIndex(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, IndexCount);
 }
-
-void GraphicEngine::UpdateDraw(TypeObject typeobject)
-{
-	if (countObj == DXColl.ImageNameALL.size())
-		countObj = 0;
-
-	int iOBJ = typeobject;
-
-	//текстуры
-	for (int i = 0; i < DXColl.ImageName.size(); i++)
-	{
-		if (DXColl.ImageName[i] == DXColl.ImageNameALL[countObj])
-		{
-			pDeviceContext->PSSetShaderResources(0u, 1u, DXColl.pSRVVec[i]);
-			pDeviceContext->PSSetSamplers(0, 1, DXColl.pSStateVec[i]);
-			break;
-		}
-	}
-
-	//матрица
-	pDeviceContext->VSSetConstantBuffers(0u, 1u, DXColl.pBufferMatrix[countObj]);
-
-	//вертексы
-	const UINT stride = sizeof(VEC3);
-	const UINT offset = 0u;
-	pDeviceContext->IASetVertexBuffers(0u, 1u, DXColl.pBufferVec[iOBJ], &stride, &offset);
-
-	//индексы
-	pDeviceContext->IASetIndexBuffer(DXColl.pBufferIndex[iOBJ], DXGI_FORMAT_R16_UINT, 0u);
-
-	//слои и шейдеры
-	Logg.Log(D3DReadFileToBlob(L"TexVertexShader.cso", &pBlobVS), "D3DReadFileToBlobVS");
-	Logg.Log(D3DReadFileToBlob(L"TexPixelShader.cso", &pBlobPS), "D3DReadFileToBlobPS");
-	Logg.Log(pDevice->CreateVertexShader(pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), nullptr, &pVertexShader), "CreateVertexShader");
-	pDeviceContext->VSSetShader(pVertexShader.Get(), 0, 0);
-	Logg.Log(pDevice->CreatePixelShader(pBlobPS->GetBufferPointer(), pBlobPS->GetBufferSize(), nullptr, &pPixelShader), "CreatePixelShader");
-	pDeviceContext->PSSetShader(pPixelShader.Get(), 0, 0);
-
-	D3D11_INPUT_ELEMENT_DESC ELEMENT_DESC[] =
-	{
-		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
-		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12u, D3D11_INPUT_PER_VERTEX_DATA, 0 }
-	};
-	Logg.Log(pDevice->CreateInputLayout(ELEMENT_DESC, sizeof(ELEMENT_DESC) / sizeof(ELEMENT_DESC[0]), pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), &pInputLayout), "CreateInputLayout");
-	pDeviceContext->IASetInputLayout(pInputLayout.Get());
-
-
-	//экранное пространство
-	SetViewports(0, 1, 0, 0, 1u);
-
-	//отрисовка индексами
-	RenderDrawIndex(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, DXColl.IndexCount[iOBJ]);
-	countObj++;
-}
-
-
-//Logg.Log(pDevice->CreateBuffer(&BD, &SD, &pBuffer), "CreateBuffer");
-//pBufferCamera[0] = pBuffer.GetAddressOf();
