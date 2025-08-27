@@ -31,7 +31,7 @@ public:
 		SWdesc.Flags = 0;
 
 		Logg.Log(hr = D3D11CreateDeviceAndSwapChain
-		(nullptr,D3D_DRIVER_TYPE_HARDWARE,nullptr,0,nullptr,0,D3D11_SDK_VERSION,&SWdesc,&pGISwapChain,&pDevice,nullptr,&pDeviceContext), "CreateDevice");
+		(nullptr, D3D_DRIVER_TYPE_HARDWARE, nullptr, 0, nullptr, 0, D3D11_SDK_VERSION, &SWdesc, &pGISwapChain, &pDevice, nullptr, &pDeviceContext), "CreateDevice");
 
 		Logg.Log(pGISwapChain->GetBuffer(0, IID_PPV_ARGS(&pResource)), "GetBuffer");
 		Logg.Log(pDevice->CreateRenderTargetView(pResource.Get(), nullptr, &pRenderTargetView), "CreateRenderTargetView");
@@ -45,7 +45,7 @@ public:
 	void RenderClearBuffer(float red, float green, float blue);
 	void Present(bool vSync);
 	void DrawObject(float x, float y, float z, float width, float height,float ZAngle, TypeObject typeOBJ, const wchar_t* filename);
-	void SetCamera(float LookAtX, float LookAtY)
+	void SetCameraTarget(float LookAtX, float LookAtY)
 	{
 		this->LookAtX = LookAtX;
 		this->LookAtY = LookAtY;
@@ -54,7 +54,7 @@ private:
 
 	vector<ID3D11ShaderResourceView**> pSRV;
 	vector<ID3D11SamplerState**> pSST;
-	ScratchImage TexList[500];
+	ScratchImage TexList[1000];
 
 	vector<const wchar_t*> TexNameList;
 	void CreateTextureBuffer(const wchar_t* filename)
@@ -278,7 +278,23 @@ private:
 		pDeviceContext->IASetPrimitiveTopology(MetodDraw);
 		pDeviceContext->DrawIndexed(IndexCount, 0u, 0u);
 	}
-	
+	void RenderAlpha()
+	{
+		D3D11_BLEND_DESC blendDesc;
+		ZeroMemory(&blendDesc, sizeof(D3D11_BLEND_DESC));
+		blendDesc.RenderTarget[0].BlendEnable = TRUE;
+		blendDesc.RenderTarget[0].SrcBlend = D3D11_BLEND_SRC_ALPHA;
+		blendDesc.RenderTarget[0].DestBlend = D3D11_BLEND_INV_SRC_ALPHA;
+		blendDesc.RenderTarget[0].BlendOp = D3D11_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].SrcBlendAlpha = D3D11_BLEND_ONE;
+		blendDesc.RenderTarget[0].DestBlendAlpha = D3D11_BLEND_ZERO;
+		blendDesc.RenderTarget[0].BlendOpAlpha = D3D11_BLEND_OP_ADD;
+		blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D11_COLOR_WRITE_ENABLE_ALL;
+		pDevice->CreateBlendState(&blendDesc, &pBlendState);
+		float blendFactor[4] = { 0.0f, 0.0f, 0.0f, 0.0f };
+
+		pDeviceContext->OMSetBlendState(pBlendState.Get(), blendFactor, 0xffffffff);
+	}
 private:
 	GraphicEngine(const GraphicEngine&) = delete;
 	GraphicEngine(GraphicEngine&) = delete;
@@ -302,6 +318,7 @@ private:
 	ComPtr<ID3D11ShaderResourceView> pShaderResView{ nullptr };
 	ComPtr<ID3D11SamplerState> pSampler{ nullptr };
 	ComPtr<ID3D11Resource> pResource{ nullptr };
+	ComPtr<ID3D11BlendState> pBlendState{ nullptr };
 	float LookAtX = 0;
 	float LookAtY = 0;
 }d3dx;
@@ -311,10 +328,12 @@ void GraphicEngine::RenderClearBuffer(float red, float green, float blue)
 {
 	const float color[] = { red,green,blue,1.0f };
 	pDeviceContext->ClearRenderTargetView(pRenderTargetView.Get(), color);
+	RenderAlpha();
 }
 
 void GraphicEngine::Present(bool vSync)
 {
+	
 	if (vSync)
 	{
 		Logg.Log(pGISwapChain->Present(1u, 0u), "Present + vSync");

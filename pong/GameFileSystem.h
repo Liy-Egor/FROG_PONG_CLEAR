@@ -111,7 +111,6 @@ void LoadSVGDataMap(const string NameFileSVG) {
             if (PlayerPlay == false)
             {
                 PlayerPlay = true;
-                /*Player = new ATPlayer("AnimationTest", arr);*/
                 Player = new ATPlayer("racket", arr);
                 Player->SetLocation(IdLocation);
             }

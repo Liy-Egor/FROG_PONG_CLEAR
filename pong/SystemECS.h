@@ -377,7 +377,7 @@ void AppGame::Render()
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					0,
 					TypeObject::BOX2DTEX,
-					L"test2.png"
+					L"test1.png"
 				);
 				var.Start();
 			}
@@ -388,7 +388,7 @@ void AppGame::Render()
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					0,
 					TypeObject::BOX2DTEX,
-					L"test2.png"
+					L"test1.png"
 				);
 				if (var.GoEvent())
 				{
@@ -402,15 +402,15 @@ void AppGame::Render()
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					0,
 					TypeObject::BOX2DTEX,
-					L"test2.png"
+					L"test1.png"
 				);
 				var.GoEvent();
 			}
 			for (ATSpike var : VLocation[i].VSpike)
 			{
 				d3dx.DrawObject(
-					Player->GetPosition()->x, Player->GetPosition()->y, 1,
-					Player->GetPosition()->Width, Player->GetPosition()->Height,
+					var.GetPosition()->x, var.GetPosition()->y, 1,
+					var.GetPosition()->Width, var.GetPosition()->Height,
 					0,
 					TypeObject::BOX2DTEX,
 					L"test2.png"
@@ -423,9 +423,8 @@ void AppGame::Render()
 				Player->GetPosition()->Width, Player->GetPosition()->Height,
 				0,
 				TypeObject::BOX2DTEX,
-				L"test1.png"
+				L"testalpha.png"
 			);
-			
 
 			Player->Start();
 			HealthBar();
@@ -433,7 +432,7 @@ void AppGame::Render()
 		}
 	}
 
-	d3dx.SetCamera(Player->GetPosition()->x, Player->GetPosition()->y);
+	d3dx.SetCameraTarget(Player->GetPosition()->x, Player->GetPosition()->y);
 
 	d3dx.Present(true);
 }
