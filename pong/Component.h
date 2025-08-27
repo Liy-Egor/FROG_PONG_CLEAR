@@ -12,9 +12,9 @@ struct CTransform
     int Scale = 2;
 };
 
-struct CBitmap
+struct CTexture
 {
-    HBITMAP HBitMap;
+    string Texture;
 };
 
 struct CGravity

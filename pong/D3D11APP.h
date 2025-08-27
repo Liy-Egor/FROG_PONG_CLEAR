@@ -44,7 +44,7 @@ public:
 
 	void RenderClearBuffer(float red, float green, float blue);
 	void Present(bool vSync);
-	void DrawObject(float x, float y, float z, float width, float height,float ZAngle, TypeObject typeOBJ, const wchar_t* filename);
+	void DrawObject(float x, float y, float z, float width, float height,float ZAngle, TypeObject typeOBJ, string filename);
 	void SetCameraTarget(float LookAtX, float LookAtY)
 	{
 		this->LookAtX = LookAtX;
@@ -56,9 +56,13 @@ private:
 	vector<ID3D11SamplerState**> pSST;
 	ScratchImage TexList[1000];
 
-	vector<const wchar_t*> TexNameList;
-	void CreateTextureBuffer(const wchar_t* filename)
+	vector<string> TexNameList;
+	void CreateTextureBuffer(string nameObject)
 	{
+		string namepng = nameObject + ".png";
+		std::wstring widestr = std::wstring(namepng.begin(), namepng.end());
+		const wchar_t* filename = widestr.c_str();
+
 		int IndexTex = 0;
 		if (TexNameList.size() == 0)
 		{
@@ -107,18 +111,18 @@ private:
 		pSRV.push_back(pSrv);
 		pSST.push_back(pSs);
 		IndexTex = 0;
-		TexNameList.push_back(filename);
+		TexNameList.push_back(namepng);
 		}
 		else
 		{
 		for (int i = 0; i < TexNameList.size(); i++)
 		{
-			if (TexNameList[i] == filename)
+			if (TexNameList[i] == namepng)
 			{
 				IndexTex = i;
 				break;
 			}
-			else if (TexNameList[i] != filename && i == TexNameList.size() - 1)
+			else if (TexNameList[i] != namepng && i == TexNameList.size() - 1)
 			{
 				DirectX::LoadFromWICFile(filename, DirectX::WIC_FLAGS_NONE, nullptr, TexList[TexNameList.size()]);
 
@@ -161,7 +165,7 @@ private:
 				pSRV.push_back(pSrv);
 				pSST.push_back(pSs);
 				IndexTex = TexNameList.size();
-				TexNameList.push_back(filename);
+				TexNameList.push_back(namepng);
 			}
 		}
 		}
@@ -344,7 +348,7 @@ void GraphicEngine::Present(bool vSync)
 	}
 }
 
-void GraphicEngine::DrawObject(float x, float y, float z,float width, float height,float ZAngle,TypeObject typeOBJ,const wchar_t* filename)
+void GraphicEngine::DrawObject(float x, float y, float z,float width, float height,float ZAngle,TypeObject typeOBJ,string filename)
 {
 	BuildListBuffer ListBuffer(x, y, z, width, height, ZAngle, LookAtX, LookAtY);
 	CreateTextureBuffer(filename);

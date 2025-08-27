@@ -3,11 +3,8 @@
 
 using namespace ECC;
 void SpikeEvent(CTransform& Transform, CDamage& Damage);
-HBITMAP GetBitmap(string BitmapNameFile);
 void LoadTransform(CTransform& CTransform, float arr[]);
 void CreateObject(CTransform& CTransform);
-void Show(CBitmap& CBitmap, CTransform& Transform);
-void ShowWindow(CBitmap& CBitmap);
 void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump);
 void ProcessGravity(CJump& CJump, CTransform& Transform, CGravity& Gravity);
 void ProcessSound(CSound& CSound);
@@ -30,16 +27,16 @@ class BaseArcheType
 protected:
     int Entity = ECS.NewEntity();
     CTransform* Transform = ECS.SetComponent<CTransform>(Entity);
-    CBitmap* Bitmap = ECS.SetComponent<CBitmap>(Entity);
+	CTexture* Textures = ECS.SetComponent<CTexture>(Entity);
     CSound* Sound = ECS.SetComponent<CSound>(Entity);
     CNameObject* NameObject = ECS.SetComponent<CNameObject>(Entity);
     int WhatLocation;
     
 
-    BaseArcheType(string BitmapNameFile, float arr[])
+    BaseArcheType(string NameFile, float arr[])
     {
         LoadTransform(*Transform, arr);
-        Bitmap->HBitMap = GetBitmap(BitmapNameFile);
+		Textures->Texture = NameFile;
         CreateObject(*Transform);
         NameObject->Number = Entity;
     }
@@ -72,9 +69,9 @@ public:
     {
         return ECS.GetComponent<CTransform>(Entity, Transform);
     }
-    CBitmap* GetBitmaps()
+	CTexture* GetTexture()
     {
-        return ECS.GetComponent<CBitmap>(Entity, Bitmap);
+        return ECS.GetComponent<CTexture>(Entity, Textures);
     }
 };
 
@@ -90,7 +87,7 @@ protected:
     CGravity* Gravity = ECS.SetComponent<CGravity>(Entity);
     CCollider* Collider = ECS.SetComponent<CCollider>(Entity);
 
-    BasePerson(string BitmapNameFile, float arr[]) : BaseArcheType(BitmapNameFile, arr){}
+    BasePerson(string NameFile, float arr[]) : BaseArcheType(NameFile, arr){}
 public:
     CDamage* GetDamage()
     {
@@ -122,7 +119,7 @@ public:
 class ATWall : public BaseArcheType
 {
 public:
-    ATWall(string BitmapNameFile, float arr[]) : BaseArcheType(BitmapNameFile, arr)
+    ATWall(string NameFile, float arr[]) : BaseArcheType(NameFile, arr)
     {
         NameObject->Name = "Wall";
     }
@@ -132,7 +129,7 @@ class ATHealFlack : public BaseArcheType
 {
     CHealth* Health = ECS.SetComponent<CHealth>(Entity);
 public:
-    ATHealFlack(string BitmapNameFile, float arr[]) : BaseArcheType(BitmapNameFile, arr)
+    ATHealFlack(string NameFile, float arr[]) : BaseArcheType(NameFile, arr)
     {
         NameObject->Name = "HealFlack";
     }
@@ -146,7 +143,7 @@ class ATSpike : public BaseArcheType
 {
     CDamage* Damage = ECS.SetComponent<CDamage>(Entity);
 public:
-    ATSpike(string BitmapNameFile, float arr[]) : BaseArcheType(BitmapNameFile, arr)
+    ATSpike(string NameFile, float arr[]) : BaseArcheType(NameFile, arr)
     {
         NameObject->Name = "Spike";
     }
@@ -160,7 +157,7 @@ class ATPortal : public BaseArcheType
 {
     CPortalPàth* PortalPàth = ECS.SetComponent<CPortalPàth>(Entity);
 public:
-    ATPortal(string BitmapNameFile, float arr[],int Paths) : BaseArcheType(BitmapNameFile, arr)
+    ATPortal(string NameFile, float arr[],int Paths) : BaseArcheType(NameFile, arr)
     {
         NameObject->Name = "Portal";
         PortalPàth->Pàth = Paths;
@@ -181,7 +178,7 @@ private:
     ÑSpecialization* Specialization = ECS.SetComponent<ÑSpecialization>(Entity);
     ÑRank* Rank = ECS.SetComponent<ÑRank>(Entity);
 public:
-    ATEnemy(string BitmapNameFile, float arr[]) : BasePerson(BitmapNameFile, arr)
+    ATEnemy(string NameFile, float arr[]) : BasePerson(NameFile, arr)
     {
         NameObject->Name = "Enemy";
         AddCharacterModifier(*Health, *Defense, *Damage, *Speed, *Specialization, *Gender, *StatusBehavior, *TypeÑharacter, *NameÑharacter, *Rank,
@@ -198,7 +195,7 @@ public:
 class ATPlayer : public BasePerson
 {
 public:
-    ATPlayer(string BitmapNameFile, float arr[]) : BasePerson(BitmapNameFile, arr)
+    ATPlayer(string NameFile, float arr[]) : BasePerson(NameFile, arr)
     {
         NameObject->Name = "Player";
         NameÑharacter->NameChar = "Komar";
@@ -211,13 +208,11 @@ public:
     }
 }*Player;
 
-
-
 //êîíåö âñåõ àðõåòèïîâ
 class ATLocation : public BaseArcheType
 {
 public:
-    ATLocation(string BitmapNameFile, float arr[]) : BaseArcheType(BitmapNameFile, arr)
+    ATLocation(string NameFile, float arr[]) : BaseArcheType(NameFile, arr)
     {
         NameObject->Name = "Level";
     }

@@ -4,6 +4,7 @@
 string StrReplace(string* str, string namestr) {
     return str->replace(str->find(namestr), namestr.length(), "");
 }
+
 //создание карт можно делать в редакторе Adobe Photoshop любой версии
 void LoadSVGDataMap(const string NameFileSVG) {
    
@@ -37,7 +38,7 @@ void LoadSVGDataMap(const string NameFileSVG) {
                     StrReplace(&str, "\"");
 
                     //исключения
-                    if (!str.find("walls_f") || !str.find("background") || !str.find("image")) {
+                    if (!str.find("walls_f") || !str.find("Back_lvl") || !str.find("image")) {
                         if (!str.find("walls_f")) {
                             dS[i].push_back("empty");
                             dS[5].push_back("error image");
@@ -85,6 +86,7 @@ void LoadSVGDataMap(const string NameFileSVG) {
         }
     }
 
+
     //загрузка уровня на основе собранных данных
     int IdLocation;
     for (int i = 0; i < dS[0].size(); i++) {
@@ -97,45 +99,86 @@ void LoadSVGDataMap(const string NameFileSVG) {
         float arr[4]{x, y, width, height};
         
         //создание объектов
-        if (!nameObject.find("walls")) {
-            Wall = new ATWall("walls", arr);
+        if (!nameObject.find("Centr_Forest_Place")) {
+            Wall = new ATWall("Centr_Forest_Place", arr);
             Wall->SetLocation(IdLocation);
             VLocation[IdLocation].VWall.push_back(*Wall);
         }
-        else if (!nameObject.find("enemy")) {
-            Enemy = new ATEnemy("enemy1", arr);
+		else if (!nameObject.find("CentrL_Forest_Place")) {
+			Wall = new ATWall("CentrL_Forest_Place", arr);
+			Wall->SetLocation(IdLocation);
+			VLocation[IdLocation].VWall.push_back(*Wall);
+		}
+		else if (!nameObject.find("CentrR_Forest_Place")) {
+			Wall = new ATWall("CentrR_Forest_Place", arr);
+			Wall->SetLocation(IdLocation);
+			VLocation[IdLocation].VWall.push_back(*Wall);
+		}
+		else if (!nameObject.find("DownL_Forest_Place")) {
+			Wall = new ATWall("DownL_Forest_Place", arr);
+			Wall->SetLocation(IdLocation);
+			VLocation[IdLocation].VWall.push_back(*Wall);
+		}
+		else if (!nameObject.find("DownM_Forest_Place")) {
+			Wall = new ATWall("DownM_Forest_Place", arr);
+			Wall->SetLocation(IdLocation);
+			VLocation[IdLocation].VWall.push_back(*Wall);
+		}
+		else if (!nameObject.find("DownR_Forest_Place")) {
+			Wall = new ATWall("DownR_Forest_Place", arr);
+			Wall->SetLocation(IdLocation);
+			VLocation[IdLocation].VWall.push_back(*Wall);
+		}
+		else if (!nameObject.find("TopL_Forest_Place")) {
+			Wall = new ATWall("TopL_Forest_Place", arr);
+			Wall->SetLocation(IdLocation);
+			VLocation[IdLocation].VWall.push_back(*Wall);
+		}
+		else if (!nameObject.find("TopM_Forest_Place")) {
+			Wall = new ATWall("TopM_Forest_Place", arr);
+			Wall->SetLocation(IdLocation);
+			VLocation[IdLocation].VWall.push_back(*Wall);
+		}
+		else if (!nameObject.find("TopR_Forest_Place")) {
+			Wall = new ATWall("TopR_Forest_Place", arr);
+			Wall->SetLocation(IdLocation);
+			VLocation[IdLocation].VWall.push_back(*Wall);
+		}
+        else if (!nameObject.find("Enemy_static_Test")) {
+            Enemy = new ATEnemy("Enemy_static_Test", arr);
             Enemy->SetLocation(IdLocation);
             VLocation[IdLocation].VEnemy.push_back(*Enemy);
         }
-        else if (!nameObject.find("racket")) {      
+        else if (!nameObject.find("Player_static_Test")) {      
             if (PlayerPlay == false)
             {
                 PlayerPlay = true;
-                Player = new ATPlayer("racket", arr);
+                Player = new ATPlayer("Player_static_Test", arr);
                 Player->SetLocation(IdLocation);
             }
         }
-        else if (!nameObject.find("background")) {
+        else if (!nameObject.find("Back_lvl")) {
             Location = new ATLocation(nameObject, arr);
             IdLocation = VLocation.size();
             VLocation.push_back(*Location);
         }
-        else if (!nameObject.find("portal")) {
-            StrReplace(&nameObject, "portal");
-            Portal = new ATPortal("racket", arr, stoi(nameObject));
-            Portal->SetLocation(IdLocation);
-            VLocation[IdLocation].VPortal.push_back(*Portal);
-        }
-        else if (!nameObject.find("heal")) {
-            HealFlack = new ATHealFlack("ball", arr);
-            HealFlack->SetLocation(IdLocation);
-            VLocation[IdLocation].VHealFlack.push_back(*HealFlack);
-        }
-        else if (!nameObject.find("spike")) {
-            Spike = new ATSpike("spike", arr);
-            Spike->SetLocation(IdLocation);
-            VLocation[IdLocation].VSpike.push_back(*Spike);
-        }
+
+        //else if (!nameObject.find("portal")) {
+        //    StrReplace(&nameObject, "portal");
+        //    Portal = new ATPortal("racket", arr, stoi(nameObject));
+        //    Portal->SetLocation(IdLocation);
+        //    VLocation[IdLocation].VPortal.push_back(*Portal);
+        //}
+        //else if (!nameObject.find("heal")) {
+        //    HealFlack = new ATHealFlack("ball", arr);
+        //    HealFlack->SetLocation(IdLocation);
+        //    VLocation[IdLocation].VHealFlack.push_back(*HealFlack);
+        //}
+        //else if (!nameObject.find("spike")) {
+        //    Spike = new ATSpike("spike", arr);
+        //    Spike->SetLocation(IdLocation);
+        //    VLocation[IdLocation].VSpike.push_back(*Spike);
+        //}
 
     }
     file.close();
