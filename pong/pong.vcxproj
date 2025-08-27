@@ -96,37 +96,37 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>..\pong\Lib\DirectXTex\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\pong\Lib\DirectXTex\bin;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\pong\Lib\DirectXTex\libs;$(LibraryPath)</LibraryPath>
     <OutDir>.\Debug</OutDir>
     <IntDir>.\Debug</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
     <IncludePath>..\pong\Lib\DirectXTex\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\pong\Lib\DirectXTex\bin;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\pong\Lib\DirectXTex\libs;$(LibraryPath)</LibraryPath>
     <OutDir>.\Debug</OutDir>
     <IntDir>.\Debug</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>..\pong\Lib\DirectXTex\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\pong\Lib\DirectXTex\bin;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\pong\Lib\DirectXTex\libs;$(LibraryPath)</LibraryPath>
     <OutDir>.\Release</OutDir>
     <IntDir>.\Release</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
     <IncludePath>..\pong\Lib\DirectXTex\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\pong\Lib\DirectXTex\bin;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\pong\Lib\DirectXTex\libs;$(LibraryPath)</LibraryPath>
     <OutDir>.\Release</OutDir>
     <IntDir>.\Release</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>..\pong\Lib\DirectXTex\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\pong\Lib\DirectXTex\bin;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\pong\Lib\DirectXTex\libs;$(LibraryPath)</LibraryPath>
     <OutDir>.\Debug</OutDir>
     <IntDir>.\Debug</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>..\pong\Lib\DirectXTex\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\pong\Lib\DirectXTex\bin;$(LibraryPath)</LibraryPath>
+    <LibraryPath>..\pong\Lib\DirectXTex\libs;$(LibraryPath)</LibraryPath>
     <OutDir>.\Release</OutDir>
     <IntDir>.\Release</IntDir>
   </PropertyGroup>
