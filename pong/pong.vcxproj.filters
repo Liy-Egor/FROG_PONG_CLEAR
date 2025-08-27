@@ -121,7 +121,7 @@
     <ClInclude Include="D3D11APP.h">
       <Filter>D3D11</Filter>
     </ClInclude>
-    <ClInclude Include="MathShaders.h">
+    <ClInclude Include="GraphicManager.h">
       <Filter>D3D11</Filter>
     </ClInclude>
     <ClInclude Include="APPGame.h">

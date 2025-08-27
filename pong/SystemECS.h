@@ -344,13 +344,20 @@ void HealthBar()
 //это можно подгрузить 1 раз и больше не подгружать
 void AppGame::Init()
 {	///////!!!!!!
-	LoadImages(L"image2.png"); ///////!!!!!!
+
+	GraphicsLoader test(1000, 500, 1, 200, 200, TypeObject::BOX2DTEX, L"test4.png", 0, d3dx.GetDEV());
+
+
 	///////!!!!!!
 	LoadSVGDataMap("LVL0");
 	LoadSVGDataMap("LVL1");
 
 	MapSizeW = VLocation[0].GetPosition()->Width;
 	MapSizeH = VLocation[0].GetPosition()->Height;
+
+
+
+	//LoadImages(L"test4.png"); ///////!!!!!!
 }
 
 //это грузит постоянно
@@ -359,7 +366,7 @@ void AppGame::Render()
 	float sin_ = sin(Timer.TimePeak()) / 1.0f + 0.5f;
 	d3dx.RenderClearBuffer(sin_ /2, 0.2f, 1.0f);
 
-	for (int i = 0; i < VLocation.size(); i++)
+	/*for (int i = 0; i < VLocation.size(); i++)
 	{
 		if (Player->GetLocation() == i)
 		{
@@ -372,7 +379,7 @@ void AppGame::Render()
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					1.1 * sin_,
 					0,
-					TypeObject::Box2DTEX,
+					TypeObject::BOX2DTEX,
 					Player->GetPosition()->x, Player->GetPosition()->y
 				);
 			}
@@ -383,7 +390,7 @@ void AppGame::Render()
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					1.1 * sin_,
 					0,
-					TypeObject::Box2DTEX,
+					TypeObject::BOX2DTEX,
 					Player->GetPosition()->x, Player->GetPosition()->y
 				);
 				var.Start();
@@ -395,7 +402,7 @@ void AppGame::Render()
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					1.1 * sin_,
 					0,
-					TypeObject::Box2DTEX,
+					TypeObject::BOX2DTEX,
 					Player->GetPosition()->x, Player->GetPosition()->y
 				);
 				if (var.GoEvent())
@@ -410,7 +417,7 @@ void AppGame::Render()
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					1.1 * sin_,
 					0,
-					TypeObject::Box2DTEX,
+					TypeObject::BOX2DTEX,
 					Player->GetPosition()->x, Player->GetPosition()->y
 				);
 				var.GoEvent();
@@ -422,7 +429,7 @@ void AppGame::Render()
 					Player->GetPosition()->Width, Player->GetPosition()->Height,
 					1.1 * sin_,
 					0,
-					TypeObject::Box2DTEX,
+					TypeObject::BOX2DTEX,
 					Player->GetPosition()->x, Player->GetPosition()->y
 				);
 				var.GoEvent();
@@ -433,7 +440,7 @@ void AppGame::Render()
 				Player->GetPosition()->Width, Player->GetPosition()->Height,
 				1.1 * sin_,
 				0,
-				TypeObject::Box2DTEX,
+				TypeObject::BOX2DTEX,
 				Player->GetPosition()->x , Player->GetPosition()->y
 			);
 
@@ -441,8 +448,9 @@ void AppGame::Render()
 			HealthBar();
 			break;
 		}
-	}
-	
+	}*/
+
+	d3dx.UpdateDraw(TypeObject::BOX2DTEX);
 	d3dx.Present(true);
 }
 

@@ -49,7 +49,13 @@ protected:
       ECS.DeleteEntity(Entity);
       /*delete this;*/ //крашит прогу 
     }
+
+
 public:
+	int GetID()
+	{
+		return Entity;
+	}
     virtual void Destroy()
     {
         DeleteAT();

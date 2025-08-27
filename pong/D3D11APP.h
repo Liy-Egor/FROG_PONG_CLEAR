@@ -1,5 +1,5 @@
 #pragma once
-#include "MathShaders.h"
+#include "GraphicManager.h"
 //ÒÓÒÎÐÈÀËÛ
 //https://www.youtube.com/@PardCode
 //https://www.rastertek.com/tutdx11win10.html
@@ -35,7 +35,6 @@ public:
 
 		Logg.Log(pGISwapChain->GetBuffer(0, IID_PPV_ARGS(&pResource)), "GetBuffer");
 		Logg.Log(pDevice->CreateRenderTargetView(pResource.Get(), nullptr, &pRenderTargetView), "CreateRenderTargetView");
-
 	}
 	~GraphicEngine()
 	{
@@ -47,15 +46,18 @@ public:
 	void Present(bool vSync);
 	void DrawObject(float x, float y, float z, float width, float height, float colorDelta,float ZAngle, TypeObject typeOBJ, float xPlayer, float yPlayer);
 
+	void UpdateDraw(TypeObject typeobject);
+
+	ID3D11Device* GetDEV()
+	{
+		return pDevice.Get();
+	}
+	
 private:
 
-	///////!!!!!!
 	bool create = false;
-	///////!!!!!!
 	vector<ID3D11ShaderResourceView**> psrv;
 	vector<ID3D11SamplerState**> ss;
-	///////!!!!!!
-
 	void CreateTextureBuffer(D3D11_TEXTURE2D_DESC TXDC, D3D11_SUBRESOURCE_DATA SD , D3D11_SHADER_RESOURCE_VIEW_DESC SRVD, D3D11_SAMPLER_DESC SDC)
 	{
 		///////!!!!!!
@@ -77,7 +79,6 @@ private:
 		pDeviceContext->PSSetSamplers(0, 1, ss[0]);
 
 	}
-
 	void CreateInputLayer(vector<D3D11_INPUT_ELEMENT_DESC> ElementDesc)
 	{
 		D3D11_INPUT_ELEMENT_DESC* arr = new D3D11_INPUT_ELEMENT_DESC[ElementDesc.size()];
@@ -105,11 +106,12 @@ private:
 		D3D11_SUBRESOURCE_DATA SD{};
 		SD.pSysMem = arr;
 		Logg.Log(pDevice->CreateBuffer(&BD, &SD, &pIndexBuffer), "CreateBuffer");
+
 		pDeviceContext->IASetIndexBuffer(pIndexBuffer.Get(),DXGI_FORMAT_R16_UINT,0u);
+
 		return Index.size();
 		delete[](arr);
 	}
-
 	void CreateMatrixBuffer(vector<XMMATRIX> matrix)
 	{
 		XMMATRIX* arr = new XMMATRIX[matrix.size()];
@@ -130,7 +132,6 @@ private:
 		pDeviceContext->VSSetConstantBuffers(0u, 1u, pConstBuffer.GetAddressOf());
 		delete[](arr);
 	}
-
 	void CreateVectorBuff(vector<VEC3> List)
 	{
 		VEC3* arr = new VEC3[List.size()];
@@ -152,9 +153,7 @@ private:
 		const UINT offset = 0u;
 		pDeviceContext->IASetVertexBuffers(0u, 1u, pBuffer.GetAddressOf(), &stride, &offset);
 		delete[](arr);
-	}
-
-
+	} 
 	void SetShadersVSPS(const wchar_t* VSNameFilecso, const wchar_t* PSNameFilecso)
 	{
 		Logg.Log(D3DReadFileToBlob(VSNameFilecso, &pBlobVS), "D3DReadFileToBlobVS");
@@ -164,7 +163,6 @@ private:
 		Logg.Log(pDevice->CreatePixelShader(pBlobPS->GetBufferPointer(), pBlobPS->GetBufferSize(), nullptr, &pPixelShader), "CreatePixelShader");
 		pDeviceContext->PSSetShader(pPixelShader.Get(), 0, 0);
 	}
-
 
 	void SetViewports(float MinDepth, float MaxDepth,float TopLeftX, float TopLeftY,UINT countViewports)
 	{
@@ -191,8 +189,8 @@ private:
 	GraphicEngine& operator = (GraphicEngine&) = delete;
 private:
 	HRESULT hr;
-	ComPtr<IDXGISwapChain> pGISwapChain{nullptr};
 	ComPtr<ID3D11Device> pDevice{ nullptr };
+	ComPtr<IDXGISwapChain> pGISwapChain{nullptr};
 	ComPtr<ID3D11DeviceContext> pDeviceContext{ nullptr };
 	ComPtr<ID3D11RenderTargetView> pRenderTargetView{nullptr};
 	ComPtr<ID3DBlob> pBlobVS{ nullptr };
@@ -207,6 +205,7 @@ private:
 	ComPtr<ID3D11ShaderResourceView> pShaderResView{ nullptr };
 	ComPtr<ID3D11SamplerState> pSampler{ nullptr };
 	ComPtr<ID3D11Resource> pResource{ nullptr };
+	int countObj = 0;
 }d3dx;
 
 //ðåàëèçàöèÿ
@@ -238,62 +237,73 @@ void GraphicEngine::DrawObject(
 )
 {
 	BuildListBuffer ListBuffer(x, y, z, width, height, colorDelta, ZAngle, xPlayer, yPlayer);
-
-	UINT IndexCount = CreateIndexBuff(ListBuffer.GetIndex(typeOBJ));
-	CreateVectorBuff(ListBuffer.GetVectorList(typeOBJ));
-
-	
-	CreateTextureBuffer(
-		ListBuffer.GetTEXTURE2D_DESC(), 
-		ListBuffer.GetSUBRESOURCE_DATA(),
-		ListBuffer.GetRESOURCE_VIEW_DESC(),
-		ListBuffer.GetSAMPLER_DESC()
-	);
-	/*ListBuffer.GetImages(L"xxx.png")*/
-
+	CreateTextureBuffer(ListBuffer.GetTEXTURE2D_DESC(), ListBuffer.GetSUBRESOURCE_DATA(),ListBuffer.GetRESOURCE_VIEW_DESC(),ListBuffer.GetSAMPLER_DESC());
 	CreateMatrixBuffer(ListBuffer.GetMatrix(typeOBJ));
-	if(typeOBJ == TypeObject::Box2D)
-	{SetShadersVSPS(L"2DVertexShader.cso", L"2DPixelShaderBlack.cso");}
-	if (typeOBJ == TypeObject::Box2DTEX)
+	CreateVectorBuff(ListBuffer.GetVectorList(typeOBJ));
+	UINT IndexCount = CreateIndexBuff(ListBuffer.GetIndex(typeOBJ));
+	if (typeOBJ == TypeObject::BOX2DTEX)
 	{
 		SetShadersVSPS(L"TexVertexShader.cso", L"TexPixelShader.cso");
 	}
-
 	CreateInputLayer(ListBuffer.GetElementDesc(typeOBJ));
-
 	SetViewports(0, 1, 0, 0, 1u);
 	RenderDrawIndex(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, IndexCount);
 }
 
+void GraphicEngine::UpdateDraw(TypeObject typeobject)
+{
+	if (countObj == DXColl.ImageNameALL.size())
+		countObj = 0;
+
+	int iOBJ = typeobject;
+
+	//òåêñòóðû
+	for (int i = 0; i < DXColl.ImageName.size(); i++)
+	{
+		if (DXColl.ImageName[i] == DXColl.ImageNameALL[countObj])
+		{
+			pDeviceContext->PSSetShaderResources(0u, 1u, DXColl.pSRVVec[i]);
+			pDeviceContext->PSSetSamplers(0, 1, DXColl.pSStateVec[i]);
+			break;
+		}
+	}
+
+	//ìàòðèöà
+	pDeviceContext->VSSetConstantBuffers(0u, 1u, DXColl.pBufferMatrix[countObj]);
+
+	//âåðòåêñû
+	const UINT stride = sizeof(VEC3);
+	const UINT offset = 0u;
+	pDeviceContext->IASetVertexBuffers(0u, 1u, DXColl.pBufferVec[iOBJ], &stride, &offset);
+
+	//èíäåêñû
+	pDeviceContext->IASetIndexBuffer(DXColl.pBufferIndex[iOBJ], DXGI_FORMAT_R16_UINT, 0u);
+
+	//ñëîè è øåéäåðû
+	Logg.Log(D3DReadFileToBlob(L"TexVertexShader.cso", &pBlobVS), "D3DReadFileToBlobVS");
+	Logg.Log(D3DReadFileToBlob(L"TexPixelShader.cso", &pBlobPS), "D3DReadFileToBlobPS");
+	Logg.Log(pDevice->CreateVertexShader(pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), nullptr, &pVertexShader), "CreateVertexShader");
+	pDeviceContext->VSSetShader(pVertexShader.Get(), 0, 0);
+	Logg.Log(pDevice->CreatePixelShader(pBlobPS->GetBufferPointer(), pBlobPS->GetBufferSize(), nullptr, &pPixelShader), "CreatePixelShader");
+	pDeviceContext->PSSetShader(pPixelShader.Get(), 0, 0);
+
+	D3D11_INPUT_ELEMENT_DESC ELEMENT_DESC[] =
+	{
+		{"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D11_INPUT_PER_VERTEX_DATA, 0},
+		{"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, 12u, D3D11_INPUT_PER_VERTEX_DATA, 0 }
+	};
+	Logg.Log(pDevice->CreateInputLayout(ELEMENT_DESC, sizeof(ELEMENT_DESC) / sizeof(ELEMENT_DESC[0]), pBlobVS->GetBufferPointer(), pBlobVS->GetBufferSize(), &pInputLayout), "CreateInputLayout");
+	pDeviceContext->IASetInputLayout(pInputLayout.Get());
 
 
-//for (int i = 0; i < DataImage.size(); ++i) {
-//	arr[i] = DataImage[i];
-//}
+	//ýêðàííîå ïðîñòðàíñòâî
+	SetViewports(0, 1, 0, 0, 1u);
 
-//unsigned int rowPitch = (WidthImage * 4) * sizeof(unsigned char);
-//D3D11_TEXTURE2D_DESC TXDC{};
-//TXDC.Width = WidthImage; //ØÈÐÈÍÀ ÈÇÎÁÐÀÆÄÅÍÈß
-//TXDC.Height = HeightImage; //ÂÛÑÎÒÀ ÈÇÎÁÐÀÆÄÅÍÈß
-//TXDC.MipLevels = 0;
-//TXDC.ArraySize = 1;
-//TXDC.Format = DXGI_FORMAT_B8G8R8A8_UNORM;
-//TXDC.SampleDesc.Count = 1;
-//TXDC.SampleDesc.Quality = 0;
-//TXDC.Usage = D3D11_USAGE_DEFAULT;
-//TXDC.BindFlags = D3D11_BIND_SHADER_RESOURCE | D3D11_BIND_RENDER_TARGET;
-//TXDC.CPUAccessFlags = 0;
-//TXDC.MiscFlags = D3D11_RESOURCE_MISC_GENERATE_MIPS;
-//Logg.Log(pDevice->CreateTexture2D(&TXDC, NULL, &pTex2D), "CreateTexture2D");
-
-//pDeviceContext->UpdateSubresource(pTex2D.Get(), 0,NULL, static_cast<const void*>(&arr) , rowPitch, 0);
+	//îòðèñîâêà èíäåêñàìè
+	RenderDrawIndex(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, DXColl.IndexCount[iOBJ]);
+	countObj++;
+}
 
 
-//D3D11_SUBRESOURCE_DATA SD{};
-//SD.pSysMem = 0; //ËÈÑÒ ÈÇÎÁÐÀÆÅÍÈß
-//SD.SysMemPitch = 0; //ØÈÐÈÍÀ ÍÀ ÑÀÉÇ
-//pDevice->CreateTexture2D(&TXDC, &SD, &pTex2D);
-
-
-
-
+//Logg.Log(pDevice->CreateBuffer(&BD, &SD, &pBuffer), "CreateBuffer");
+//pBufferCamera[0] = pBuffer.GetAddressOf();
