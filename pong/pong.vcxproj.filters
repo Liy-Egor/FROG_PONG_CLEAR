@@ -22,9 +22,6 @@
     <Filter Include="D3D11\Shaders">
       <UniqueIdentifier>{b69261c4-2070-4d40-b240-bcdb8f5355a6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="D3D11\Shaders\SH2D">
-      <UniqueIdentifier>{bbee4c4f-ca36-46b0-99b3-79d83d406aca}</UniqueIdentifier>
-    </Filter>
     <Filter Include="test">
       <UniqueIdentifier>{a98345bb-9b64-4238-b1cd-9972123c0b7f}</UniqueIdentifier>
     </Filter>
@@ -39,109 +36,47 @@
   </ItemGroup>
   <ItemGroup>
     <Media Include="..\Debug\music.mp3" />
-    <Media Include="Resoursces\Sound\bounce.wav">
-      <Filter>Resource Files</Filter>
-    </Media>
-    <Media Include="Resoursces\Sound\fail.wav">
-      <Filter>Resource Files</Filter>
-    </Media>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="Resoursces\Image\back.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Resoursces\Image\background_0.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Resoursces\Image\background_1.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Resoursces\Image\ball.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Resoursces\Image\enemy1.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Resoursces\Image\frog.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Resoursces\Image\health_empty.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Resoursces\Image\health_full.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Resoursces\Image\racket.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Resoursces\Image\racket_enemy.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Resoursces\Image\spike.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="Resoursces\Image\walls.bmp">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="test1.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="test2.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="test3.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-    <Image Include="test4.png">
-      <Filter>Resource Files</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="BaseStructures.h">
+    <ClInclude Include="HeaderFile\SystemECS.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="HeaderFile\PrimaryProcess.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="GameFileSystem.h">
+    <ClInclude Include="HeaderFile\Macros.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="PrimaryProcess.h">
+    <ClInclude Include="HeaderFile\GraphicManager.h">
+      <Filter>D3D11</Filter>
+    </ClInclude>
+    <ClInclude Include="HeaderFile\GameFileSystem.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ArcheType.h">
+    <ClInclude Include="HeaderFile\ECSSoft.h">
       <Filter>ECS</Filter>
     </ClInclude>
-    <ClInclude Include="Component.h">
-      <Filter>ECS</Filter>
-    </ClInclude>
-    <ClInclude Include="ECSSoft.h">
-      <Filter>ECS</Filter>
-    </ClInclude>
-    <ClInclude Include="SystemECS.h">
-      <Filter>ECS</Filter>
-    </ClInclude>
-    <ClInclude Include="D3D11APP.h">
+    <ClInclude Include="HeaderFile\D3D11APP.h">
       <Filter>D3D11</Filter>
     </ClInclude>
-    <ClInclude Include="GraphicManager.h">
-      <Filter>D3D11</Filter>
+    <ClInclude Include="HeaderFile\Component.h">
+      <Filter>ECS</Filter>
     </ClInclude>
-    <ClInclude Include="APPGame.h">
-      <Filter>D3D11</Filter>
+    <ClInclude Include="HeaderFile\BaseStructures.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="HeaderFile\ArcheType.h">
+      <Filter>ECS</Filter>
+    </ClInclude>
+    <ClInclude Include="HeaderFile\APPGame.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="2DPixelShaderBlack.hlsl">
-      <Filter>D3D11\Shaders\SH2D</Filter>
-    </FxCompile>
-    <FxCompile Include="2DVertexShader.hlsl">
-      <Filter>D3D11\Shaders\SH2D</Filter>
-    </FxCompile>
-    <FxCompile Include="2DPixelShaderWhite.hlsl">
-      <Filter>D3D11\Shaders\SH2D</Filter>
-    </FxCompile>
-    <FxCompile Include="TexVertexShader.hlsl">
+    <FxCompile Include="Shaders\2DTEX\TexVertexShader.hlsl">
       <Filter>D3D11\Shaders\TEX2D</Filter>
     </FxCompile>
-    <FxCompile Include="TexPixelShader.hlsl">
+    <FxCompile Include="Shaders\2DTEX\TexPixelShader.hlsl">
       <Filter>D3D11\Shaders\TEX2D</Filter>
     </FxCompile>
   </ItemGroup>
