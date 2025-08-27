@@ -3,6 +3,7 @@
 int main()
 {
 	App.FrameGo();
+
 	return 0;
 }
 
