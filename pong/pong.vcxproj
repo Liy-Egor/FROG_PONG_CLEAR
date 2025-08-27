@@ -95,28 +95,40 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>..\Lib\DirectXTex\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\Lib\DirectXTex\bin;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\pong\Lib\DirectXTex\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\pong\Lib\DirectXTex\bin;$(LibraryPath)</LibraryPath>
+    <OutDir>.\Debug</OutDir>
+    <IntDir>.\Debug</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|ARM'">
-    <IncludePath>..\Lib\DirectXTex\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\Lib\DirectXTex\bin;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\pong\Lib\DirectXTex\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\pong\Lib\DirectXTex\bin;$(LibraryPath)</LibraryPath>
+    <OutDir>.\Debug</OutDir>
+    <IntDir>.\Debug</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>..\Lib\DirectXTex\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\Lib\DirectXTex\bin;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\pong\Lib\DirectXTex\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\pong\Lib\DirectXTex\bin;$(LibraryPath)</LibraryPath>
+    <OutDir>.\Release</OutDir>
+    <IntDir>.\Release</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|ARM'">
-    <IncludePath>..\Lib\DirectXTex\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\Lib\DirectXTex\bin;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\pong\Lib\DirectXTex\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\pong\Lib\DirectXTex\bin;$(LibraryPath)</LibraryPath>
+    <OutDir>.\Release</OutDir>
+    <IntDir>.\Release</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>..\Lib\DirectXTex\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\Lib\DirectXTex\bin;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\pong\Lib\DirectXTex\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\pong\Lib\DirectXTex\bin;$(LibraryPath)</LibraryPath>
+    <OutDir>.\Debug</OutDir>
+    <IntDir>.\Debug</IntDir>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>..\Lib\DirectXTex\include;$(IncludePath)</IncludePath>
-    <LibraryPath>..\Lib\DirectXTex\bin;$(LibraryPath)</LibraryPath>
+    <IncludePath>..\pong\Lib\DirectXTex\include;$(IncludePath)</IncludePath>
+    <LibraryPath>..\pong\Lib\DirectXTex\bin;$(LibraryPath)</LibraryPath>
+    <OutDir>.\Release</OutDir>
+    <IntDir>.\Release</IntDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -124,12 +136,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpp23</LanguageStandard>
       <ShowIncludes>false</ShowIncludes>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EntryPointSymbol>
       </EntryPointSymbol>
@@ -147,12 +159,12 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <LanguageStandard>stdcpp20</LanguageStandard>
+      <LanguageStandard>stdcpp23</LanguageStandard>
       <ShowIncludes>false</ShowIncludes>
       <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EntryPointSymbol>
       </EntryPointSymbol>
@@ -177,7 +189,7 @@
       <LanguageStandard>stdcpp23</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -202,7 +214,7 @@
       <LanguageStandard>stdcpp23</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -220,9 +232,10 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp23</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalDependencies>d3d11.lib;d3dcompiler.lib;DirectXTexD_x86.lib;Msimg32.lib;Winmm.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
@@ -241,7 +254,7 @@
       <LanguageStandard>stdcpp23</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
@@ -344,6 +357,5 @@
     </FxCompile>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
-  </ImportGroup>
+  <ImportGroup Label="ExtensionTargets" />
 </Project>
