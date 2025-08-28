@@ -39,7 +39,7 @@ public:
 	~GraphicEngine()
 	{
 
-
+		
 	}
 
 	void RenderClearBuffer(float red, float green, float blue);
@@ -67,7 +67,8 @@ private:
 		if (TexNameList.size() == 0)
 		{
 		DirectX::LoadFromWICFile(filename, DirectX::WIC_FLAGS_NONE, nullptr, TexList[TexNameList.size()]);
-
+		this->WidthImage = TexList[TexNameList.size()].GetImages()->width;
+		this->HeightImage = TexList[TexNameList.size()].GetImages()->height;
 		D3D11_TEXTURE2D_DESC TXDC{};
 		TXDC.Width = TexList[TexNameList.size()].GetImages()->width;
 		TXDC.Height = TexList[TexNameList.size()].GetImages()->height;
@@ -119,13 +120,16 @@ private:
 		{
 			if (TexNameList[i] == namepng)
 			{
+				this->WidthImage = TexList[i].GetImages()->width;
+				this->HeightImage = TexList[i].GetImages()->height;
 				IndexTex = i;
 				break;
 			}
 			else if (TexNameList[i] != namepng && i == TexNameList.size() - 1)
 			{
 				DirectX::LoadFromWICFile(filename, DirectX::WIC_FLAGS_NONE, nullptr, TexList[TexNameList.size()]);
-
+				this ->WidthImage = TexList[TexNameList.size()].GetImages()->width;
+				this->HeightImage = TexList[TexNameList.size()].GetImages()->height;
 				D3D11_TEXTURE2D_DESC TXDC{};
 				TXDC.Width = TexList[TexNameList.size()].GetImages()->width;
 				TXDC.Height = TexList[TexNameList.size()].GetImages()->height;
@@ -252,7 +256,10 @@ private:
 	{
 		const wchar_t* VSNameFilecso = L"";
 		const wchar_t* PSNameFilecso = L"";
-		if (TypeObject::BOX2DTEX == typeOBJ)
+		if (TypeObject::BOX2DTEX == typeOBJ || 
+			TypeObject::BOX2DTEXSEEMLESS == typeOBJ ||
+			TypeObject::BOX2DTEXSEEMLESS_LMR == typeOBJ
+			)
 		{
 			VSNameFilecso = SHTEX"TexVertexShader.cso";
 			PSNameFilecso = SHTEX"TexPixelShader.cso";
@@ -325,6 +332,8 @@ private:
 	ComPtr<ID3D11BlendState> pBlendState{ nullptr };
 	float LookAtX = 0;
 	float LookAtY = 0;
+	float WidthImage = 0;
+	float HeightImage = 0;
 }d3dx;
 
 //реализация
@@ -350,13 +359,25 @@ void GraphicEngine::Present(bool vSync)
 
 void GraphicEngine::DrawObject(float x, float y, float z,float width, float height,float ZAngle,TypeObject typeOBJ,string filename)
 {
-	BuildListBuffer ListBuffer(x, y, z, width, height, ZAngle, LookAtX, LookAtY);
-	CreateTextureBuffer(filename);
-	CreateMatrixBuffer(ListBuffer.GetMatrix(typeOBJ));
-	CreateVectorBuff(ListBuffer.GetVectorList(typeOBJ));
-	UINT IndexCount = CreateIndexBuff(ListBuffer.GetIndex(typeOBJ));
-	SetShadersVSPS(typeOBJ);
-	CreateInputLayer(ListBuffer.GetElementDesc(typeOBJ));
-	SetViewports(0, 1, 0, 0, 1u);
-	RenderDrawIndex(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, IndexCount);
+	int Iterators = 0;
+	if (TypeObject::BOX2DTEX == typeOBJ ||
+		TypeObject::BOX2DTEXSEEMLESS == typeOBJ)
+	{Iterators = 1;}
+	else if (TypeObject::BOX2DTEXSEEMLESS_LMR == typeOBJ)
+	{Iterators = 3;}
+
+	for (int i = 0; i < Iterators; i++)
+	{
+		BuildListBuffer ListBuffer(x, y, z, width, height, ZAngle, LookAtX, LookAtY, i+1);
+		CreateTextureBuffer(filename);
+		CreateMatrixBuffer(ListBuffer.GetMatrix(typeOBJ));
+		ListBuffer.SetImageWH(WidthImage, HeightImage);
+		CreateVectorBuff(ListBuffer.GetVectorList(typeOBJ));
+		UINT IndexCount = CreateIndexBuff(ListBuffer.GetIndex(typeOBJ));
+		SetShadersVSPS(typeOBJ);
+		CreateInputLayer(ListBuffer.GetElementDesc(typeOBJ));
+		SetViewports(0, 1, 0, 0, 1u);
+		RenderDrawIndex(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST, IndexCount);
+	};
+
 }
