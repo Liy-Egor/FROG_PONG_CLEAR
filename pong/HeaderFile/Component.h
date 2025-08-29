@@ -1,6 +1,6 @@
 #pragma once
 #include"PrimaryProcess.h"
-
+#include"GraphicManager.h"
 
 namespace ECC
 {
@@ -37,6 +37,11 @@ struct CNameObject
 {
     const char* Name;
     int Number;
+};
+
+struct CTypeRender
+{
+	TypeObject TypeRender;
 };
 
 //Ñharacter Components

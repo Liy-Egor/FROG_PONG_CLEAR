@@ -97,53 +97,18 @@ void LoadSVGDataMap(const string NameFileSVG) {
         float arr[4]{x, y, width, height};
         
         //создание объектов
-        if (!nameObject.find("Centr_Forest_Place")) {
-            Wall = new ATWall(PLATF"Centr_Forest_Place", arr);
+        if (!nameObject.find("TopLMR_Forest_Place_Seamless")) {
+            Wall = new ATWall(PLATF"TopLMR_Forest_Place_Seamless", arr,TypeObject::BOX2DTEXSEEMLESS_LMR);
             Wall->SetLocation(IdLocation);
             VLocation[IdLocation].VWall.push_back(*Wall);
         }
-		else if (!nameObject.find("CentrL_Forest_Place")) {
-			Wall = new ATWall(PLATF"CentrL_Forest_Place", arr);
-			Wall->SetLocation(IdLocation);
-			VLocation[IdLocation].VWall.push_back(*Wall);
-		}
-		else if (!nameObject.find("CentrR_Forest_Place")) {
-			Wall = new ATWall(PLATF"CentrR_Forest_Place", arr);
-			Wall->SetLocation(IdLocation);
-			VLocation[IdLocation].VWall.push_back(*Wall);
-		}
-		else if (!nameObject.find("DownL_Forest_Place")) {
-			Wall = new ATWall(PLATF"DownL_Forest_Place", arr);
-			Wall->SetLocation(IdLocation);
-			VLocation[IdLocation].VWall.push_back(*Wall);
-		}
-		else if (!nameObject.find("DownM_Forest_Place")) {
-			Wall = new ATWall(PLATF"DownM_Forest_Place", arr);
-			Wall->SetLocation(IdLocation);
-			VLocation[IdLocation].VWall.push_back(*Wall);
-		}
-		else if (!nameObject.find("DownR_Forest_Place")) {
-			Wall = new ATWall(PLATF"DownR_Forest_Place", arr);
-			Wall->SetLocation(IdLocation);
-			VLocation[IdLocation].VWall.push_back(*Wall);
-		}
-		else if (!nameObject.find("TopL_Forest_Place")) {
-			Wall = new ATWall(PLATF"TopL_Forest_Place", arr);
-			Wall->SetLocation(IdLocation);
-			VLocation[IdLocation].VWall.push_back(*Wall);
-		}
-		else if (!nameObject.find("TopM_Forest_Place")) {
-			Wall = new ATWall(PLATF"TopM_Forest_Place", arr);
-			Wall->SetLocation(IdLocation);
-			VLocation[IdLocation].VWall.push_back(*Wall);
-		}
-		else if (!nameObject.find("TopR_Forest_Place")) {
-			Wall = new ATWall(PLATF"TopR_Forest_Place", arr);
+		else if (!nameObject.find("InvisibleWall")) {
+			Wall = new ATWall(PLATF"InvisibleWall", arr, TypeObject::BOX2DTEX);
 			Wall->SetLocation(IdLocation);
 			VLocation[IdLocation].VWall.push_back(*Wall);
 		}
         else if (!nameObject.find("Enemy_static_Test")) {
-            Enemy = new ATEnemy(ENEMY"Enemy_static_Test", arr);
+            Enemy = new ATEnemy(ENEMY"Enemy_static_Test", arr, TypeObject::BOX2DTEX);
             Enemy->SetLocation(IdLocation);
             VLocation[IdLocation].VEnemy.push_back(*Enemy);
         }
@@ -151,22 +116,21 @@ void LoadSVGDataMap(const string NameFileSVG) {
             if (PlayerPlay == false)
             {
                 PlayerPlay = true;
-                Player = new ATPlayer(PLAYER"Player_static_Test", arr);
+                Player = new ATPlayer(PLAYER"Player_static_Test", arr, TypeObject::BOX2DTEX);
                 Player->SetLocation(IdLocation);
             }
         }
         else if (!nameObject.find("Back_lvl")) {
-            Location = new ATLocation(BACKG + nameObject, arr);
+            Location = new ATLocation(BACKG + nameObject, arr, TypeObject::BOX2DTEX);
             IdLocation = VLocation.size();
             VLocation.push_back(*Location);
         }
-
-        //else if (!nameObject.find("portal")) {
-        //    StrReplace(&nameObject, "portal");
-        //    Portal = new ATPortal("racket", arr, stoi(nameObject));
-        //    Portal->SetLocation(IdLocation);
-        //    VLocation[IdLocation].VPortal.push_back(*Portal);
-        //}
+        else if (!nameObject.find("Portal")) {
+            StrReplace(&nameObject, "Portal");
+            Portal = new ATPortal(PORTALS"Portal", arr, TypeObject::BOX2DTEX, stoi(nameObject));
+            Portal->SetLocation(IdLocation);
+            VLocation[IdLocation].VPortal.push_back(*Portal);
+        }
         //else if (!nameObject.find("heal")) {
         //    HealFlack = new ATHealFlack("ball", arr);
         //    HealFlack->SetLocation(IdLocation);

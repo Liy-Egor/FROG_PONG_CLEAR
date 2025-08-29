@@ -133,10 +133,7 @@ public:
 			   };
 			   return Vectors;
 		   }
-
 	   }
-
-
 	}
 
 	vector<XMMATRIX> GetMatrix(TypeObject typeObject)

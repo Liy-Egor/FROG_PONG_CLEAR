@@ -254,8 +254,8 @@ void SwitchLotation(CPortalPаth& PortalPаth, CTransform& Transform)
         if (VLocation.size() >= PortalPаth.Pаth)
         {
             Player->SetLocation(PortalPаth.Pаth);
-            Player->GetPosition()->x = 300;
-            Player->GetPosition()->y = 800;
+            Player->GetPosition()->x = 2473;
+            Player->GetPosition()->y = 3639;
             MapSizeW = VLocation[PortalPаth.Pаth].GetPosition()->Width;
             MapSizeH = VLocation[PortalPаth.Pаth].GetPosition()->Height;
         }
@@ -335,9 +335,8 @@ void HealthBar()
 
 void AppGame::Init()
 {	
-
-	LoadSVGDataMap(MAPS"LVL0testnewengine");
-	/*LoadSVGDataMap("LVL1");*/
+	LoadSVGDataMap(MAPS"LVLDemoDay0");
+	LoadSVGDataMap(MAPS"LVLDemoDay1");
 
 	MapSizeW = VLocation[0].GetPosition()->Width;
 	MapSizeH = VLocation[0].GetPosition()->Height;
@@ -360,7 +359,7 @@ void AppGame::Render()
 				VLocation[Player->GetLocation()].GetPosition()->Width,
 				VLocation[Player->GetLocation()].GetPosition()->Height,
 				0,
-				TypeObject::BOX2DTEX,
+				VLocation[Player->GetLocation()].GetRender()->TypeRender,
 				VLocation[Player->GetLocation()].GetTexture()->Texture
 			);
 
@@ -370,7 +369,7 @@ void AppGame::Render()
 					var.GetPosition()->x, var.GetPosition()->y, 1,
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					0,
-					TypeObject::BOX2DTEX,
+					var.GetRender()->TypeRender,
 					var.GetTexture()->Texture
 				);
 			}
@@ -380,7 +379,7 @@ void AppGame::Render()
 					var.GetPosition()->x, var.GetPosition()->y, 1,
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					0,
-					TypeObject::BOX2DTEX,
+					var.GetRender()->TypeRender,
 					var.GetTexture()->Texture
 				);
 				var.Start();
@@ -405,7 +404,7 @@ void AppGame::Render()
 					var.GetPosition()->x, var.GetPosition()->y, 1,
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					0,
-					TypeObject::BOX2DTEX,
+					var.GetRender()->TypeRender,
 					var.GetTexture()->Texture
 				);
 				var.GoEvent();
@@ -416,7 +415,7 @@ void AppGame::Render()
 					var.GetPosition()->x, var.GetPosition()->y, 1,
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					0,
-					TypeObject::BOX2DTEX,
+					var.GetRender()->TypeRender,
 					var.GetTexture()->Texture
 				);
 				var.GoEvent();
@@ -426,7 +425,7 @@ void AppGame::Render()
 				Player->GetPosition()->x, Player->GetPosition()->y, 1,
 				Player->GetPosition()->Width, Player->GetPosition()->Height,
 				0,
-				TypeObject::BOX2DTEX,
+				Player->GetRender()->TypeRender,
 				Player->GetTexture()->Texture
 			);
 
@@ -435,16 +434,6 @@ void AppGame::Render()
 			break;
 		}
 	}
-
-	d3dx.DrawObject(
-		100, 1265, 1,
-		1100, 157,
-		0,
-		TypeObject::BOX2DTEXSEEMLESS_LMR,
-		PLATF"TopLMR_Forest_Place_Seamless"
-	);
-
-
 	d3dx.SetCameraTarget(Player->GetPosition()->x, Player->GetPosition()->y);
 
 	d3dx.Present(true);

@@ -30,15 +30,17 @@ protected:
 	CTexture* Textures = ECS.SetComponent<CTexture>(Entity);
     CSound* Sound = ECS.SetComponent<CSound>(Entity);
     CNameObject* NameObject = ECS.SetComponent<CNameObject>(Entity);
+	CTypeRender* TypeRenders = ECS.SetComponent<CTypeRender>(Entity);
     int WhatLocation;
     
 
-    BaseArcheType(string NameFile, float arr[])
+    BaseArcheType(string NameFile, float arr[], TypeObject TypeRend)
     {
         LoadTransform(*Transform, arr);
 		Textures->Texture = NameFile;
         CreateObject(*Transform);
         NameObject->Number = Entity;
+		TypeRenders->TypeRender = TypeRend;
     }
 
     void DeleteAT()
@@ -49,10 +51,6 @@ protected:
 
 
 public:
-	int GetID()
-	{
-		return Entity;
-	}
     virtual void Destroy()
     {
         DeleteAT();
@@ -73,6 +71,10 @@ public:
     {
         return ECS.GetComponent<CTexture>(Entity, Textures);
     }
+	CTypeRender* GetRender()
+	{
+		return ECS.GetComponent<CTypeRender>(Entity, TypeRenders);
+	}
 };
 
 class BasePerson : public BaseArcheType
@@ -87,7 +89,7 @@ protected:
     CGravity* Gravity = ECS.SetComponent<CGravity>(Entity);
     CCollider* Collider = ECS.SetComponent<CCollider>(Entity);
 
-    BasePerson(string NameFile, float arr[]) : BaseArcheType(NameFile, arr){}
+    BasePerson(string NameFile, float arr[], TypeObject TypeRend) : BaseArcheType(NameFile, arr, TypeRend){}
 public:
     CDamage* GetDamage()
     {
@@ -119,7 +121,7 @@ public:
 class ATWall : public BaseArcheType
 {
 public:
-    ATWall(string NameFile, float arr[]) : BaseArcheType(NameFile, arr)
+    ATWall(string NameFile, float arr[], TypeObject TypeRend) : BaseArcheType(NameFile, arr, TypeRend)
     {
         NameObject->Name = "Wall";
     }
@@ -129,7 +131,7 @@ class ATHealFlack : public BaseArcheType
 {
     CHealth* Health = ECS.SetComponent<CHealth>(Entity);
 public:
-    ATHealFlack(string NameFile, float arr[]) : BaseArcheType(NameFile, arr)
+    ATHealFlack(string NameFile, float arr[], TypeObject TypeRend) : BaseArcheType(NameFile, arr, TypeRend)
     {
         NameObject->Name = "HealFlack";
     }
@@ -143,7 +145,7 @@ class ATSpike : public BaseArcheType
 {
     CDamage* Damage = ECS.SetComponent<CDamage>(Entity);
 public:
-    ATSpike(string NameFile, float arr[]) : BaseArcheType(NameFile, arr)
+    ATSpike(string NameFile, float arr[], TypeObject TypeRend) : BaseArcheType(NameFile, arr, TypeRend)
     {
         NameObject->Name = "Spike";
     }
@@ -157,7 +159,7 @@ class ATPortal : public BaseArcheType
 {
     CPortalP‡th* PortalP‡th = ECS.SetComponent<CPortalP‡th>(Entity);
 public:
-    ATPortal(string NameFile, float arr[],int Paths) : BaseArcheType(NameFile, arr)
+    ATPortal(string NameFile, float arr[], TypeObject TypeRend,int Paths) : BaseArcheType(NameFile, arr, TypeRend)
     {
         NameObject->Name = "Portal";
         PortalP‡th->P‡th = Paths;
@@ -172,30 +174,30 @@ public:
 class ATEnemy : public BasePerson
 {
 private:
-    CStatusBehavior* StatusBehavior = ECS.SetComponent<CStatusBehavior>(Entity);
-    CType—haracter* Type—haracter = ECS.SetComponent<CType—haracter>(Entity);
-    CGender* Gender = ECS.SetComponent<CGender>(Entity);
-    —Specialization* Specialization = ECS.SetComponent<—Specialization>(Entity);
-    —Rank* Rank = ECS.SetComponent<—Rank>(Entity);
+	CStatusBehavior* StatusBehavior = ECS.SetComponent<CStatusBehavior>(Entity);
+	CType—haracter* Type—haracter = ECS.SetComponent<CType—haracter>(Entity);
+	CGender* Gender = ECS.SetComponent<CGender>(Entity);
+	—Specialization* Specialization = ECS.SetComponent<—Specialization>(Entity);
+	—Rank* Rank = ECS.SetComponent<—Rank>(Entity);
 public:
-    ATEnemy(string NameFile, float arr[]) : BasePerson(NameFile, arr)
-    {
-        NameObject->Name = "Enemy";
-        AddCharacterModifier(*Health, *Defense, *Damage, *Speed, *Specialization, *Gender, *StatusBehavior, *Type—haracter, *Name—haracter, *Rank,
-            "TypeDamage", "Status", "Type—h", "Gendr", "Frog", "Specialist", 0);
-    }
-    void Start()
-    {
-        MoveCharacter(*Jump,*Transform,*Speed,*Collider,*Gravity);
-        TracerCollide(*Collider, *Transform, *Jump);
-        ProcessGravity(*Jump, *Transform, *Gravity);
-    }
+	ATEnemy(string NameFile, float arr[], TypeObject TypeRend) : BasePerson(NameFile, arr, TypeRend)
+	{
+		NameObject->Name = "Enemy";
+		AddCharacterModifier(*Health, *Defense, *Damage, *Speed, *Specialization, *Gender, *StatusBehavior, *Type—haracter, *Name—haracter, *Rank,
+			"TypeDamage", "Status", "Type—h", "Gendr", "Frog", "Specialist", 0);
+	}
+	void Start()
+	{
+		MoveCharacter(*Jump, *Transform, *Speed, *Collider, *Gravity);
+		TracerCollide(*Collider, *Transform, *Jump);
+		ProcessGravity(*Jump, *Transform, *Gravity);
+	}
 }*Enemy;
 
 class ATPlayer : public BasePerson
 {
 public:
-    ATPlayer(string NameFile, float arr[]) : BasePerson(NameFile, arr)
+    ATPlayer(string NameFile, float arr[], TypeObject TypeRend) : BasePerson(NameFile, arr, TypeRend)
     {
         NameObject->Name = "Player";
         Name—haracter->NameChar = "Komar";
@@ -212,7 +214,7 @@ public:
 class ATLocation : public BaseArcheType
 {
 public:
-    ATLocation(string NameFile, float arr[]) : BaseArcheType(NameFile, arr)
+    ATLocation(string NameFile, float arr[], TypeObject TypeRend) : BaseArcheType(NameFile, arr, TypeRend)
     {
         NameObject->Name = "Level";
     }

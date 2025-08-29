@@ -9,5 +9,6 @@
 #define PLATF "..\\pong\\Texture2D\\Platforms\\"
 #define PLAYER "..\\pong\\Texture2D\\Player\\"
 #define GUI "..\\pong\\Texture2D\\UI\\"
+#define PORTALS "..\\pong\\Texture2D\\Portal\\"
 
 #define SOUND "..\\pong\\Sound\\"
