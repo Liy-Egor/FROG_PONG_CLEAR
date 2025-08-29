@@ -70,54 +70,69 @@ public:
 	   }
 	   else if (typeObject == TypeObject::BOX2DTEXSEEMLESS_LMR)
 	   {
-		   float StepX = 33;
-		   float CondertStepX = 1 - (window.width / 2 - StepX) / (window.width / 2);
-		   float xRightStep1 = xRight - (xRight - CondertStepX);
-
-		   float CondertStepX2 = WidthObject / WidthImage;
-		   float xLeftStep2 = xLeft - CondertStepX;
-		   float xRightStep2 = xRight - CondertStepX;
-
-		   float CondertStepX3 = 1 - CondertStepX;
-		   float xLeftStep3 = xRight - CondertStepX;
-		   float xRightStep3 = xRight;
-
-
-		   if (Iterator == 1)
+		   float StepX = 33; //произвольный отступ от края до цельной части объекта
+		   float ConvertStepX =  1 - (window.width / 2 - StepX) / (window.width / 2);
+		   float ConvertWimageX = 1 - (window.width / 2 - WidthImage) / (window.width / 2);
+		   float xRStep1 = xLeft - ConvertStepX;
+		   float xRStep4 = xRight - ConvertStepX;
+		   
+		   if (Iterator == 0)
 		   {
 		   Vectors =
 		   {
 			   { -xLeft,-yBottom,zFront,	   0.0f,1.0f },
 			   { -xLeft,yTop,zFront,		   0.0f,0.0f },
-			   { xRightStep1,yTop,zFront,      CondertStepX,0.0f },
-			   { xRightStep1,-yBottom,zFront,  CondertStepX,1.0f },
+			   { -xRStep1,yTop,zFront,         StepX / WidthImage,0.0f },
+			   { -xRStep1,-yBottom,zFront,     StepX / WidthImage,1.0f },
 			};
 		   return Vectors;
 		   }
-		   else if (Iterator == 2)
+		   else if (Iterator > 0 && Iterator < WidthObject / WidthImage + 1)
 		   {
+			   float offsetL2 = ConvertWimageX * (Iterator - 1);
+			   float offsetR2 = ConvertWimageX * ((WidthObject / WidthImage) - Iterator);
+
+			   float xLStep2 = xRStep1 - offsetL2;
+			   float xRStep2 = xRStep4 - offsetR2;
+
 			   Vectors =
 			   {
-				   { -xLeftStep2,-yBottom,zFront,       0.0f,1.0f },
-				   { -xLeftStep2,yTop,zFront,           0.0f,0.0f },
-				   { xRightStep2,yTop,zFront,      CondertStepX2,0.0f },
-				   { xRightStep2,-yBottom,zFront,  CondertStepX2,1.0f },
+				   { -xLStep2,-yBottom,zFront,     StepX / WidthImage,1.0f },
+				   { -xLStep2,yTop,zFront,         StepX / WidthImage,0.0f },
+				   { xRStep2,yTop,zFront,      1 - StepX / WidthImage,0.0f },
+				   { xRStep2,-yBottom,zFront,  1 - StepX / WidthImage,1.0f },
 			   };
 			   return Vectors;
 		   }
-		   else if (Iterator == 3)
+		   else if (Iterator > 0 && Iterator < WidthObject / WidthImage + ((WidthObject / WidthImage)))
 		   {
+			   float offsetR3 = ConvertWimageX * ((WidthObject / WidthImage) - (Iterator - WidthObject / WidthImage));
+
+			   float xLStep3 = xRStep4 - offsetR3;
+			   float xRStep3 = xLStep3 + (ConvertStepX * 2);
+
+			   float ImageWL = 0.5 - (StepX / (WidthImage - StepX * 2));
+			   float ImageWR = 0.5 + (StepX / (WidthImage - StepX * 2));
 			   Vectors =
 			   {
-				   { -xLeftStep3,-yBottom,zFront,  0.0f,1.0f },
-				   { -xLeftStep3,yTop,zFront,      0.0f,0.0f },
-				   { xRightStep3,yTop,zFront,      CondertStepX3,0.0f },
-				   { xRightStep3,-yBottom,zFront,  CondertStepX3,1.0f },
+				   { xLStep3,-yBottom,zFront,     ImageWL,1.0f },
+				   { xLStep3,yTop,zFront,         ImageWL,0.0f },
+				   { xRStep3,yTop,zFront,		  ImageWR,0.0f },
+				   { xRStep3,-yBottom,zFront,     ImageWR,1.0f },
 			   };
 			   return Vectors;
 		   }
-
-
+		   else if (Iterator == WidthObject / WidthImage + ((WidthObject / WidthImage)))
+		   {
+			   Vectors =
+			   {
+				   { xRStep4,-yBottom,zFront,				 1 - StepX / WidthImage,1.0f },
+				   { xRStep4,yTop,zFront,					 1 - StepX / WidthImage,0.0f },
+				   { xRight ,				yTop,zFront,	 1.0,0.0f },
+				   { xRight ,				-yBottom,zFront, 1.0,1.0f },
+			   };
+			   return Vectors;
+		   }
 
 	   }
 

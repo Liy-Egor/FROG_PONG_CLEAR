@@ -437,11 +437,11 @@ void AppGame::Render()
 	}
 
 	d3dx.DrawObject(
-		667, 1265, 1,
-		1000, 157,
+		100, 1265, 1,
+		1100, 157,
 		0,
-		TypeObject::BOX2DTEXSEEMLESS,
-		PLATF"TopM_Forest_Place_Seamless_Pix210"
+		TypeObject::BOX2DTEXSEEMLESS_LMR,
+		PLATF"TopLMR_Forest_Place_Seamless"
 	);
 
 
