@@ -434,7 +434,56 @@ void AppGame::Render()
 			break;
 		}
 	}
+
+	if (GetAsyncKeyState(0x31))
+	{
+	d3dx.DrawObject(
+		2248, 3460, 1,
+		275, 157,
+		0,
+		TypeObject::BOX2DTEX,
+		PLATF"TopLMR_Forest_Place_Seamless"
+	);
+	}
+	else if (GetAsyncKeyState(0x32))
+	{
+		d3dx.DrawObject(
+			2248, 3460, 1,
+			550, 157,
+			0,
+			TypeObject::BOX2DTEXSEEMLESS,
+			PLATF"TopM_Forest_Place_Seamless_Pix210"
+		);
+	}
+	else if (GetAsyncKeyState(0x33))
+	{
+		d3dx.DrawObject(
+			2248, 3460, 1,
+			550, 157,
+			0,
+			TypeObject::BOX2DTEXSEEMLESS_LMR,
+			PLATF"TopLMR_Forest_Place_Seamless"
+		);
+	}
+
+
+	//камера
+	if (GetAsyncKeyState(0x34))
+	{
+		d3dx.SetCameraTarget(VLocation[0].VEnemy[0].GetPosition()->x, VLocation[0].VEnemy[0].GetPosition()->y);
+	}
+	else if (GetAsyncKeyState(0x35))
+	{
+		d3dx.SetCameraTarget(VLocation[0].VPortal[0].GetPosition()->x, VLocation[0].VPortal[0].GetPosition()->y);
+	}
+	else
+	{
 	d3dx.SetCameraTarget(Player->GetPosition()->x, Player->GetPosition()->y);
+	}
+
+
+
+
 
 	d3dx.Present(true);
 }
