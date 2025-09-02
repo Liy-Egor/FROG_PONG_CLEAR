@@ -247,13 +247,23 @@ public:
 		this->status = status;
 		for (string var : animations)
 		{
-			if (!var.find("player"))
+			int z = 1;
+			if (!var.find("walk"))
 			{
-
-				return PLAYER ANI + GetNameAnimation(var);
+				int a = 1;
+				int c = 1;
+				return var;
 			}
 
-
+			/*if (!var.find("player"))
+			{
+				string nameFile = GetNameAnimation(var);
+				if (nameFile != "")
+				{
+					int a = 1;
+				return PLAYER ANI + nameFile;
+				}
+			}*/
 		}
 	}
 
@@ -267,10 +277,13 @@ private:
 	string GetNameAnimation(string var)
 	{
 		if (!var.find("walk") && status == StatusAnimate::WALK)
+		{
 		return var;
-
+		}
 		if (!var.find("idle") && status == StatusAnimate::IDLE)
+		{
 		return var;
+		}
 	}
 
 	float xLeft, xRight, yBottom, yTop, zFront, zBack;

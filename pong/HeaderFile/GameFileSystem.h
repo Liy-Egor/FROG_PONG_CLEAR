@@ -157,7 +157,7 @@ void LoadAnimationFiles(const string PathFile)
 		
 		if (!FileName.find("player"))
 		{
-			Player->SetAnimation(FileName);
+			Player->SetAnimation(PLAYER ANI + FileName);
 		}
 
 

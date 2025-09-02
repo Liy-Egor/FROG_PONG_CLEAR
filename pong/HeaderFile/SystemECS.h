@@ -441,7 +441,7 @@ void AppGame::Render()
 				0,
 				Player->GetRender()->TypeRender,
 				Player->GetTexture()->Texture,
-				StatusAnimate::WALK,
+				StatusAnimate::DEFAULT,
 				Player->GetAnimation()->ListAnimation
 			);
 
@@ -450,7 +450,7 @@ void AppGame::Render()
 			break;
 		}
 	}
-
+	Player.
 	d3dx.SetCameraTarget(Player->GetPosition()->x, Player->GetPosition()->y);
 	
 	d3dx.Present(true);
