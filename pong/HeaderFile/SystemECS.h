@@ -441,7 +441,7 @@ void AppGame::Render()
 				0,
 				Player->GetRender()->TypeRender,
 				Player->GetTexture()->Texture,
-				StatusAnimate::DEFAULT,
+				StatusAnimate::WALK,
 				Player->GetAnimation()->ListAnimation
 			);
 
