@@ -12,6 +12,14 @@ enum TypeObject
 	UI,
 	UIX
 };
+
+enum StatusAnimate
+{
+	DEFAULT,
+	WALK,
+	IDLE
+};
+
 class VEC3
 {
 public:
@@ -44,7 +52,9 @@ public:
 
 	vector<VEC3> GetVectorList(TypeObject typeObject) 
 	{
-	   if (typeObject == TypeObject::BOX2DTEX)
+		if (status == StatusAnimate::DEFAULT)
+		{
+		 if (typeObject == TypeObject::BOX2DTEX)
 		{
 			Vectors =
 			{
@@ -55,7 +65,7 @@ public:
 			};
 			return Vectors;
 		}
-	   else if (typeObject == TypeObject::BOX2DTEXSEEMLESS)
+		 else if (typeObject == TypeObject::BOX2DTEXSEEMLESS)
 	   {
 		   float CountSeemX = WidthObject / WidthImage;
 		   float CountSeemY = HeightObject / HeightImage;
@@ -68,7 +78,7 @@ public:
 		   };
 		   return Vectors;
 	   }
-	   else if (typeObject == TypeObject::BOX2DTEXSEEMLESS_LMR)
+		 else if (typeObject == TypeObject::BOX2DTEXSEEMLESS_LMR)
 	   {
 		   float StepX = 33; //произвольный отступ от края до цельной части объекта
 		   float ConvertStepX =  1 - (window.width / 2 - StepX) / (window.width / 2);
@@ -134,6 +144,28 @@ public:
 			   return Vectors;
 		   }
 	   }
+		}
+		else
+		{
+			//здесь нужно указать шаг для анимации
+			if (TimeLineAnimation.size() > 1)
+			{
+				vector<int>::iterator it;
+				it = TimeLineAnimation.begin();
+				TimeLineAnimation.erase(it);
+			}
+			float ind = TimeLineAnimation[0];
+			Vectors =
+			{
+				{ -xLeft,-yBottom,zFront,  0.0f,1.0f },
+				{ -xLeft,yTop,zFront,      0.0f,0.0f },
+				{ xRight,yTop,zFront,      1.0f,0.0f },
+				{ xRight,-yBottom,zFront,  1.0f,1.0f },
+			};
+
+
+			return Vectors;
+		}
 	}
 
 	vector<XMMATRIX> GetMatrix(TypeObject typeObject)
@@ -203,13 +235,44 @@ public:
 
 		this->WidthImage = WidthImage;
 		this->HeightImage = HeightImage;
+
+		if (status != StatusAnimate::DEFAULT)
+		{
+			TimeLineAnimation.push_back(WidthImage/70);
+		}
 	}
+
+	string GetAnimation(vector<string> animations, StatusAnimate status)
+	{
+		this->status = status;
+		for (string var : animations)
+		{
+			if (!var.find("player"))
+			{
+
+				return PLAYER ANI + GetNameAnimation(var);
+			}
+
+
+		}
+	}
+
 protected:
 	vector<VEC3> Vectors;
 	vector<XMMATRIX> Matrx;
 	vector<unsigned short> Index;
 	vector<D3D11_INPUT_ELEMENT_DESC> ELEMENT_DESC;
 private:
+
+	string GetNameAnimation(string var)
+	{
+		if (!var.find("walk") && status == StatusAnimate::WALK)
+		return var;
+
+		if (!var.find("idle") && status == StatusAnimate::IDLE)
+		return var;
+	}
+
 	float xLeft, xRight, yBottom, yTop, zFront, zBack;
 	float colorDelta;
 	float ZAngle;
@@ -217,4 +280,6 @@ private:
 	float WidthObject , HeightObject;
 	int Iterator;
 	float WidthImage, HeightImage;
+	vector<int> TimeLineAnimation;
+	StatusAnimate status = StatusAnimate::DEFAULT;
 };
