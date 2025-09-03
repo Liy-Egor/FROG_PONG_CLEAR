@@ -347,7 +347,7 @@ void AppGame::Init()
 void AppGame::Render()
 {
 	float sin_ = sin(Timer.TimePeak()) / 1.0f + 0.5f;
-	d3dx.RenderClearBuffer(sin_ /2, 0.2f, 1.0f);
+	d3dx.RenderClearBuffer(0.2f, 0.2f, 1.0f);
 
 	for (int i = 0; i < VLocation.size(); i++)
 	{
@@ -450,7 +450,7 @@ void AppGame::Render()
 			break;
 		}
 	}
-	Player.
+	
 	d3dx.SetCameraTarget(Player->GetPosition()->x, Player->GetPosition()->y);
 	
 	d3dx.Present(true);

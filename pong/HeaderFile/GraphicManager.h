@@ -179,6 +179,7 @@ public:
 			XMFLOAT3 CameraPos = { CameraPosX,-CameraPosY,-0.5f };
 			XMFLOAT3 CameraTarget = { CameraPosX,-CameraPosY,0 };
 			XMFLOAT3 Up = { 0,1,0 };
+
 			Matrx =
 			{
 				XMMatrixTranspose(
@@ -190,7 +191,6 @@ public:
 			};
 			return Matrx;
 		}
-
 	}
 
 	vector<unsigned short> GetIndex(TypeObject typeObject)

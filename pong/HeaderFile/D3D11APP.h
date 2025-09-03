@@ -345,7 +345,6 @@ void GraphicEngine::RenderClearBuffer(float red, float green, float blue)
 
 void GraphicEngine::Present(bool vSync)
 {
-	
 	if (vSync)
 	{
 		Logg.Log(pGISwapChain->Present(1u, 0u), "Present + vSync");
@@ -384,8 +383,8 @@ void GraphicEngine::DrawObject(float x, float y, float z,float width, float heig
 		{
 			CreateTextureBuffer(ListBuffer.GetAnimation(animations, status));
 		}
-		CreateMatrixBuffer(ListBuffer.GetMatrix(typeOBJ));
 		ListBuffer.SetImageWH(WidthImage, HeightImage);
+		CreateMatrixBuffer(ListBuffer.GetMatrix(typeOBJ));
 		CreateVectorBuff(ListBuffer.GetVectorList(typeOBJ));
 		UINT IndexCount = CreateIndexBuff(ListBuffer.GetIndex(typeOBJ));
 		SetShadersVSPS(typeOBJ);
