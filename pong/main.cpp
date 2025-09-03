@@ -7,7 +7,6 @@ int CALLBACK WinMain(
 	int nShowCmd)			 
 {
 	App.FrameGo();
-	
 	return 0;
 };
 

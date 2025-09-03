@@ -338,6 +338,8 @@ void AppGame::Init()
 	LoadSVGDataMap(MAPS"LVLDemoDay0");
 	LoadSVGDataMap(MAPS"LVLDemoDay1");
 
+	LoadAnimationFiles(PLAYER"Animation");
+
 	MapSizeW = VLocation[0].GetPosition()->Width;
 	MapSizeH = VLocation[0].GetPosition()->Height;
 }
@@ -345,7 +347,7 @@ void AppGame::Init()
 void AppGame::Render()
 {
 	float sin_ = sin(Timer.TimePeak()) / 1.0f + 0.5f;
-	d3dx.RenderClearBuffer(sin_ /2, 0.2f, 1.0f);
+	d3dx.RenderClearBuffer(0.2f, 0.2f, 1.0f);
 
 	for (int i = 0; i < VLocation.size(); i++)
 	{
@@ -360,7 +362,9 @@ void AppGame::Render()
 				VLocation[Player->GetLocation()].GetPosition()->Height,
 				0,
 				VLocation[Player->GetLocation()].GetRender()->TypeRender,
-				VLocation[Player->GetLocation()].GetTexture()->Texture
+				VLocation[Player->GetLocation()].GetTexture()->Texture,
+				StatusAnimate::DEFAULT,
+				VLocation[Player->GetLocation()].GetAnimation()->ListAnimation
 			);
 
 			for (ATWall var : VLocation[i].VWall)
@@ -370,7 +374,9 @@ void AppGame::Render()
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					0,
 					var.GetRender()->TypeRender,
-					var.GetTexture()->Texture
+					var.GetTexture()->Texture,
+					StatusAnimate::DEFAULT,
+					var.GetAnimation()->ListAnimation
 				);
 			}
 			for (ATEnemy var : VLocation[i].VEnemy)
@@ -380,7 +386,9 @@ void AppGame::Render()
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					0,
 					var.GetRender()->TypeRender,
-					var.GetTexture()->Texture
+					var.GetTexture()->Texture,
+					StatusAnimate::DEFAULT,
+					var.GetAnimation()->ListAnimation
 				);
 				var.Start();
 			}
@@ -390,8 +398,10 @@ void AppGame::Render()
 					var.GetPosition()->x, var.GetPosition()->y, 1,
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					0,
-					TypeObject::BOX2DTEX,
-					var.GetTexture()->Texture
+					var.GetRender()->TypeRender,
+					var.GetTexture()->Texture,
+					StatusAnimate::DEFAULT,
+					var.GetAnimation()->ListAnimation
 				);
 				if (var.GoEvent())
 				{
@@ -405,7 +415,9 @@ void AppGame::Render()
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					0,
 					var.GetRender()->TypeRender,
-					var.GetTexture()->Texture
+					var.GetTexture()->Texture,
+					StatusAnimate::DEFAULT,
+					var.GetAnimation()->ListAnimation
 				);
 				var.GoEvent();
 			}
@@ -416,7 +428,9 @@ void AppGame::Render()
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					0,
 					var.GetRender()->TypeRender,
-					var.GetTexture()->Texture
+					var.GetTexture()->Texture,
+					StatusAnimate::DEFAULT,
+					var.GetAnimation()->ListAnimation
 				);
 				var.GoEvent();
 			}
@@ -426,7 +440,9 @@ void AppGame::Render()
 				Player->GetPosition()->Width, Player->GetPosition()->Height,
 				0,
 				Player->GetRender()->TypeRender,
-				Player->GetTexture()->Texture
+				Player->GetTexture()->Texture,
+				StatusAnimate::DEFAULT,
+				Player->GetAnimation()->ListAnimation
 			);
 
 			Player->Start();
@@ -434,57 +450,9 @@ void AppGame::Render()
 			break;
 		}
 	}
-
-	if (GetAsyncKeyState(0x31))
-	{
-	d3dx.DrawObject(
-		2248, 3460, 1,
-		275, 157,
-		0,
-		TypeObject::BOX2DTEX,
-		PLATF"TopLMR_Forest_Place_Seamless"
-	);
-	}
-	else if (GetAsyncKeyState(0x32))
-	{
-		d3dx.DrawObject(
-			2248, 3460, 1,
-			550, 157,
-			0,
-			TypeObject::BOX2DTEXSEEMLESS,
-			PLATF"TopM_Forest_Place_Seamless_Pix210"
-		);
-	}
-	else if (GetAsyncKeyState(0x33))
-	{
-		d3dx.DrawObject(
-			2248, 3460, 1,
-			550, 157,
-			0,
-			TypeObject::BOX2DTEXSEEMLESS_LMR,
-			PLATF"TopLMR_Forest_Place_Seamless"
-		);
-	}
-
-
-	//камера
-	if (GetAsyncKeyState(0x34))
-	{
-		d3dx.SetCameraTarget(VLocation[0].VEnemy[0].GetPosition()->x, VLocation[0].VEnemy[0].GetPosition()->y);
-	}
-	else if (GetAsyncKeyState(0x35))
-	{
-		d3dx.SetCameraTarget(VLocation[0].VPortal[0].GetPosition()->x, VLocation[0].VPortal[0].GetPosition()->y);
-	}
-	else
-	{
+	
 	d3dx.SetCameraTarget(Player->GetPosition()->x, Player->GetPosition()->y);
-	}
-
-
-
-
-
+	
 	d3dx.Present(true);
 }
 

@@ -1,6 +1,6 @@
 ﻿#pragma once
 #include "ArcheType.h"
-
+#include <filesystem>
 string StrReplace(string* str, string namestr) {
     return str->replace(str->find(namestr), namestr.length(), "");
 }
@@ -144,4 +144,24 @@ void LoadSVGDataMap(const string NameFileSVG) {
 
     }
     file.close();
+}
+
+
+
+void LoadAnimationFiles(const string PathFile)
+{
+	
+	for (const auto& entry : filesystem::directory_iterator(PathFile))
+	{
+		string FileName = entry.path().filename().string();
+		
+		if (!FileName.find("player"))
+		{
+			Player->SetAnimation(PLAYER ANI + FileName);
+		}
+
+
+
+
+	}
 }

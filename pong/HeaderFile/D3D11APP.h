@@ -44,7 +44,7 @@ public:
 
 	void RenderClearBuffer(float red, float green, float blue);
 	void Present(bool vSync);
-	void DrawObject(float x, float y, float z, float width, float height,float ZAngle, TypeObject typeOBJ, string filename);
+	void DrawObject(float x, float y, float z, float width, float height,float ZAngle, TypeObject typeOBJ, string filename, StatusAnimate status, vector<string> animations);
 	void SetCameraTarget(float LookAtX, float LookAtY)
 	{
 		this->LookAtX = LookAtX;
@@ -345,7 +345,6 @@ void GraphicEngine::RenderClearBuffer(float red, float green, float blue)
 
 void GraphicEngine::Present(bool vSync)
 {
-	
 	if (vSync)
 	{
 		Logg.Log(pGISwapChain->Present(1u, 0u), "Present + vSync");
@@ -356,13 +355,17 @@ void GraphicEngine::Present(bool vSync)
 	}
 }
 
-void GraphicEngine::DrawObject(float x, float y, float z,float width, float height,float ZAngle,TypeObject typeOBJ,string filename)
+void GraphicEngine::DrawObject(float x, float y, float z,float width, float height,float ZAngle,TypeObject typeOBJ,string filename, StatusAnimate status, vector<string> animations)
 {
+	if (status == StatusAnimate::DEFAULT)
+	{
 		CreateTextureBuffer(filename);
+	}
 
 	int Iterators = 0;
 	if ( typeOBJ == TypeObject::BOX2DTEX ||
-		 typeOBJ == TypeObject::BOX2DTEXSEEMLESS)
+		 typeOBJ == TypeObject::BOX2DTEXSEEMLESS
+		)
 	{
 		Iterators = 1;
 	}
@@ -370,12 +373,18 @@ void GraphicEngine::DrawObject(float x, float y, float z,float width, float heig
 	{
 		Iterators = (width / WidthImage) + 2 + ((width / WidthImage) -1);
 	}
+	
 
 	for (int i = 0; i < Iterators; i++)
-	{
+	{	//цикл здесь будет сильно нагружать систему
 		BuildListBuffer ListBuffer(x, y, z, width, height, ZAngle, LookAtX, LookAtY, i);
-		CreateMatrixBuffer(ListBuffer.GetMatrix(typeOBJ));
+
+		if (status != StatusAnimate::DEFAULT)
+		{
+			CreateTextureBuffer(ListBuffer.GetAnimation(animations, status));
+		}
 		ListBuffer.SetImageWH(WidthImage, HeightImage);
+		CreateMatrixBuffer(ListBuffer.GetMatrix(typeOBJ));
 		CreateVectorBuff(ListBuffer.GetVectorList(typeOBJ));
 		UINT IndexCount = CreateIndexBuff(ListBuffer.GetIndex(typeOBJ));
 		SetShadersVSPS(typeOBJ);

@@ -44,6 +44,11 @@ struct CTypeRender
 	TypeObject TypeRender;
 };
 
+struct CListAnimation
+{
+	vector<string> ListAnimation;
+};
+
 //Ñharacter Components
 struct CHealth
 {
