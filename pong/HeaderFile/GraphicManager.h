@@ -45,7 +45,7 @@ public:
 	 this -> CameraPosY = (LookAtY - window.height / 2) / (window.height / 2);
 	 this -> WidthObject = width;
 	 this -> HeightObject = height;
-	 this -> Iterator = Iterator;
+	 this->Iterator = Iterator;
 	};
 
 	~BuildListBuffer(){};
@@ -79,71 +79,99 @@ public:
 		   return Vectors;
 	   }
 		 else if (typeObject == TypeObject::BOX2DTEXSEEMLESS_LMR)
-	   {
+	     {
+		   Vectors.clear();
 		   float StepX = 33; //произвольный отступ от края до цельной части объекта
 		   float ConvertStepX =  1 - (window.width / 2 - StepX) / (window.width / 2);
 		   float ConvertWimageX = 1 - (window.width / 2 - WidthImage) / (window.width / 2);
 		   float xRStep1 = xLeft - ConvertStepX;
 		   float xRStep4 = xRight - ConvertStepX;
 		   
-		   if (Iterator == 0)
+		   for (int i = 0; i < Iterator; i++)
 		   {
-		   Vectors =
-		   {
-			   { -xLeft,-yBottom,zFront,	   0.0f,1.0f },
-			   { -xLeft,yTop,zFront,		   0.0f,0.0f },
-			   { -xRStep1,yTop,zFront,         StepX / WidthImage,0.0f },
-			   { -xRStep1,-yBottom,zFront,     StepX / WidthImage,1.0f },
-			};
+			   if (i == 0)
+			   {
+				   /*  Vectors =
+					 {
+						 { -xLeft,-yBottom,zFront,0.0f,1.0f },
+						 { -xLeft,yTop,zFront,0.0f,0.0f },
+						 { -xRStep1,yTop,zFront,StepX / WidthImage,0.0f },
+						 { -xRStep1,-yBottom,zFront,StepX / WidthImage,1.0f },
+					 };
+					 return Vectors;*/
+
+				   Vectors.push_back({ -xLeft,-yBottom,zFront,0.0f,1.0f });
+				   Vectors.push_back({ -xLeft,yTop,zFront,0.0f,0.0f });
+				   Vectors.push_back({ -xRStep1,yTop,zFront,StepX / WidthImage,0.0f });
+				   Vectors.push_back({ -xRStep1,-yBottom,zFront,StepX / WidthImage,1.0f });
+
+			   }
+			   else if (i > 0 && i < WidthObject / WidthImage + 1)
+			   {
+				   float offsetL2 = ConvertWimageX * (i - 1);
+				   float offsetR2 = ConvertWimageX * ((WidthObject / WidthImage) - i);
+
+				   float xLStep2 = xRStep1 - offsetL2;
+				   float xRStep2 = xRStep4 - offsetR2;
+
+				   /*Vectors =
+				   {
+					   { -xLStep2,-yBottom,zFront,     StepX / WidthImage,1.0f },
+					   { -xLStep2,yTop,zFront,         StepX / WidthImage,0.0f },
+					   { xRStep2,yTop,zFront,      1 - StepX / WidthImage,0.0f },
+					   { xRStep2,-yBottom,zFront,  1 - StepX / WidthImage,1.0f },
+				   };
+				   return Vectors;*/
+
+				   Vectors.push_back({ -xLStep2,-yBottom,zFront,     StepX / WidthImage,1.0f });
+				   Vectors.push_back({ -xLStep2,yTop,zFront,         StepX / WidthImage,0.0f });
+				   Vectors.push_back({ xRStep2,yTop,zFront,      1 - StepX / WidthImage,0.0f });
+				   Vectors.push_back({ xRStep2,-yBottom,zFront,  1 - StepX / WidthImage,1.0f });
+			   }
+			   else if (i > 0 && i < WidthObject / WidthImage + ((WidthObject / WidthImage)))
+			   {
+				   float offsetR3 = ConvertWimageX * ((WidthObject / WidthImage) - (i - WidthObject / WidthImage));
+
+				   float xLStep3 = xRStep4 - offsetR3;
+				   float xRStep3 = xLStep3 + (ConvertStepX * 2);
+
+				   float ImageWL = 0.5 - (StepX / (WidthImage - StepX * 2));
+				   float ImageWR = 0.5 + (StepX / (WidthImage - StepX * 2));
+
+				   /* Vectors =
+					{
+						{ xLStep3,-yBottom,zFront,     ImageWL,1.0f },
+						{ xLStep3,yTop,zFront,         ImageWL,0.0f },
+						{ xRStep3,yTop,zFront,		  ImageWR,0.0f },
+						{ xRStep3,-yBottom,zFront,     ImageWR,1.0f },
+					};
+					return Vectors;*/
+
+				   Vectors.push_back({ xLStep3,-yBottom,zFront,     ImageWL,1.0f });
+				   Vectors.push_back({ xLStep3,yTop,zFront,         ImageWL,0.0f });
+				   Vectors.push_back({ xRStep3,yTop,zFront,		  ImageWR,0.0f });
+				   Vectors.push_back({ xRStep3,-yBottom,zFront,     ImageWR,1.0f });
+			   }
+			   else if (i == WidthObject / WidthImage + ((WidthObject / WidthImage)))
+			   {
+				   //Vectors =
+				   //{
+					  // { xRStep4,-yBottom,zFront,				 1 - StepX / WidthImage,1.0f },
+					  // { xRStep4,yTop,zFront,					 1 - StepX / WidthImage,0.0f  },
+					  // { xRight ,				yTop,zFront,	 1.0,0.0f },
+					  // { xRight ,				-yBottom,zFront, 1.0,1.0f },
+				   //};
+				   //return Vectors;
+
+				   Vectors.push_back({ xRStep4,-yBottom,zFront,				 1 - StepX / WidthImage,1.0f });
+				   Vectors.push_back({ xRStep4,yTop,zFront,					 1 - StepX / WidthImage,0.0f });
+				   Vectors.push_back({ xRight ,				yTop,zFront,	 1.0,0.0f });
+				   Vectors.push_back({ xRight ,				-yBottom,zFront, 1.0,1.0f });
+			   }
+		   }
+
 		   return Vectors;
-		   }
-		   else if (Iterator > 0 && Iterator < WidthObject / WidthImage + 1)
-		   {
-			   float offsetL2 = ConvertWimageX * (Iterator - 1);
-			   float offsetR2 = ConvertWimageX * ((WidthObject / WidthImage) - Iterator);
-
-			   float xLStep2 = xRStep1 - offsetL2;
-			   float xRStep2 = xRStep4 - offsetR2;
-
-			   Vectors =
-			   {
-				   { -xLStep2,-yBottom,zFront,     StepX / WidthImage,1.0f },
-				   { -xLStep2,yTop,zFront,         StepX / WidthImage,0.0f },
-				   { xRStep2,yTop,zFront,      1 - StepX / WidthImage,0.0f },
-				   { xRStep2,-yBottom,zFront,  1 - StepX / WidthImage,1.0f },
-			   };
-			   return Vectors;
-		   }
-		   else if (Iterator > 0 && Iterator < WidthObject / WidthImage + ((WidthObject / WidthImage)))
-		   {
-			   float offsetR3 = ConvertWimageX * ((WidthObject / WidthImage) - (Iterator - WidthObject / WidthImage));
-
-			   float xLStep3 = xRStep4 - offsetR3;
-			   float xRStep3 = xLStep3 + (ConvertStepX * 2);
-
-			   float ImageWL = 0.5 - (StepX / (WidthImage - StepX * 2));
-			   float ImageWR = 0.5 + (StepX / (WidthImage - StepX * 2));
-			   Vectors =
-			   {
-				   { xLStep3,-yBottom,zFront,     ImageWL,1.0f },
-				   { xLStep3,yTop,zFront,         ImageWL,0.0f },
-				   { xRStep3,yTop,zFront,		  ImageWR,0.0f },
-				   { xRStep3,-yBottom,zFront,     ImageWR,1.0f },
-			   };
-			   return Vectors;
-		   }
-		   else if (Iterator == WidthObject / WidthImage + ((WidthObject / WidthImage)))
-		   {
-			   Vectors =
-			   {
-				   { xRStep4,-yBottom,zFront,				 1 - StepX / WidthImage,1.0f },
-				   { xRStep4,yTop,zFront,					 1 - StepX / WidthImage,0.0f },
-				   { xRight ,				yTop,zFront,	 1.0,0.0f },
-				   { xRight ,				-yBottom,zFront, 1.0,1.0f },
-			   };
-			   return Vectors;
-		   }
-	   }
+	     }
 		}
 		else
 		{
@@ -200,13 +228,16 @@ public:
 			typeObject == TypeObject::BOX2DTEXSEEMLESS_LMR
 			)
 		{
-			Index =
+			Index.clear();
+			for (int i = 0; i < Iterator; i++)
 			{
-				{
-				 0,1,2,
-				 2,3,0,
-				},
-			};
+				Index.push_back(0 + (i * 4));
+				Index.push_back(1 + (i * 4));
+				Index.push_back(2 + (i * 4));
+				Index.push_back(2 + (i * 4));
+				Index.push_back(3 + (i * 4));
+				Index.push_back(0 + (i * 4));
+			}
 			return Index;
 		}
 
@@ -242,30 +273,12 @@ public:
 		}
 	}
 
-	string GetAnimation(vector<string> animations, StatusAnimate status)
+	//*****************************************
+	string GetAnimation(StatusAnimate status)
 	{
 		this->status = status;
-		for (string var : animations)
-		{
-			int z = 1;
-			if (!var.find("walk"))
-			{
-				int a = 1;
-				int c = 1;
-				return var;
-			}
-
-			/*if (!var.find("player"))
-			{
-				string nameFile = GetNameAnimation(var);
-				if (nameFile != "")
-				{
-					int a = 1;
-				return PLAYER ANI + nameFile;
-				}
-			}*/
-		}
 	}
+	//*****************************************
 
 protected:
 	vector<VEC3> Vectors;
@@ -273,19 +286,6 @@ protected:
 	vector<unsigned short> Index;
 	vector<D3D11_INPUT_ELEMENT_DESC> ELEMENT_DESC;
 private:
-
-	string GetNameAnimation(string var)
-	{
-		if (!var.find("walk") && status == StatusAnimate::WALK)
-		{
-		return var;
-		}
-		if (!var.find("idle") && status == StatusAnimate::IDLE)
-		{
-		return var;
-		}
-	}
-
 	float xLeft, xRight, yBottom, yTop, zFront, zBack;
 	float colorDelta;
 	float ZAngle;

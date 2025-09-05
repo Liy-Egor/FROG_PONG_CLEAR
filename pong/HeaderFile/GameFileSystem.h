@@ -146,22 +146,19 @@ void LoadSVGDataMap(const string NameFileSVG) {
     file.close();
 }
 
-
-
 void LoadAnimationFiles(const string PathFile)
 {
-	
 	for (const auto& entry : filesystem::directory_iterator(PathFile))
 	{
 		string FileName = entry.path().filename().string();
 		
-		if (!FileName.find("player"))
+		if (!FileName.find("walk"))
 		{
-			Player->SetAnimation(PLAYER ANI + FileName);
+		animations.CollectionAnimation[StatusAnimate::WALK - 1].push_back(FileName);
 		}
-
-
-
-
+		else if (!FileName.find("idle"))
+		{
+		animations.CollectionAnimation[StatusAnimate::IDLE - 1].push_back(FileName);
+		}
 	}
 }

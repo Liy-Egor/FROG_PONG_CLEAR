@@ -17,8 +17,7 @@ void AddCharacterModifier(
 void SwitchLotation(CPortalPàth& PortalPàth, CTransform& CTransform);
 bool HealEvent(CTransform& Transform, CHealth& Health);
 void SpikeEvent(CTransform& Transform,CDamage& Damage);
-void UpdateView();
-void UpdatePhysics();
+
 
 
 //áàçîâûå êëàññû
@@ -31,7 +30,6 @@ protected:
     CSound* Sound = ECS.SetComponent<CSound>(Entity);
     CNameObject* NameObject = ECS.SetComponent<CNameObject>(Entity);
 	CTypeRender* TypeRenders = ECS.SetComponent<CTypeRender>(Entity);
-	CListAnimation* ListAnimations = ECS.SetComponent<CListAnimation>(Entity);
     int WhatLocation;
     
 
@@ -75,14 +73,6 @@ public:
 	CTypeRender* GetRender()
 	{
 		return ECS.GetComponent<CTypeRender>(Entity, TypeRenders);
-	}
-	CListAnimation* GetAnimation()
-	{
-		return ECS.GetComponent<CListAnimation>(Entity, ListAnimations);
-	}
-	void SetAnimation(string listanimation)
-	{
-		ListAnimations->ListAnimation.push_back(listanimation);
 	}
 };
 

@@ -4,8 +4,7 @@
 class AppGame
 {
 public:
-	AppGame() {};
-
+	AppGame(){};
 	void FrameGo()
 	{
 

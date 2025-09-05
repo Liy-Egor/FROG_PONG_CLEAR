@@ -58,6 +58,12 @@ struct
     int h;
 } player_view;
 
+struct
+{
+	vector<vector<string>> CollectionAnimation;
+
+}animations;
+
 int MapSizeW = window.width;
 int MapSizeH = window.height;
 
