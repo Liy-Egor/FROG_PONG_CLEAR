@@ -314,6 +314,7 @@ void AppGame::Render()
 				0,
 				VLocation[Player->GetLocation()].GetRender()->TypeRender,
 				VLocation[Player->GetLocation()].GetTexture()->Texture,
+				VLocation[Player->GetLocation()].GetNameObj()->Name,
 				StatusAnimate::DEFAULT
 			);
 
@@ -325,6 +326,7 @@ void AppGame::Render()
 					0,
 					var.GetRender()->TypeRender,
 					var.GetTexture()->Texture,
+					var.GetNameObj()->Name,
 					StatusAnimate::DEFAULT
 				);
 			}
@@ -336,6 +338,7 @@ void AppGame::Render()
 					0,
 					var.GetRender()->TypeRender,
 					var.GetTexture()->Texture,
+					var.GetNameObj()->Name,
 					StatusAnimate::DEFAULT
 				);
 				var.Start();
@@ -348,6 +351,7 @@ void AppGame::Render()
 					0,
 					var.GetRender()->TypeRender,
 					var.GetTexture()->Texture,
+					var.GetNameObj()->Name,
 					StatusAnimate::DEFAULT
 				);
 				if (var.GoEvent())
@@ -363,6 +367,7 @@ void AppGame::Render()
 					0,
 					var.GetRender()->TypeRender,
 					var.GetTexture()->Texture,
+					var.GetNameObj()->Name,
 					StatusAnimate::DEFAULT
 				);
 				var.GoEvent();
@@ -375,6 +380,7 @@ void AppGame::Render()
 					0,
 					var.GetRender()->TypeRender,
 					var.GetTexture()->Texture,
+					var.GetNameObj()->Name,
 					StatusAnimate::DEFAULT
 				);
 				var.GoEvent();
@@ -386,7 +392,8 @@ void AppGame::Render()
 				0,
 				Player->GetRender()->TypeRender,
 				Player->GetTexture()->Texture,
-				StatusAnimate::DEFAULT
+				Player->GetNameObj()->Name,
+				StatusAnimate::WALK
 			);
 
 			Player->Start();

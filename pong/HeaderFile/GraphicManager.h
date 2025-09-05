@@ -29,10 +29,32 @@ private:
 	float x{}, y{}, z{}, u{}, v{};
 };
 
+string GetAnimation(StatusAnimate status, string NameObj)
+{
+	string NameStatus = "";
+	string NameCut = NameObj + ".png";
+	string Name = animations.CollectionAnimation[status - 1][0];
+	NameStatus = Name.replace(Name.find(NameCut), NameCut.length(), "");
+	
+	string path = "";
+	if (NameObj == "player")
+	path = PLAYER ANI;
+
+	else if(NameObj == "enemy")
+	path = ENEMY ANI;
+
+	return path + NameStatus + NameObj;
+}
+
+
+int timeLine;
+float sss;
+float fff;
+
 class BuildListBuffer
 {
 public:
-	BuildListBuffer(float x, float y, float z, float width, float height,float ZAngle, float LookAtX, float LookAtY,int Iterator)
+	BuildListBuffer(float x, float y, float z, float width, float height,float ZAngle, float LookAtX, float LookAtY,int Iterator, StatusAnimate Status)
 	{
 	 this -> xLeft = (window.width / 2 - x) / (window.width / 2);
 	 this -> xRight = (x + width - window.width / 2) / (window.width / 2);
@@ -46,15 +68,14 @@ public:
 	 this -> WidthObject = width;
 	 this -> HeightObject = height;
 	 this->Iterator = Iterator;
+	 this->Status = Status;
 	};
 
 	~BuildListBuffer(){};
 
 	vector<VEC3> GetVectorList(TypeObject typeObject) 
 	{
-		if (status == StatusAnimate::DEFAULT)
-		{
-		 if (typeObject == TypeObject::BOX2DTEX)
+		 if (typeObject == TypeObject::BOX2DTEX && Status == StatusAnimate::DEFAULT)
 		{
 			Vectors =
 			{
@@ -65,7 +86,7 @@ public:
 			};
 			return Vectors;
 		}
-		 else if (typeObject == TypeObject::BOX2DTEXSEEMLESS)
+		 else if (typeObject == TypeObject::BOX2DTEXSEEMLESS && Status == StatusAnimate::DEFAULT)
 	   {
 		   float CountSeemX = WidthObject / WidthImage;
 		   float CountSeemY = HeightObject / HeightImage;
@@ -78,7 +99,7 @@ public:
 		   };
 		   return Vectors;
 	   }
-		 else if (typeObject == TypeObject::BOX2DTEXSEEMLESS_LMR)
+		 else if (typeObject == TypeObject::BOX2DTEXSEEMLESS_LMR && Status == StatusAnimate::DEFAULT)
 	     {
 		   Vectors.clear();
 		   float StepX = 33; //произвольный отступ от края до цельной части объекта
@@ -172,28 +193,41 @@ public:
 
 		   return Vectors;
 	     }
-		}
-		else
-		{
-			//здесь нужно указать шаг для анимации
-			if (TimeLineAnimation.size() > 1)
-			{
-				vector<int>::iterator it;
-				it = TimeLineAnimation.begin();
-				TimeLineAnimation.erase(it);
-			}
-			float ind = TimeLineAnimation[0];
-			Vectors =
-			{
-				{ -xLeft,-yBottom,zFront,  0.0f,1.0f },
-				{ -xLeft,yTop,zFront,      0.0f,0.0f },
-				{ xRight,yTop,zFront,      1.0f,0.0f },
-				{ xRight,-yBottom,zFront,  1.0f,1.0f },
-			};
 
+
+
+		 //тут основой расчет сдвига анимации
+
+		 if (typeObject == TypeObject::BOX2DTEX && Status != StatusAnimate::DEFAULT)
+		 {
+			 if (timeLine == 0)
+			 {
+				 timeLine = WidthImage / 70 + 1;
+				 fff = (float)1 / (float)timeLine;
+				 sss = 0;
+			 }
+
+
+			 float PitchStart = sss;
+			 float PitchEnd = fff;
+
+			 Vectors =
+			 {
+				 { -xLeft,-yBottom,zFront,  PitchStart,1.0f },
+				 { -xLeft,yTop,zFront,      PitchStart,0.0f },
+				 { xRight,yTop,zFront,      PitchEnd,0.0f },
+				 { xRight,-yBottom,zFront,  PitchEnd,1.0f },
+			 };
+
+			 timeLine--;
+			 sss =+ PitchEnd;
+			 fff =+ (float)1 / (float)timeLine;
 
 			return Vectors;
-		}
+		 }
+
+
+
 	}
 
 	vector<XMMATRIX> GetMatrix(TypeObject typeObject)
@@ -223,10 +257,7 @@ public:
 
 	vector<unsigned short> GetIndex(TypeObject typeObject)
 	{
-		if (typeObject == TypeObject::BOX2DTEX || 
-			typeObject == TypeObject::BOX2DTEXSEEMLESS ||
-			typeObject == TypeObject::BOX2DTEXSEEMLESS_LMR
-			)
+		if (typeObject == TypeObject::BOX2DTEX || typeObject == TypeObject::BOX2DTEXSEEMLESS || typeObject == TypeObject::BOX2DTEXSEEMLESS_LMR)
 		{
 			Index.clear();
 			for (int i = 0; i < Iterator; i++)
@@ -267,18 +298,7 @@ public:
 		this->WidthImage = WidthImage;
 		this->HeightImage = HeightImage;
 
-		if (status != StatusAnimate::DEFAULT)
-		{
-			TimeLineAnimation.push_back(WidthImage/70);
-		}
 	}
-
-	//*****************************************
-	string GetAnimation(StatusAnimate status)
-	{
-		this->status = status;
-	}
-	//*****************************************
 
 protected:
 	vector<VEC3> Vectors;
@@ -293,6 +313,6 @@ private:
 	float WidthObject , HeightObject;
 	int Iterator;
 	float WidthImage, HeightImage;
-	vector<int> TimeLineAnimation;
-	StatusAnimate status = StatusAnimate::DEFAULT;
+	
+	StatusAnimate Status;
 };

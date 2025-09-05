@@ -44,7 +44,7 @@ public:
 
 	void RenderClearBuffer(float red, float green, float blue);
 	void Present(bool vSync);
-	void DrawObject(float x, float y, float z, float width, float height,float ZAngle, TypeObject typeOBJ, string filename, StatusAnimate status);
+	void DrawObject(float x, float y, float z, float width, float height,float ZAngle, TypeObject typeOBJ, string filename, string NameObj, StatusAnimate status);
 	void SetCameraTarget(float LookAtX, float LookAtY)
 	{
 		this->LookAtX = LookAtX;
@@ -347,7 +347,7 @@ void GraphicEngine::Present(bool vSync)
 {
 	if (vSync)
 	{
-		Logg.Log(pGISwapChain->Present(1u, 0u), "Present + vSync");
+		Logg.Log(pGISwapChain->Present(3u, 0u), "Present + vSync");
 	}
 	else
 	{
@@ -355,9 +355,9 @@ void GraphicEngine::Present(bool vSync)
 	}
 }
 
-void GraphicEngine::DrawObject(float x, float y, float z,float width, float height,float ZAngle,TypeObject typeOBJ,string filename, StatusAnimate status)
+void GraphicEngine::DrawObject(float x, float y, float z,float width, float height,float ZAngle,TypeObject typeOBJ,string filename,string NameObj, StatusAnimate status)
 {
-
+	int Iterators = 0;
 
 		if (status == StatusAnimate::DEFAULT)
 		{
@@ -365,22 +365,17 @@ void GraphicEngine::DrawObject(float x, float y, float z,float width, float heig
 		}
 		else
 		{
-		/*CreateTextureBuffer();*/
-		}
-	
-		int Iterators = 0;
-		if ( typeOBJ == TypeObject::BOX2DTEX ||
-		 typeOBJ == TypeObject::BOX2DTEXSEEMLESS
-		)
-		{
-		Iterators = 1;
-		}
-		else if ( typeOBJ == TypeObject::BOX2DTEXSEEMLESS_LMR)
-		{
-		Iterators = (width / WidthImage) + 2 + ((width / WidthImage) -1);
+		CreateTextureBuffer(GetAnimation(status, NameObj));
 		}
 
-			BuildListBuffer ListBuffer(x, y, z, width, height, ZAngle, LookAtX, LookAtY, Iterators);
+	
+		if ( typeOBJ == TypeObject::BOX2DTEX || typeOBJ == TypeObject::BOX2DTEXSEEMLESS)
+		Iterators = 1;
+
+		else if ( typeOBJ == TypeObject::BOX2DTEXSEEMLESS_LMR)
+		Iterators = (width / WidthImage) + 2 + ((width / WidthImage) -1);
+
+			BuildListBuffer ListBuffer(x, y, z, width, height, ZAngle, LookAtX, LookAtY, Iterators, status);
 			ListBuffer.SetImageWH(WidthImage, HeightImage);
 			CreateMatrixBuffer(ListBuffer.GetMatrix(typeOBJ));
 			CreateVectorBuff(ListBuffer.GetVectorList(typeOBJ));

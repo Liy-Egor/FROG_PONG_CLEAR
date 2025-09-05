@@ -32,7 +32,6 @@ protected:
 	CTypeRender* TypeRenders = ECS.SetComponent<CTypeRender>(Entity);
     int WhatLocation;
     
-
     BaseArcheType(string NameFile, float arr[], TypeObject TypeRend)
     {
         LoadTransform(*Transform, arr);
@@ -47,7 +46,6 @@ protected:
       ECS.DeleteEntity(Entity);
       /*delete this;*/ //êðàøèò ïðîãó 
     }
-
 
 public:
     virtual void Destroy()
@@ -73,6 +71,10 @@ public:
 	CTypeRender* GetRender()
 	{
 		return ECS.GetComponent<CTypeRender>(Entity, TypeRenders);
+	}
+	CNameObject* GetNameObj()
+	{
+		return ECS.GetComponent<CNameObject>(Entity, NameObject);
 	}
 };
 
@@ -181,7 +183,7 @@ private:
 public:
 	ATEnemy(string NameFile, float arr[], TypeObject TypeRend) : BasePerson(NameFile, arr, TypeRend)
 	{
-		NameObject->Name = "Enemy";
+		NameObject->Name = "enemy";
 		AddCharacterModifier(*Health, *Defense, *Damage, *Speed, *Specialization, *Gender, *StatusBehavior, *TypeÑharacter, *NameÑharacter, *Rank,
 			"TypeDamage", "Status", "TypeÑh", "Gendr", "Frog", "Specialist", 0);
 	}
@@ -198,7 +200,7 @@ class ATPlayer : public BasePerson
 public:
     ATPlayer(string NameFile, float arr[], TypeObject TypeRend) : BasePerson(NameFile, arr, TypeRend)
     {
-        NameObject->Name = "Player";
+        NameObject->Name = "player";
         NameÑharacter->NameChar = "Komar";
     }
     void Start()

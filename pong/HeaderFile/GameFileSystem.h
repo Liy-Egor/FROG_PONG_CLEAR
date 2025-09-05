@@ -148,17 +148,18 @@ void LoadSVGDataMap(const string NameFileSVG) {
 
 void LoadAnimationFiles(const string PathFile)
 {
+	animations.CollectionAnimation.resize(3); //виды анимаций
 	for (const auto& entry : filesystem::directory_iterator(PathFile))
 	{
-		string FileName = entry.path().filename().string();
-		
+		string FileName = entry.path().filename().string().c_str();
+
 		if (!FileName.find("walk"))
 		{
-		animations.CollectionAnimation[StatusAnimate::WALK - 1].push_back(FileName);
+		animations.CollectionAnimation[(int)StatusAnimate::WALK - 1].push_back(FileName);
 		}
 		else if (!FileName.find("idle"))
-		{
-		animations.CollectionAnimation[StatusAnimate::IDLE - 1].push_back(FileName);
+		{			
+		animations.CollectionAnimation[(int)StatusAnimate::IDLE - 1].push_back(FileName);
 		}
 	}
 }
