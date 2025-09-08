@@ -347,7 +347,7 @@ void GraphicEngine::Present(bool vSync)
 {
 	if (vSync)
 	{
-		Logg.Log(pGISwapChain->Present(3u, 0u), "Present + vSync");
+		Logg.Log(pGISwapChain->Present(4u, 0u), "Present + vSync");
 	}
 	else
 	{
