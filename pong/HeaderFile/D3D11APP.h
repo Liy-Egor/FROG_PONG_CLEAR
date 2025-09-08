@@ -44,7 +44,7 @@ public:
 
 	void RenderClearBuffer(float red, float green, float blue);
 	void Present(bool vSync);
-	void DrawObject(float x, float y, float z, float width, float height,float ZAngle, TypeObject typeOBJ, string filename, StatusAnimate status, vector<string> animations);
+	void DrawObject(float x, float y, float z, float width, float height,float ZAngle, TypeObject typeOBJ, string filename, string NameObj, StatusAnimate status);
 	void SetCameraTarget(float LookAtX, float LookAtY)
 	{
 		this->LookAtX = LookAtX;
@@ -347,7 +347,7 @@ void GraphicEngine::Present(bool vSync)
 {
 	if (vSync)
 	{
-		Logg.Log(pGISwapChain->Present(1u, 0u), "Present + vSync");
+		Logg.Log(pGISwapChain->Present(3u, 0u), "Present + vSync");
 	}
 	else
 	{
@@ -355,42 +355,33 @@ void GraphicEngine::Present(bool vSync)
 	}
 }
 
-void GraphicEngine::DrawObject(float x, float y, float z,float width, float height,float ZAngle,TypeObject typeOBJ,string filename, StatusAnimate status, vector<string> animations)
+void GraphicEngine::DrawObject(float x, float y, float z,float width, float height,float ZAngle,TypeObject typeOBJ,string filename,string NameObj, StatusAnimate status)
 {
-	if (status == StatusAnimate::DEFAULT)
-	{
-		CreateTextureBuffer(filename);
-	}
-
 	int Iterators = 0;
-	if ( typeOBJ == TypeObject::BOX2DTEX ||
-		 typeOBJ == TypeObject::BOX2DTEXSEEMLESS
-		)
-	{
-		Iterators = 1;
-	}
-	else if ( typeOBJ == TypeObject::BOX2DTEXSEEMLESS_LMR)
-	{
-		Iterators = (width / WidthImage) + 2 + ((width / WidthImage) -1);
-	}
-	
 
-	for (int i = 0; i < Iterators; i++)
-	{	//цикл здесь будет сильно нагружать систему
-		BuildListBuffer ListBuffer(x, y, z, width, height, ZAngle, LookAtX, LookAtY, i);
-
-		if (status != StatusAnimate::DEFAULT)
+		if (status == StatusAnimate::DEFAULT)
 		{
-			CreateTextureBuffer(ListBuffer.GetAnimation(animations, status));
+		CreateTextureBuffer(filename);
 		}
-		ListBuffer.SetImageWH(WidthImage, HeightImage);
-		CreateMatrixBuffer(ListBuffer.GetMatrix(typeOBJ));
-		CreateVectorBuff(ListBuffer.GetVectorList(typeOBJ));
-		UINT IndexCount = CreateIndexBuff(ListBuffer.GetIndex(typeOBJ));
-		SetShadersVSPS(typeOBJ);
-		CreateInputLayer(ListBuffer.GetElementDesc(typeOBJ));
-		SetViewports(0, 1, 0, 0, 1u);
-		RenderDrawIndex(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, IndexCount);
-	};
+		else
+		{
+		CreateTextureBuffer(GetAnimation(status, NameObj));
+		}
 
-}
+	
+		if ( typeOBJ == TypeObject::BOX2DTEX || typeOBJ == TypeObject::BOX2DTEXSEEMLESS)
+		Iterators = 1;
+
+		else if ( typeOBJ == TypeObject::BOX2DTEXSEEMLESS_LMR)
+		Iterators = (width / WidthImage) + 2 + ((width / WidthImage) -1);
+
+			BuildListBuffer ListBuffer(x, y, z, width, height, ZAngle, LookAtX, LookAtY, Iterators, status);
+			ListBuffer.SetImageWH(WidthImage, HeightImage);
+			CreateMatrixBuffer(ListBuffer.GetMatrix(typeOBJ));
+			CreateVectorBuff(ListBuffer.GetVectorList(typeOBJ));
+			UINT IndexCount = CreateIndexBuff(ListBuffer.GetIndex(typeOBJ));
+			SetShadersVSPS(typeOBJ);
+			CreateInputLayer(ListBuffer.GetElementDesc(typeOBJ));
+			SetViewports(0, 1, 0, 0, 1u);
+			RenderDrawIndex(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, IndexCount);
+};

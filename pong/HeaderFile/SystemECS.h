@@ -28,56 +28,6 @@ bool CheckCollision(float x1, float y1, float w1, float h1,
         y1 + h1 > y2;
 }
 
-//void Show(CBitmap& CBitmap, CTransform& Transform)
-//{
-//    float vx = (Transform.x - player_view.x) * Transform.Scale + window.width / 2;
-//    float vy = (Transform.y - player_view.y) * Transform.Scale + window.height / 2;
-//    float vw = Transform.Width * Transform.Scale;
-//    float vh = Transform.Height * Transform.Scale;
-//
-//    bool in = false;
-//
-//    if (vx + vw >= 0 && vx < window.width &&
-//        vy + vh >= 0 && vy < window.height)
-//        in = true;
-//
-//    if (!in) return;
-//    ShowBitmap(window.context, vx, vy, vw, vh, CBitmap.HBitMap, false);
-//}
-//
-//void ShowAnimation(CBitmap& CBitmap, CTransform& Transform,int num)
-//{
-//    float vx = (Transform.x - player_view.x) * Transform.Scale + window.width / 2;
-//    float vy = (Transform.y - player_view.y) * Transform.Scale + window.height / 2;
-//    float vw = Transform.Width * Transform.Scale;
-//    float vh = Transform.Height * Transform.Scale;
-//
-//    bool in = false;
-//    static int lastDamageTime = 0;
-//    if (vx + vw >= 0 && vx < window.width &&
-//        vy + vh >= 0 && vy < window.height)
-//        in = true;
-//
-//    if (!in) return;
-//        HBITMAP hbm, hOldbm;
-//        HDC hMemDC;
-//        BITMAP bm;
-//        hMemDC = CreateCompatibleDC(window.context);
-//        hOldbm = (HBITMAP)SelectObject(hMemDC, CBitmap.HBitMap);
-//        GetObject(CBitmap.HBitMap, sizeof(BITMAP), (LPSTR)&bm);
-//        if (hOldbm)
-//        {
-//            StretchBlt(window.context, vx, vy, vw/4, vh, hMemDC, num, 0, 137, bm.bmHeight, SRCCOPY);
-//            SelectObject(hMemDC, hOldbm);
-//        }
-//        DeleteDC(hMemDC); // ??????? ???????? ??????
-//}
-//
-//void ShowWindow(CBitmap& CBitmap)
-//{
-//    ShowBitmap(window.context, 0, 0, window.width, window.height, CBitmap.HBitMap, false);
-//}
-
 void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump)
 {
     CCollider.LastTracePlatformNum = -1;
@@ -339,6 +289,7 @@ void AppGame::Init()
 	LoadSVGDataMap(MAPS"LVLDemoDay1");
 
 	LoadAnimationFiles(PLAYER"Animation");
+	LoadAnimationFiles(ENEMY"Animation");
 
 	MapSizeW = VLocation[0].GetPosition()->Width;
 	MapSizeH = VLocation[0].GetPosition()->Height;
@@ -363,8 +314,8 @@ void AppGame::Render()
 				0,
 				VLocation[Player->GetLocation()].GetRender()->TypeRender,
 				VLocation[Player->GetLocation()].GetTexture()->Texture,
-				StatusAnimate::DEFAULT,
-				VLocation[Player->GetLocation()].GetAnimation()->ListAnimation
+				VLocation[Player->GetLocation()].GetNameObj()->Name,
+				StatusAnimate::DEFAULT
 			);
 
 			for (ATWall var : VLocation[i].VWall)
@@ -375,8 +326,8 @@ void AppGame::Render()
 					0,
 					var.GetRender()->TypeRender,
 					var.GetTexture()->Texture,
-					StatusAnimate::DEFAULT,
-					var.GetAnimation()->ListAnimation
+					var.GetNameObj()->Name,
+					StatusAnimate::DEFAULT
 				);
 			}
 			for (ATEnemy var : VLocation[i].VEnemy)
@@ -387,8 +338,8 @@ void AppGame::Render()
 					0,
 					var.GetRender()->TypeRender,
 					var.GetTexture()->Texture,
-					StatusAnimate::DEFAULT,
-					var.GetAnimation()->ListAnimation
+					var.GetNameObj()->Name,
+					StatusAnimate::DEFAULT
 				);
 				var.Start();
 			}
@@ -400,8 +351,8 @@ void AppGame::Render()
 					0,
 					var.GetRender()->TypeRender,
 					var.GetTexture()->Texture,
-					StatusAnimate::DEFAULT,
-					var.GetAnimation()->ListAnimation
+					var.GetNameObj()->Name,
+					StatusAnimate::DEFAULT
 				);
 				if (var.GoEvent())
 				{
@@ -416,8 +367,8 @@ void AppGame::Render()
 					0,
 					var.GetRender()->TypeRender,
 					var.GetTexture()->Texture,
-					StatusAnimate::DEFAULT,
-					var.GetAnimation()->ListAnimation
+					var.GetNameObj()->Name,
+					StatusAnimate::DEFAULT
 				);
 				var.GoEvent();
 			}
@@ -429,8 +380,8 @@ void AppGame::Render()
 					0,
 					var.GetRender()->TypeRender,
 					var.GetTexture()->Texture,
-					StatusAnimate::DEFAULT,
-					var.GetAnimation()->ListAnimation
+					var.GetNameObj()->Name,
+					StatusAnimate::DEFAULT
 				);
 				var.GoEvent();
 			}
@@ -441,8 +392,8 @@ void AppGame::Render()
 				0,
 				Player->GetRender()->TypeRender,
 				Player->GetTexture()->Texture,
-				StatusAnimate::DEFAULT,
-				Player->GetAnimation()->ListAnimation
+				Player->GetNameObj()->Name,
+				StatusAnimate::WALK
 			);
 
 			Player->Start();

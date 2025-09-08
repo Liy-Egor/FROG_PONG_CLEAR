@@ -17,8 +17,7 @@ void AddCharacterModifier(
 void SwitchLotation(CPortalPàth& PortalPàth, CTransform& CTransform);
 bool HealEvent(CTransform& Transform, CHealth& Health);
 void SpikeEvent(CTransform& Transform,CDamage& Damage);
-void UpdateView();
-void UpdatePhysics();
+
 
 
 //áàçîâûå êëàññû
@@ -31,10 +30,8 @@ protected:
     CSound* Sound = ECS.SetComponent<CSound>(Entity);
     CNameObject* NameObject = ECS.SetComponent<CNameObject>(Entity);
 	CTypeRender* TypeRenders = ECS.SetComponent<CTypeRender>(Entity);
-	CListAnimation* ListAnimations = ECS.SetComponent<CListAnimation>(Entity);
     int WhatLocation;
     
-
     BaseArcheType(string NameFile, float arr[], TypeObject TypeRend)
     {
         LoadTransform(*Transform, arr);
@@ -49,7 +46,6 @@ protected:
       ECS.DeleteEntity(Entity);
       /*delete this;*/ //êðàøèò ïðîãó 
     }
-
 
 public:
     virtual void Destroy()
@@ -76,13 +72,9 @@ public:
 	{
 		return ECS.GetComponent<CTypeRender>(Entity, TypeRenders);
 	}
-	CListAnimation* GetAnimation()
+	CNameObject* GetNameObj()
 	{
-		return ECS.GetComponent<CListAnimation>(Entity, ListAnimations);
-	}
-	void SetAnimation(string listanimation)
-	{
-		ListAnimations->ListAnimation.push_back(listanimation);
+		return ECS.GetComponent<CNameObject>(Entity, NameObject);
 	}
 };
 
@@ -191,7 +183,7 @@ private:
 public:
 	ATEnemy(string NameFile, float arr[], TypeObject TypeRend) : BasePerson(NameFile, arr, TypeRend)
 	{
-		NameObject->Name = "Enemy";
+		NameObject->Name = "enemy";
 		AddCharacterModifier(*Health, *Defense, *Damage, *Speed, *Specialization, *Gender, *StatusBehavior, *TypeÑharacter, *NameÑharacter, *Rank,
 			"TypeDamage", "Status", "TypeÑh", "Gendr", "Frog", "Specialist", 0);
 	}
@@ -208,7 +200,7 @@ class ATPlayer : public BasePerson
 public:
     ATPlayer(string NameFile, float arr[], TypeObject TypeRend) : BasePerson(NameFile, arr, TypeRend)
     {
-        NameObject->Name = "Player";
+        NameObject->Name = "player";
         NameÑharacter->NameChar = "Komar";
     }
     void Start()
