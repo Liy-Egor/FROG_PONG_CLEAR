@@ -44,6 +44,12 @@ struct CTypeRender
 	TypeObject TypeRender;
 };
 
+struct CAnimationTimeLine
+{
+	vector<int> TimeLineIt;
+	vector<string> TimeLineName;
+};
+
 //Ñharacter Components
 struct CHealth
 {

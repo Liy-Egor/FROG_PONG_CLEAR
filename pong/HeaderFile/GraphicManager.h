@@ -29,13 +29,14 @@ private:
 	float x{}, y{}, z{}, u{}, v{};
 };
 
-string GetAnimation(StatusAnimate status, string NameObj)
+pair<float, string> GetAnimation(StatusAnimate status, string NameObj)
 {
 	string NameStatus = "";
 	string NameCut = NameObj + ".png";
 	string Name = animations.CollectionAnimation[status - 1][0];
 	NameStatus = Name.replace(Name.find(NameCut), NameCut.length(), "");
-	
+
+
 	string path = "";
 	if (NameObj == "player")
 	path = PLAYER ANI;
@@ -43,18 +44,19 @@ string GetAnimation(StatusAnimate status, string NameObj)
 	else if(NameObj == "enemy")
 	path = ENEMY ANI;
 
-	return path + NameStatus + NameObj;
+
+	float n = 0;
+	size_t digits = NameStatus.find_first_of("1234567890+-");
+	if (digits <= NameStatus.size())
+	n = atof(NameStatus.c_str() + digits);
+
+	return pair<float, string>(n,path + NameStatus + NameObj);
 }
-
-
-int timeLine;
-float sss;
-float fff;
 
 class BuildListBuffer
 {
 public:
-	BuildListBuffer(float x, float y, float z, float width, float height,float ZAngle, float LookAtX, float LookAtY,int Iterator, StatusAnimate Status)
+	BuildListBuffer(float x, float y, float z, float width, float height,float ZAngle, float LookAtX, float LookAtY,int Iterator, StatusAnimate Status, float PitchImage)
 	{
 	 this -> xLeft = (window.width / 2 - x) / (window.width / 2);
 	 this -> xRight = (x + width - window.width / 2) / (window.width / 2);
@@ -69,11 +71,12 @@ public:
 	 this -> HeightObject = height;
 	 this->Iterator = Iterator;
 	 this->Status = Status;
+	 this->PitchImage = PitchImage;
 	};
 
 	~BuildListBuffer(){};
 
-	vector<VEC3> GetVectorList(TypeObject typeObject) 
+	vector<VEC3> GetVectorList(TypeObject typeObject, vector<int>* TimeLineIt, vector<string>* TimeLineName)
 	{
 		 if (typeObject == TypeObject::BOX2DTEX && Status == StatusAnimate::DEFAULT)
 		{
@@ -195,21 +198,29 @@ public:
 	     }
 
 
-
-		 //тут основой расчет сдвига анимации
-
 		 if (typeObject == TypeObject::BOX2DTEX && Status != StatusAnimate::DEFAULT)
 		 {
-			 if (timeLine == 0)
+			 int speed = 10;
+			 if (TimeLineIt->size() == 0 || TimeLineIt[0][0] <= 0)
 			 {
-				 timeLine = WidthImage / 70 + 1;
-				 fff = (float)1 / (float)timeLine;
-				 sss = 0;
+			 if (Status == StatusAnimate::WALK)
+			 {
+				 TimeLineIt->clear();
+				 TimeLineName->clear();
+				 TimeLineIt->push_back((WidthImage / PitchImage) * speed);
+				 TimeLineName->push_back("walk");
+			 }
 			 }
 
+			 int a = TimeLineIt[0][0] % speed;
+			 if (a != 0)
+			 a = speed - a;
 
-			 float PitchStart = sss;
-			 float PitchEnd = fff;
+			 TimeLineIt[0][0]--;
+			 int iterator = ((WidthImage / PitchImage)* speed) - TimeLineIt[0][0] - a;
+
+			 float PitchStart = (PitchImage * (iterator - 1)) / WidthImage;
+			 float PitchEnd = (PitchImage * iterator) / WidthImage;
 
 			 Vectors =
 			 {
@@ -219,14 +230,8 @@ public:
 				 { xRight,-yBottom,zFront,  PitchEnd,1.0f },
 			 };
 
-			 timeLine--;
-			 sss =+ PitchEnd;
-			 fff =+ (float)1 / (float)timeLine;
-
 			return Vectors;
 		 }
-
-
 
 	}
 
@@ -294,10 +299,8 @@ public:
 
 	void SetImageWH(float WidthImage, float HeightImage)
 	{
-
 		this->WidthImage = WidthImage;
 		this->HeightImage = HeightImage;
-
 	}
 
 protected:
@@ -311,8 +314,8 @@ private:
 	float ZAngle;
 	float CameraPosX, CameraPosY;
 	float WidthObject , HeightObject;
-	int Iterator;
+	int   Iterator;
 	float WidthImage, HeightImage;
-	
+	float PitchImage;
 	StatusAnimate Status;
 };

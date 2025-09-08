@@ -30,6 +30,7 @@ protected:
     CSound* Sound = ECS.SetComponent<CSound>(Entity);
     CNameObject* NameObject = ECS.SetComponent<CNameObject>(Entity);
 	CTypeRender* TypeRenders = ECS.SetComponent<CTypeRender>(Entity);
+	CAnimationTimeLine* AnimationTimeLine = ECS.SetComponent<CAnimationTimeLine>(Entity);
     int WhatLocation;
     
     BaseArcheType(string NameFile, float arr[], TypeObject TypeRend)
@@ -75,6 +76,10 @@ public:
 	CNameObject* GetNameObj()
 	{
 		return ECS.GetComponent<CNameObject>(Entity, NameObject);
+	}
+	CAnimationTimeLine* GetTimeLine()
+	{
+		return ECS.GetComponent<CAnimationTimeLine>(Entity, AnimationTimeLine);
 	}
 };
 
@@ -209,6 +214,7 @@ public:
        TracerCollide(*Collider, *Transform, *Jump);
        ProcessGravity(*Jump, *Transform, *Gravity);
     }
+
 }*Player;
 
 //конец всех архетипов
