@@ -8,7 +8,7 @@ void CreateObject(CTransform& CTransform);
 void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump);
 void ProcessGravity(CJump& CJump, CTransform& Transform, CGravity& Gravity);
 void ProcessSound(CSound& CSound);
-void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity);
+void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation);
 void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity);
 void AddCharacterModifier(
     CHealth& CHealth, CDefense& CDefense, CDamage& CDamage, CSpeed& CSpeed, ÑSpecialization& ÑSpecialization,
@@ -31,6 +31,7 @@ protected:
     CNameObject* NameObject = ECS.SetComponent<CNameObject>(Entity);
 	CTypeRender* TypeRenders = ECS.SetComponent<CTypeRender>(Entity);
 	CAnimationTimeLine* AnimationTimeLine = ECS.SetComponent<CAnimationTimeLine>(Entity);
+	CStatusAnimation* StatusAnimation = ECS.SetComponent<CStatusAnimation>(Entity);
     int WhatLocation;
     
     BaseArcheType(string NameFile, float arr[], TypeObject TypeRend)
@@ -80,6 +81,10 @@ public:
 	CAnimationTimeLine* GetTimeLine()
 	{
 		return ECS.GetComponent<CAnimationTimeLine>(Entity, AnimationTimeLine);
+	}
+	CStatusAnimation* GetStatusAnimation()
+	{
+		return ECS.GetComponent<CStatusAnimation>(Entity, StatusAnimation);
 	}
 };
 
@@ -210,7 +215,7 @@ public:
     }
     void Start()
     {      
-       MovePlayer(*Jump, *Transform, *Speed, *Collider, *Gravity); 
+       MovePlayer(*Jump, *Transform, *Speed, *Collider, *Gravity, *StatusAnimation);
        TracerCollide(*Collider, *Transform, *Jump);
        ProcessGravity(*Jump, *Transform, *Gravity);
     }

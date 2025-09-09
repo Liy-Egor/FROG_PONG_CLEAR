@@ -148,7 +148,7 @@ void LoadSVGDataMap(const string NameFileSVG) {
 
 void LoadAnimationFiles(const string PathFile)
 {
-	animations.CollectionAnimation.resize(3); //виды анимаций
+	animations.CollectionAnimation.resize(LastEnum); //виды анимаций
 	for (const auto& entry : filesystem::directory_iterator(PathFile))
 	{
 		string FileName = entry.path().filename().string().c_str();
@@ -161,5 +161,6 @@ void LoadAnimationFiles(const string PathFile)
 		{			
 		animations.CollectionAnimation[(int)StatusAnimate::IDLE - 1].push_back(FileName);
 		}
+
 	}
 }

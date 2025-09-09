@@ -50,8 +50,9 @@ public:
 		this->LookAtX = LookAtX;
 		this->LookAtY = LookAtY;
 	};
-	void SetAnimetionTimeLine(vector<int> TimeLineIt, vector<string> TimeLineName)
+	void SetAnimetionTimeLine(vector<int> TimeLineIt, vector<string> TimeLineName,int Mirror)
 	{
+		this->Mirror = Mirror;
 		this->TimeLineIts = TimeLineIt;
 		this->TimeLineNames = TimeLineName;
 	}
@@ -347,6 +348,7 @@ private:
 	float WidthImage = 0;
 	float HeightImage = 0;
 	float PitchImage = 80;
+	int Mirror = 1;
 	vector<int> TimeLineIts;
 	vector<string> TimeLineNames;
 }d3dx;
@@ -396,7 +398,7 @@ void GraphicEngine::DrawObject(float x, float y, float z,float width, float heig
 			BuildListBuffer ListBuffer(x, y, z, width, height, ZAngle, LookAtX, LookAtY, Iterators, status, PitchImage);
 			ListBuffer.SetImageWH(WidthImage, HeightImage);
 			CreateMatrixBuffer(ListBuffer.GetMatrix(typeOBJ));
-			CreateVectorBuff(ListBuffer.GetVectorList(typeOBJ, &TimeLineIts,&TimeLineNames));
+			CreateVectorBuff(ListBuffer.GetVectorList(typeOBJ, &TimeLineIts,&TimeLineNames, Mirror));
 			UINT IndexCount = CreateIndexBuff(ListBuffer.GetIndex(typeOBJ));
 			SetShadersVSPS(typeOBJ);
 			CreateInputLayer(ListBuffer.GetElementDesc(typeOBJ));

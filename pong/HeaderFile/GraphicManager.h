@@ -17,7 +17,14 @@ enum StatusAnimate
 {
 	DEFAULT,
 	WALK,
-	IDLE
+	IDLE,
+
+
+
+
+
+
+	LastEnum
 };
 
 class VEC3
@@ -76,7 +83,7 @@ public:
 
 	~BuildListBuffer(){};
 
-	vector<VEC3> GetVectorList(TypeObject typeObject, vector<int>* TimeLineIt, vector<string>* TimeLineName)
+	vector<VEC3> GetVectorList(TypeObject typeObject, vector<int>* TimeLineIt, vector<string>* TimeLineName, int Mirror)
 	{
 		 if (typeObject == TypeObject::BOX2DTEX && Status == StatusAnimate::DEFAULT)
 		{
@@ -203,31 +210,37 @@ public:
 			 int speed = 10;
 			 if (TimeLineIt->size() == 0 || TimeLineIt[0][0] <= 0)
 			 {
-			 if (Status == StatusAnimate::WALK)
-			 {
 				 TimeLineIt->clear();
 				 TimeLineName->clear();
-				 TimeLineIt->push_back((WidthImage / PitchImage) * speed);
+				 TimeLineIt->push_back((WidthImage / PitchImage)* speed);
+			 if (Status == StatusAnimate::WALK)
+			 {
 				 TimeLineName->push_back("walk");
 			 }
+			 if (Status == StatusAnimate::IDLE)
+			 {
+				 TimeLineName->push_back("idle");
 			 }
 
-			 int a = TimeLineIt[0][0] % speed;
-			 if (a != 0)
-			 a = speed - a;
+
+			 }
+
+			 int NextFrame = TimeLineIt[0][0] % speed;
+			 if (NextFrame != 0)
+			 NextFrame = speed - NextFrame;
 
 			 TimeLineIt[0][0]--;
-			 int iterator = ((WidthImage / PitchImage)* speed) - TimeLineIt[0][0] - a;
+			 int iterator = ((WidthImage / PitchImage)* speed) - TimeLineIt[0][0] - NextFrame;
 
 			 float PitchStart = (PitchImage * (iterator - 1)) / WidthImage;
 			 float PitchEnd = (PitchImage * iterator) / WidthImage;
 
 			 Vectors =
 			 {
-				 { -xLeft,-yBottom,zFront,  PitchStart,1.0f },
-				 { -xLeft,yTop,zFront,      PitchStart,0.0f },
-				 { xRight,yTop,zFront,      PitchEnd,0.0f },
-				 { xRight,-yBottom,zFront,  PitchEnd,1.0f },
+				 { -xLeft,-yBottom,zFront,  PitchStart * Mirror,1.0f },
+				 { -xLeft,yTop,zFront,      PitchStart * Mirror,0.0f },
+				 { xRight,yTop,zFront,      PitchEnd * Mirror,0.0f },
+				 { xRight,-yBottom,zFront,  PitchEnd * Mirror,1.0f },
 			 };
 
 			return Vectors;

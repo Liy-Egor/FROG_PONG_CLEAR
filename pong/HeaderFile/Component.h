@@ -50,6 +50,12 @@ struct CAnimationTimeLine
 	vector<string> TimeLineName;
 };
 
+struct CStatusAnimation
+{
+	StatusAnimate StatusAnim = StatusAnimate::DEFAULT;
+	int Mirror = 1;
+};
+
 //Ñharacter Components
 struct CHealth
 {
