@@ -20,7 +20,7 @@ enum StatusAnimate
 	IDLE,
 
 
-
+	
 
 
 
