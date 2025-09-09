@@ -207,7 +207,7 @@ public:
 
 		 if (typeObject == TypeObject::BOX2DTEX && Status != StatusAnimate::DEFAULT)
 		 {
-			 int speed = 16;
+			 int speed = 3;
 			 if (TimeLineIt->size() == 0 || TimeLineIt[0][0] <= 0)
 			 {
 				 TimeLineIt->clear();
