@@ -207,33 +207,30 @@ public:
 
 		 if (typeObject == TypeObject::BOX2DTEX && Status != StatusAnimate::DEFAULT)
 		 {
-			 int speed = 10;
+			 int speed = 16;
 			 if (TimeLineIt->size() == 0 || TimeLineIt[0][0] <= 0)
 			 {
 				 TimeLineIt->clear();
 				 TimeLineName->clear();
-				 TimeLineIt->push_back((WidthImage / PitchImage)* speed);
+				 TimeLineIt->push_back((WidthImage / PitchImage) * speed);
+
 			 if (Status == StatusAnimate::WALK)
-			 {
 				 TimeLineName->push_back("walk");
-			 }
+
 			 if (Status == StatusAnimate::IDLE)
-			 {
 				 TimeLineName->push_back("idle");
+
+
+
 			 }
-
-
-			 }
-
-			 int NextFrame = TimeLineIt[0][0] % speed;
-			 if (NextFrame != 0)
-			 NextFrame = speed - NextFrame;
 
 			 TimeLineIt[0][0]--;
-			 int iterator = ((WidthImage / PitchImage)* speed) - TimeLineIt[0][0] - NextFrame;
 
-			 float PitchStart = (PitchImage * (iterator - 1)) / WidthImage;
-			 float PitchEnd = (PitchImage * iterator) / WidthImage;
+			 int NextFrame = speed - (TimeLineIt[0][0] % speed);
+			 int iterator = (((WidthImage / PitchImage)* speed) - TimeLineIt[0][0] - NextFrame) / speed;
+
+			 float PitchStart = (PitchImage * ((iterator * Mirror)-1)) / WidthImage;
+			 float PitchEnd = (PitchImage * (iterator * Mirror)) / WidthImage;
 
 			 Vectors =
 			 {
