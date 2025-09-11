@@ -56,7 +56,7 @@ struct CStatusAnimation
 	int Mirror = 1;
 };
 
-//—haracter Components
+//√ëharacter Components
 struct CHealth
 {
     int Health = 100, MaxHealth = 100;
@@ -79,7 +79,7 @@ struct CSpeed
     int SpeedAttack = 10, SpeedWalk = 15;
 };
 
-struct —Rank
+struct √ëRank
 {
     int Rank = 0;
 };
@@ -89,9 +89,9 @@ struct CGender
     const char* Gender;
 };
 
-struct CType—haracter
+struct CType√ëharacter
 {
-    const char* Type—haracter;
+    const char* Type√ëharacter;
 };
 
 struct CStatusBehavior
@@ -99,12 +99,12 @@ struct CStatusBehavior
     const char* Status;
 };
 
-struct —Specialization
+struct √ëSpecialization
 {
     const char* Specialization;
 };
 
-struct CName—haracter
+struct CName√ëharacter
 {
     const char* NameChar;
 };
@@ -116,9 +116,9 @@ struct CJump
     bool InJump = false;
 };
 
-struct CPortalP‡th
+struct CPortalP√†th
 {
-    int P‡th;
+    int P√†th;
 };
 
 };
