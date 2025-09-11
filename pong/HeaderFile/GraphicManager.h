@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseStructures.h"
 
+
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
@@ -329,3 +330,4 @@ private:
 	float PitchImage;
 	StatusAnimate Status;
 };
+
