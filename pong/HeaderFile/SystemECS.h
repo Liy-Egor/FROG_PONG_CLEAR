@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "GameFileSystem.h"
 
 using namespace ECC;
