@@ -16,7 +16,8 @@
 #include <wrl.h>
 #include "DirectXTex.h"
 #include "Macros.h"
-
+#include <utility>
+#include <cstdlib>
 
 using namespace std;
 class Logger

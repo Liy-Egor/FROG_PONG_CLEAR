@@ -50,8 +50,22 @@ public:
 		this->LookAtX = LookAtX;
 		this->LookAtY = LookAtY;
 	};
-private:
+	void SetAnimetionTimeLine(vector<int> TimeLineIt, vector<string> TimeLineName,int Mirror)
+	{
+		this->Mirror = Mirror;
+		this->TimeLineIts = TimeLineIt;
+		this->TimeLineNames = TimeLineName;
+	}
+	vector<int> GetTimeLineIt()
+	{
+		return TimeLineIts;
+	}
+	vector<string> GetTimeLineName()
+	{
+		return TimeLineNames;
+	}
 
+private:
 	vector<ID3D11ShaderResourceView**> pSRV;
 	vector<ID3D11SamplerState**> pSST;
 	ScratchImage TexList[1000];
@@ -333,6 +347,10 @@ private:
 	float LookAtY = 0;
 	float WidthImage = 0;
 	float HeightImage = 0;
+	float PitchImage = 80;
+	int Mirror = 1;
+	vector<int> TimeLineIts;
+	vector<string> TimeLineNames;
 }d3dx;
 
 //реализация
@@ -347,7 +365,7 @@ void GraphicEngine::Present(bool vSync)
 {
 	if (vSync)
 	{
-		Logg.Log(pGISwapChain->Present(3u, 0u), "Present + vSync");
+		Logg.Log(pGISwapChain->Present(1u, 0u), "Present + vSync");
 	}
 	else
 	{
@@ -365,7 +383,9 @@ void GraphicEngine::DrawObject(float x, float y, float z,float width, float heig
 		}
 		else
 		{
-		CreateTextureBuffer(GetAnimation(status, NameObj));
+		pair<float, string> DataAimation = GetAnimation(status, NameObj);
+		PitchImage = DataAimation.first;
+		CreateTextureBuffer(DataAimation.second);
 		}
 
 	
@@ -375,10 +395,10 @@ void GraphicEngine::DrawObject(float x, float y, float z,float width, float heig
 		else if ( typeOBJ == TypeObject::BOX2DTEXSEEMLESS_LMR)
 		Iterators = (width / WidthImage) + 2 + ((width / WidthImage) -1);
 
-			BuildListBuffer ListBuffer(x, y, z, width, height, ZAngle, LookAtX, LookAtY, Iterators, status);
+			BuildListBuffer ListBuffer(x, y, z, width, height, ZAngle, LookAtX, LookAtY, Iterators, status, PitchImage);
 			ListBuffer.SetImageWH(WidthImage, HeightImage);
 			CreateMatrixBuffer(ListBuffer.GetMatrix(typeOBJ));
-			CreateVectorBuff(ListBuffer.GetVectorList(typeOBJ));
+			CreateVectorBuff(ListBuffer.GetVectorList(typeOBJ, &TimeLineIts,&TimeLineNames, Mirror));
 			UINT IndexCount = CreateIndexBuff(ListBuffer.GetIndex(typeOBJ));
 			SetShadersVSPS(typeOBJ);
 			CreateInputLayer(ListBuffer.GetElementDesc(typeOBJ));

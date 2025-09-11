@@ -44,6 +44,18 @@ struct CTypeRender
 	TypeObject TypeRender;
 };
 
+struct CAnimationTimeLine
+{
+	vector<int> TimeLineIt;
+	vector<string> TimeLineName;
+};
+
+struct CStatusAnimation
+{
+	StatusAnimate StatusAnim = StatusAnimate::DEFAULT;
+	int Mirror = 1;
+};
+
 //Ñharacter Components
 struct CHealth
 {
