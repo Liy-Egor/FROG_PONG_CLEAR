@@ -41,7 +41,7 @@ pair<float, string> GetAnimation(StatusAnimate status, string NameObj)
 {
 	string NameStatus = "";
 	string NameCut = NameObj + ".png";
-	string Name = animations.CollectionAnimation[status - 1][0];
+	string Name = animations.CollectionAnimation[status - 1][0]; ///!!!!!!!!! итерация 0 это чисто игрок но нужны все объекты из массива из заэтого и ошибка
 	NameStatus = Name.replace(Name.find(NameCut), NameCut.length(), "");
 
 
