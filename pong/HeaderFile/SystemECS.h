@@ -168,7 +168,7 @@ void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& 
 
 void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation)
 {
-        CSpeed.SpeedWalk = 14;
+        CSpeed.SpeedWalk = 6;
 
         for (int i = 0; i < VLocation.size(); i++)
         {
@@ -181,14 +181,14 @@ void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollid
                         auto& platform = *VLocation[i].VWall[CCollider.LastTracePlatformNum].GetPosition();
                         if (CTransform.x <= platform.x)
                         {
-							/*StatusAnimation.StatusAnim = StatusAnimate::WALK;*/
-							/*StatusAnimation.Mirror = 1;*/
+							StatusAnimation.StatusAnim = StatusAnimate::WALK;
+							StatusAnimation.Mirror = 1;
                             CCollider.Direction = 1;
                         }
                         if (CTransform.x + CTransform.Width >= platform.x + platform.Width)
                         {
-							/*StatusAnimation.StatusAnim = StatusAnimate::WALK;*/
-							/*StatusAnimation.Mirror = -1;*/
+							StatusAnimation.StatusAnim = StatusAnimate::WALK;
+							StatusAnimation.Mirror = -1;
                             CCollider.Direction = -1;
                         }
                     }
@@ -344,6 +344,7 @@ void AppGame::Render()
 			}
 			for (ATEnemy var : VLocation[i].VEnemy)
 			{
+
 				d3dx.SetAnimetionTimeLine(var.GetTimeLine()->TimeLineIt, var.GetTimeLine()->TimeLineName, var.GetStatusAnimation()->Mirror);
 
 				d3dx.DrawObject(

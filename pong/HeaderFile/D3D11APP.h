@@ -347,8 +347,8 @@ private:
 	float LookAtY = 0;
 	float WidthImage = 0;
 	float HeightImage = 0;
-	float PitchImage = 80;
-	int Mirror = 1;
+	float PitchImage = 0;
+	int Mirror = 0;
 	vector<int> TimeLineIts;
 	vector<string> TimeLineNames;
 }d3dx;
@@ -383,17 +383,20 @@ void GraphicEngine::DrawObject(float x, float y, float z,float width, float heig
 		}
 		else
 		{
-		pair<float, string> DataAimation = GetAnimation(status, NameObj);
+		pair<float, string> DataAimation = GetAnimation(status, NameObj, TimeLineIts, TimeLineNames);
 		PitchImage = DataAimation.first;
 		CreateTextureBuffer(DataAimation.second);
 		}
 
 	
-		if ( typeOBJ == TypeObject::BOX2DTEX || typeOBJ == TypeObject::BOX2DTEXSEEMLESS)
-		Iterators = 1;
-
-		else if ( typeOBJ == TypeObject::BOX2DTEXSEEMLESS_LMR)
-		Iterators = (width / WidthImage) + 2 + ((width / WidthImage) -1);
+		if (typeOBJ == TypeObject::BOX2DTEX || typeOBJ == TypeObject::BOX2DTEXSEEMLESS)
+		{
+			Iterators = 1;
+		}
+		else if (typeOBJ == TypeObject::BOX2DTEXSEEMLESS_LMR)
+		{
+		Iterators = (width / WidthImage) + 2 + ((width / WidthImage) - 1);
+		}
 
 			BuildListBuffer ListBuffer(x, y, z, width, height, ZAngle, LookAtX, LookAtY, Iterators, status, PitchImage);
 			ListBuffer.SetImageWH(WidthImage, HeightImage);

@@ -199,7 +199,7 @@ public:
 	}
 	void Start()
 	{
-		MoveCharacter(*Jump, *Transform, *Speed, *Collider, *Gravity,*StatusAnimation);
+		MoveCharacter(*Jump, *Transform, *Speed, *Collider, *Gravity, *StatusAnimation);
 		TracerCollide(*Collider, *Transform, *Jump);
 		ProcessGravity(*Jump, *Transform, *Gravity);
 	}
