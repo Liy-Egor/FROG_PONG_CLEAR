@@ -36,25 +36,14 @@ private:
 	float x{}, y{}, z{}, u{}, v{};
 };
 
-pair<float, string> GetAnimation(StatusAnimate status, string NameObj, vector<int> TimeLineIt, vector<string> TimeLineName)
+pair<float, string> GetAnimation(StatusAnimate Status, string NameObj, vector<int>* TimeLineIt, vector<string>* TimeLineName)
 {
-
-
-	//здесь переопределять анимации если базовая анимация уже заложена
-
-
-
-
-
-
-
-
-
 	string NameStatus = "";
+	string AddName = "";
 	string NameCut = NameObj + ".png";
-	for (int i = 0; i < animations.CollectionAnimation[status - 1].size(); i++)
+	for (int i = 0; i < animations.CollectionAnimation[Status - 1].size(); i++)
 	{
-		string Name = animations.CollectionAnimation[status - 1][i];
+		string Name = animations.CollectionAnimation[Status - 1][i];
 		if (Name.find(NameObj) <= Name.size())
 		{
 			NameStatus = Name.replace(Name.find(NameCut), NameCut.length(), "");
@@ -63,9 +52,32 @@ pair<float, string> GetAnimation(StatusAnimate status, string NameObj, vector<in
 	}
 
 	float PitchPix = 0;
-	size_t digits = NameStatus.find_first_of("1234567890+-");
+	size_t digits = NameStatus.find_first_of("1234567890");
 	if (digits <= NameStatus.size())
 	PitchPix = atof(NameStatus.c_str() + digits);
+
+	if (TimeLineIt->size() == 0 || TimeLineIt[0][0] <= 0)
+	{
+		if (Status == StatusAnimate::WALK)
+			TimeLineName->push_back("walk");
+
+		if (Status == StatusAnimate::IDLE)
+			TimeLineName->push_back("idle");
+
+		if (Status == StatusAnimate::TURN)
+			TimeLineName->push_back("turn");
+
+		if (Status == StatusAnimate::JUMP)
+			TimeLineName->push_back("jump");
+
+		if (Status == StatusAnimate::DEATH)
+			TimeLineName->push_back("death");
+
+		if (Status == StatusAnimate::ATTACK)
+			TimeLineName->push_back("attack");
+	}
+
+	AddName = NameStatus.replace(NameStatus.find(TimeLineName[0][0]), TimeLineName[0][0].length(), "");
 
 	string path = "";
 	if (NameObj == "player")
@@ -129,7 +141,7 @@ public:
 		 else if (typeObject == TypeObject::BOX2DTEXSEEMLESS_LMR && Status == StatusAnimate::DEFAULT)
 	     {
 		   Vectors.clear();
-		   float StepX = 33; //произвольный отступ от края до цельной части объекта
+		   float StepX = 33; //ГЇГ°Г®ГЁГ§ГўГ®Г«ГјГ­Г»Г© Г®ГІГ±ГІГіГЇ Г®ГІ ГЄГ°Г Гї Г¤Г® Г¶ГҐГ«ГјГ­Г®Г© Г·Г Г±ГІГЁ Г®ГЎГєГҐГЄГІГ 
 		   float ConvertStepX =  1 - (window.width / 2 - StepX) / (window.width / 2);
 		   float ConvertWimageX = 1 - (window.width / 2 - WidthImage) / (window.width / 2);
 		   float xRStep1 = xLeft - ConvertStepX;
@@ -224,32 +236,13 @@ public:
 
 		 if (typeObject == TypeObject::BOX2DTEX && Status != StatusAnimate::DEFAULT)
 		 {
-			 //регулировать скорость так же через файл
-			 int speed = 3;
-			 //нужно продумать лучшее условие
+			 int speed = 1;
+			
 			 if (TimeLineIt->size() == 0 || TimeLineIt[0][0] <= 0)
 			 {
 				 TimeLineIt->clear();
 				 TimeLineName->clear();
 				 TimeLineIt->push_back((WidthImage / PitchImage) * speed);
-
-			 if (Status == StatusAnimate::WALK)
-				 TimeLineName->push_back("walk");
-
-			 if (Status == StatusAnimate::IDLE)
-				 TimeLineName->push_back("idle");
-
-			 if (Status == StatusAnimate::TURN)
-				 TimeLineName->push_back("turn");
-
-			 if (Status == StatusAnimate::JUMP)
-				 TimeLineName->push_back("jump");
-
-			 if (Status == StatusAnimate::DEATH)
-				 TimeLineName->push_back("death");
-
-			 if (Status == StatusAnimate::ATTACK)
-				 TimeLineName->push_back("attack");
 			 }
 
 			 TimeLineIt[0][0]--;

@@ -199,26 +199,26 @@ void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollid
 }
 
 void AddCharacterModifier(
-    CHealth& CHealth, CDefense& CDefense, CDamage& CDamage, CSpeed& CSpeed, СSpecialization& СSpecialization,
-    CGender& CGender, CStatusBehavior& CStatusBehavior, CTypeСharacter& CTypeСharacter, CNameСharacter& CNameСharacter, СRank& СRank,
-    string TypeDamage, string Status, string Typeаharacter, string Gender, string NameChar, string Specialization, int Rank)
+    CHealth& CHealth, CDefense& CDefense, CDamage& CDamage, CSpeed& CSpeed, CSpecialization& CSpecialization,
+    CGender& CGender, CStatusBehavior& CStatusBehavior, CTypeCharacter& CTypeCharacter, CNameCharacter& CNameCharacter, CRank& CRank,
+    string TypeDamage, string Status, string TypeCharacter, string Gender, string NameChar, string Specialization, int Rank)
 {
 
 
 
 }
 
-void SwitchLotation(CPortalPаth& PortalPаth, CTransform& Transform)
+void SwitchLotation(CPortalPath& PortalPath, CTransform& Transform)
 {
     if (CheckCollision(Player->GetPosition()->x, Player->GetPosition()->y, Player->GetPosition()->Width, Player->GetPosition()->Height, Transform.x, Transform.y, Transform.Width, Transform.Height))
     {
-        if (VLocation.size() >= PortalPаth.Pаth)
+        if (VLocation.size() >= PortalPath.Path)
         {
-            Player->SetLocation(PortalPаth.Pаth);
+            Player->SetLocation(PortalPath.Path);
             Player->GetPosition()->x = 2473;
             Player->GetPosition()->y = 3639;
-            MapSizeW = VLocation[PortalPаth.Pаth].GetPosition()->Width;
-            MapSizeH = VLocation[PortalPаth.Pаth].GetPosition()->Height;
+            MapSizeW = VLocation[PortalPath.Path].GetPosition()->Width;
+            MapSizeH = VLocation[PortalPath.Path].GetPosition()->Height;
         }
     }
 }

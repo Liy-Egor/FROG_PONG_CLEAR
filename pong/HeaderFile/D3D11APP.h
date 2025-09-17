@@ -1,6 +1,6 @@
 #pragma once
 #include "GraphicManager.h"
-//“”“Œ–»¿À€
+//√í√ì√í√é√ê√à√Ä√ã√õ
 //https://www.youtube.com/@PardCode
 //https://www.rastertek.com/tutdx11win10.html
 //https://learn.microsoft.com/ru-ru/windows/win32/api/d3d11/
@@ -353,7 +353,7 @@ private:
 	vector<string> TimeLineNames;
 }d3dx;
 
-//Â‡ÎËÁ‡ˆËˇ
+//√∞√•√†√´√®√ß√†√∂√®√ø
 void GraphicEngine::RenderClearBuffer(float red, float green, float blue)
 {
 	const float color[] = { red,green,blue,1.0f };
@@ -383,7 +383,7 @@ void GraphicEngine::DrawObject(float x, float y, float z,float width, float heig
 		}
 		else
 		{
-		pair<float, string> DataAimation = GetAnimation(status, NameObj, TimeLineIts, TimeLineNames);
+		pair<float, string> DataAimation = GetAnimation(status, NameObj, &TimeLineIts, &TimeLineNames);
 		PitchImage = DataAimation.first;
 		CreateTextureBuffer(DataAimation.second);
 		}

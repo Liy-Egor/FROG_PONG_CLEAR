@@ -79,7 +79,7 @@ struct CSpeed
     int SpeedAttack = 10, SpeedWalk = 15;
 };
 
-struct ÑRank
+struct CRank
 {
     int Rank = 0;
 };
@@ -89,9 +89,9 @@ struct CGender
     const char* Gender;
 };
 
-struct CTypeÑharacter
+struct CTypeCharacter
 {
-    const char* TypeÑharacter;
+    const char* TypeCharacter;
 };
 
 struct CStatusBehavior
@@ -99,12 +99,12 @@ struct CStatusBehavior
     const char* Status;
 };
 
-struct ÑSpecialization
+struct CSpecialization
 {
     const char* Specialization;
 };
 
-struct CNameÑharacter
+struct CNameCharacter
 {
     const char* NameChar;
 };
@@ -116,9 +116,9 @@ struct CJump
     bool InJump = false;
 };
 
-struct CPortalPàth
+struct CPortalPath
 {
-    int Pàth;
+    int Path;
 };
 
 };

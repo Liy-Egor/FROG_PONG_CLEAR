@@ -11,16 +11,16 @@ void ProcessSound(CSound& CSound);
 void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation);
 void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation);
 void AddCharacterModifier(
-    CHealth& CHealth, CDefense& CDefense, CDamage& CDamage, CSpeed& CSpeed, ÑSpecialization& ÑSpecialization,
-    CGender& CGender, CStatusBehavior& CStatusBehavior, CTypeÑharacter& CTypeÑharacter, CNameÑharacter& CNameÑharacter, ÑRank& ÑRank,
-    string TypeDamage, string Status, string TypeÑharacter, string Gender, string NameChar, string Specialization, int Rank);
-void SwitchLotation(CPortalPàth& PortalPàth, CTransform& CTransform);
+    CHealth& CHealth, CDefense& CDefense, CDamage& CDamage, CSpeed& CSpeed, CSpecialization& CSpecialization,
+    CGender& CGender, CStatusBehavior& CStatusBehavior, CTypeCharacter& CTypeCharacter, CNameCharacter& CNameCharacter, CRank& CRank,
+    string TypeDamage, string Status, string TypeCharacter, string Gender, string NameChar, string Specialization, int Rank);
+void SwitchLotation(CPortalPath& PortalPath, CTransform& CTransform);
 bool HealEvent(CTransform& Transform, CHealth& Health);
 void SpikeEvent(CTransform& Transform,CDamage& Damage);
 
 
 
-//áàçîâûå êëàññû
+//Ã¡Ã Ã§Ã®Ã¢Ã»Ã¥ ÃªÃ«Ã Ã±Ã±Ã»
 class BaseArcheType
 {
 protected:
@@ -46,7 +46,7 @@ protected:
     void DeleteAT()
     {
       ECS.DeleteEntity(Entity);
-      /*delete this;*/ //êğàøèò ïğîãó 
+      /*delete this;*/ //ÃªÃ°Ã Ã¸Ã¨Ã² Ã¯Ã°Ã®Ã£Ã³ 
     }
 
 public:
@@ -95,7 +95,7 @@ protected:
     CHealth* Health = ECS.SetComponent<CHealth>(Entity);
     CDefense* Defense = ECS.SetComponent<CDefense>(Entity);
     CSpeed* Speed = ECS.SetComponent<CSpeed>(Entity);
-    CNameÑharacter* NameÑharacter = ECS.SetComponent<CNameÑharacter>(Entity);
+    CNameCharacter* NameCharacter = ECS.SetComponent<CNameCharacter>(Entity);
     CJump* Jump = ECS.SetComponent<CJump>(Entity);
     CGravity* Gravity = ECS.SetComponent<CGravity>(Entity);
     CCollider* Collider = ECS.SetComponent<CCollider>(Entity);
@@ -122,13 +122,13 @@ public:
     {
         return ECS.GetComponent<CSpeed>(Entity, Speed);
     }
-    CNameÑharacter* GetNameÑharacter()
+    CNameCharacter* GetNameCharacter()
     {
-        return ECS.GetComponent<CNameÑharacter>(Entity, NameÑharacter);
+        return ECS.GetComponent<CNameCharacter>(Entity, NameCharacter);
     }
 };
 
-//íàñëåäíèêè
+//Ã­Ã Ã±Ã«Ã¥Ã¤Ã­Ã¨ÃªÃ¨
 class ATWall : public BaseArcheType
 {
 public:
@@ -168,17 +168,17 @@ public:
 
 class ATPortal : public BaseArcheType
 {
-    CPortalPàth* PortalPàth = ECS.SetComponent<CPortalPàth>(Entity);
+    CPortalPath* PortalPath = ECS.SetComponent<CPortalPath>(Entity);
 public:
     ATPortal(string NameFile, float arr[], TypeObject TypeRend,int Paths) : BaseArcheType(NameFile, arr, TypeRend)
     {
         NameObject->Name = "Portal";
-        PortalPàth->Pàth = Paths;
+        PortalPath->Path = Paths;
     }
 
     void GoEvent()
     {
-        SwitchLotation(*PortalPàth,*Transform);
+        SwitchLotation(*PortalPath,*Transform);
     }
 }*Portal;
 
@@ -186,16 +186,16 @@ class ATEnemy : public BasePerson
 {
 private:
 	CStatusBehavior* StatusBehavior = ECS.SetComponent<CStatusBehavior>(Entity);
-	CTypeÑharacter* TypeÑharacter = ECS.SetComponent<CTypeÑharacter>(Entity);
+	CTypeCharacter* TypeCharacter = ECS.SetComponent<CTypeCharacter>(Entity);
 	CGender* Gender = ECS.SetComponent<CGender>(Entity);
-	ÑSpecialization* Specialization = ECS.SetComponent<ÑSpecialization>(Entity);
-	ÑRank* Rank = ECS.SetComponent<ÑRank>(Entity);
+	CSpecialization* Specialization = ECS.SetComponent<CSpecialization>(Entity);
+	CRank* Rank = ECS.SetComponent<CRank>(Entity);
 public:
 	ATEnemy(string NameFile, float arr[], TypeObject TypeRend) : BasePerson(NameFile, arr, TypeRend)
 	{
 		NameObject->Name = "enemy";
-		AddCharacterModifier(*Health, *Defense, *Damage, *Speed, *Specialization, *Gender, *StatusBehavior, *TypeÑharacter, *NameÑharacter, *Rank,
-			"TypeDamage", "Status", "TypeÑh", "Gendr", "Frog", "Specialist", 0);
+		AddCharacterModifier(*Health, *Defense, *Damage, *Speed, *Specialization, *Gender, *StatusBehavior, *TypeCharacter, *NameCharacter, *Rank,
+			"TypeDamage", "Status", "TypeÃ‘h", "Gendr", "Frog", "Specialist", 0);
 	}
 	void Start()
 	{
@@ -211,7 +211,7 @@ public:
     ATPlayer(string NameFile, float arr[], TypeObject TypeRend) : BasePerson(NameFile, arr, TypeRend)
     {
         NameObject->Name = "player";
-        NameÑharacter->NameChar = "Komar";
+        NameCharacter->NameChar = "Komar";
     }
     void Start()
     {      
@@ -222,7 +222,7 @@ public:
 
 }*Player;
 
-//êîíåö âñåõ àğõåòèïîâ
+//ÃªÃ®Ã­Ã¥Ã¶ Ã¢Ã±Ã¥Ãµ Ã Ã°ÃµÃ¥Ã²Ã¨Ã¯Ã®Ã¢
 class ATLocation : public BaseArcheType
 {
 public:
@@ -237,5 +237,5 @@ public:
     vector<ATEnemy> VEnemy;
 
 }*Location;
-vector<ATLocation> VLocation; // ïğè óäàëåíèè îò ñşäà òîæå íàäî áóäåò óäàëÿòü ıêçåìàëÿğû èíà÷å áóäåò óòå÷êà ïàìÿòè (íåáîëüøàÿ íî âñå æå)
+vector<ATLocation> VLocation; // Ã¯Ã°Ã¨ Ã³Ã¤Ã Ã«Ã¥Ã­Ã¨Ã¨ Ã®Ã² Ã±Ã¾Ã¤Ã  Ã²Ã®Ã¦Ã¥ Ã­Ã Ã¤Ã® Ã¡Ã³Ã¤Ã¥Ã² Ã³Ã¤Ã Ã«Ã¿Ã²Ã¼ Ã½ÃªÃ§Ã¥Ã¬Ã Ã«Ã¿Ã°Ã» Ã¨Ã­Ã Ã·Ã¥ Ã¡Ã³Ã¤Ã¥Ã² Ã³Ã²Ã¥Ã·ÃªÃ  Ã¯Ã Ã¬Ã¿Ã²Ã¨ (Ã­Ã¥Ã¡Ã®Ã«Ã¼Ã¸Ã Ã¿ Ã­Ã® Ã¢Ã±Ã¥ Ã¦Ã¥)
 
