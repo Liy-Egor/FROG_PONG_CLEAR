@@ -1,6 +1,7 @@
 #pragma once
 #include "BaseStructures.h"
 
+
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
@@ -18,11 +19,10 @@ enum StatusAnimate
 	DEFAULT,
 	WALK,
 	IDLE,
-
-
-	
-
-
+	TURN,
+	JUMP,
+	DEATH,
+	ATTACK,
 
 	LastEnum
 };
@@ -36,13 +36,36 @@ private:
 	float x{}, y{}, z{}, u{}, v{};
 };
 
-pair<float, string> GetAnimation(StatusAnimate status, string NameObj)
+pair<float, string> GetAnimation(StatusAnimate status, string NameObj, vector<int> TimeLineIt, vector<string> TimeLineName)
 {
+
+
+	//здесь переопределять анимации если базовая анимация уже заложена
+
+
+
+
+
+
+
+
+
 	string NameStatus = "";
 	string NameCut = NameObj + ".png";
-	string Name = animations.CollectionAnimation[status - 1][0];
-	NameStatus = Name.replace(Name.find(NameCut), NameCut.length(), "");
+	for (int i = 0; i < animations.CollectionAnimation[status - 1].size(); i++)
+	{
+		string Name = animations.CollectionAnimation[status - 1][i];
+		if (Name.find(NameObj) <= Name.size())
+		{
+			NameStatus = Name.replace(Name.find(NameCut), NameCut.length(), "");
+			break;
+		}
+	}
 
+	float PitchPix = 0;
+	size_t digits = NameStatus.find_first_of("1234567890+-");
+	if (digits <= NameStatus.size())
+	PitchPix = atof(NameStatus.c_str() + digits);
 
 	string path = "";
 	if (NameObj == "player")
@@ -51,13 +74,7 @@ pair<float, string> GetAnimation(StatusAnimate status, string NameObj)
 	else if(NameObj == "enemy")
 	path = ENEMY ANI;
 
-
-	float n = 0;
-	size_t digits = NameStatus.find_first_of("1234567890+-");
-	if (digits <= NameStatus.size())
-	n = atof(NameStatus.c_str() + digits);
-
-	return pair<float, string>(n,path + NameStatus + NameObj);
+	return pair<float, string>(PitchPix, path + NameStatus + NameObj);
 }
 
 class BuildListBuffer
@@ -207,7 +224,9 @@ public:
 
 		 if (typeObject == TypeObject::BOX2DTEX && Status != StatusAnimate::DEFAULT)
 		 {
+			 //регулировать скорость так же через файл
 			 int speed = 3;
+			 //нужно продумать лучшее условие
 			 if (TimeLineIt->size() == 0 || TimeLineIt[0][0] <= 0)
 			 {
 				 TimeLineIt->clear();
@@ -220,8 +239,17 @@ public:
 			 if (Status == StatusAnimate::IDLE)
 				 TimeLineName->push_back("idle");
 
+			 if (Status == StatusAnimate::TURN)
+				 TimeLineName->push_back("turn");
 
+			 if (Status == StatusAnimate::JUMP)
+				 TimeLineName->push_back("jump");
 
+			 if (Status == StatusAnimate::DEATH)
+				 TimeLineName->push_back("death");
+
+			 if (Status == StatusAnimate::ATTACK)
+				 TimeLineName->push_back("attack");
 			 }
 
 			 TimeLineIt[0][0]--;
@@ -329,3 +357,4 @@ private:
 	float PitchImage;
 	StatusAnimate Status;
 };
+

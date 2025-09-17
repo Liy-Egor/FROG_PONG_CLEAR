@@ -161,6 +161,22 @@ void LoadAnimationFiles(const string PathFile)
 		{			
 		animations.CollectionAnimation[(int)StatusAnimate::IDLE - 1].push_back(FileName);
 		}
+		else if (!FileName.find("turn"))
+		{
+			animations.CollectionAnimation[(int)StatusAnimate::TURN - 1].push_back(FileName);
+		}
+		else if (!FileName.find("jump"))
+		{
+			animations.CollectionAnimation[(int)StatusAnimate::JUMP - 1].push_back(FileName);
+		}
+		else if (!FileName.find("death"))
+		{
+			animations.CollectionAnimation[(int)StatusAnimate::DEATH - 1].push_back(FileName);
+		}
+		else if (!FileName.find("attack"))
+		{
+			animations.CollectionAnimation[(int)StatusAnimate::ATTACK - 1].push_back(FileName);
+		}
 
 	}
 }
