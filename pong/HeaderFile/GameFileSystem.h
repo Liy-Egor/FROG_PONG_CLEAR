@@ -177,6 +177,31 @@ void LoadAnimationFiles(const string PathFile)
 		{
 			animations.CollectionAnimation[(int)StatusAnimate::ATTACK - 1].push_back(FileName);
 		}
-
 	}
+}
+
+void LoadPatternAnmation()
+{
+	ifstream file;
+	file.open(PATTERN "PatternAnimations.anim");
+	if (file.is_open())
+	{
+		int switchs = 0;
+		string str = "";
+		while (!file.eof()) {
+		file >> str;
+
+		if (!str.find("~") || switchs == 1)
+		{
+			switchs = 1;
+			animations.PatternAnimation.push_back(str);
+			if (!str.find("<end>"))
+			{
+				switchs = 0;
+			}
+		}
+		}
+		animations.PatternAnimation.size();
+	}
+	file.close();
 }

@@ -54,6 +54,7 @@ struct CStatusAnimation
 {
 	StatusAnimate StatusAnim = StatusAnimate::DEFAULT;
 	int Mirror = 1;
+	string PatternAnim = "no pattern";
 };
 
 //Ñharacter Components

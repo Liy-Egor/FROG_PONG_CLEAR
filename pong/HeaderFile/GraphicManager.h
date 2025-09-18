@@ -1,7 +1,6 @@
 #pragma once
 #include "BaseStructures.h"
 
-
 using namespace DirectX;
 using namespace Microsoft::WRL;
 
@@ -36,11 +35,34 @@ private:
 	float x{}, y{}, z{}, u{}, v{};
 };
 
-pair<float, string> GetAnimation(StatusAnimate Status, string NameObj, vector<int>* TimeLineIt, vector<string>* TimeLineName)
+pair<string, string> RebuildNameAnimation(string Status,int Pitch)
+{
+	string status;
+	string mod;
+
+	if (Status.find("infinit") <= Status.size())
+		mod = "infinit";
+
+	if (Status.find("start") <= Status.size())
+		mod = "start";
+
+	if (Status.find("end") <= Status.size())
+		mod = "end";
+
+		status = Status.replace(Status.find(mod), mod.length(), "");
+		status = Status.replace(Status.find(to_string(Pitch)), to_string(Pitch).length(), "");
+
+	return pair<string, string>(status, mod);
+}
+
+pair<float, string> GetAnimation(StatusAnimate Status, string NameObj, vector<int>* TimeLineIt, vector<string>* TimeLineName, string Pattern)
 {
 	string NameStatus = "";
 	string AddName = "";
 	string NameCut = NameObj + ".png";
+	float PitchPix = 0;
+	string path = "";
+
 	for (int i = 0; i < animations.CollectionAnimation[Status - 1].size(); i++)
 	{
 		string Name = animations.CollectionAnimation[Status - 1][i];
@@ -51,43 +73,65 @@ pair<float, string> GetAnimation(StatusAnimate Status, string NameObj, vector<in
 		}
 	}
 
-	float PitchPix = 0;
 	size_t digits = NameStatus.find_first_of("1234567890");
 	if (digits <= NameStatus.size())
 	PitchPix = atof(NameStatus.c_str() + digits);
 
+	auto Rebuildname = RebuildNameAnimation(NameStatus, PitchPix);
+	
+	if (NameObj == "player")
+		path = PLAYER ANI;
 
-	if (TimeLineIt->size() == 0 || TimeLineIt[0][0] <= 0)
+	else if (NameObj == "enemy")
+		path = ENEMY ANI;
+	
+	if (Pattern == "no pattern")
+	{ //базовый случай резкий переход
+	TimeLineIt->resize(1);
+	return pair<float, string>(PitchPix, path + NameStatus + NameObj);
+	}
+	else
 	{
-		if (Status == StatusAnimate::WALK)
-			TimeLineName->push_back("walk");
+		int switchs = 0;
+		TimeLineName->clear();
+		for (int i = 0; i < animations.PatternAnimation.size(); i++)
+		{
+			if (animations.PatternAnimation[i] == Pattern || switchs == 1)
+			{
+				switchs = 1;
+				if (animations.PatternAnimation[i] != "<start>" && 
+					animations.PatternAnimation[i] != "<end>" && 
+					animations.PatternAnimation[i] != Pattern
+					)
+				{
+				TimeLineName->push_back(animations.PatternAnimation[i]);
+				}
+				if (animations.PatternAnimation[i] == "<end>")
+				{
+					switchs = 0;
+					break;
+				}
+			}
+		}
 
-		if (Status == StatusAnimate::IDLE)
-			TimeLineName->push_back("idle");
+		TimeLineIt->resize(animations.PatternAnimation.size()-3);
 
-		if (Status == StatusAnimate::TURN)
-			TimeLineName->push_back("turn");
+	/*	for (int j = 0; j < TimeLineIt->size(); j++)
+		{
+			if(TimeLineIt[0][j] > 0)
+			{ 
+			 return pair<float, string>(PitchPix, path + TimeLineName[0][j]);
+			}
+			else
+			{
+			return pair<float, string>(PitchPix, path + NameStatus + NameObj);
+			}
+		}*/
 
-		if (Status == StatusAnimate::JUMP)
-			TimeLineName->push_back("jump");
-
-		if (Status == StatusAnimate::DEATH)
-			TimeLineName->push_back("death");
-
-		if (Status == StatusAnimate::ATTACK)
-			TimeLineName->push_back("attack");
+		 return pair<float, string>(PitchPix, path + NameStatus + NameObj);
 	}
 
-	AddName = NameStatus.replace(NameStatus.find(TimeLineName[0][0]), TimeLineName[0][0].length(), "");
 
-	string path = "";
-	if (NameObj == "player")
-	path = PLAYER ANI;
-
-	else if(NameObj == "enemy")
-	path = ENEMY ANI;
-
-	return pair<float, string>(PitchPix, path + NameStatus + NameObj);
 }
 
 class BuildListBuffer
@@ -234,17 +278,12 @@ public:
 		   return Vectors;
 	     }
 
-
 		 if (typeObject == TypeObject::BOX2DTEX && Status != StatusAnimate::DEFAULT)
 		 {
-			 int speed = 1;
+			 int speed = 3;
 			
-			 if (TimeLineIt->size() == 0 || TimeLineIt[0][0] <= 0)
-			 {
-				 TimeLineIt->clear();
-				 TimeLineName->clear();
-				 TimeLineIt->push_back((WidthImage / PitchImage) * speed);
-			 }
+			 if (TimeLineIt[0][0] <= 0)
+				 TimeLineIt[0][0] = (WidthImage / PitchImage) * speed;
 
 			 TimeLineIt[0][0]--;
 

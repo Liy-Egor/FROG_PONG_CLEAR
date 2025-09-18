@@ -17,7 +17,6 @@
 #include "DirectXTex.h"
 #include "Macros.h"
 #include <utility>
-#include <cstdlib>
 
 using namespace std;
 class Logger
@@ -62,7 +61,7 @@ struct
 struct
 {
 	vector<vector<string>> CollectionAnimation;
-
+	vector<string> PatternAnimation;
 }animations;
 
 int MapSizeW = window.width;

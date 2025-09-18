@@ -11,6 +11,7 @@
 #define GUI "..\\pong\\Texture2D\\UI\\"
 #define PORTALS "..\\pong\\Texture2D\\Portal\\"
 
+#define PATTERN "..\\pong\\Texture2D\\"
 #define ANI "Animation\\"
 
 #define SOUND "..\\pong\\Sound\\"

@@ -50,11 +50,12 @@ public:
 		this->LookAtX = LookAtX;
 		this->LookAtY = LookAtY;
 	};
-	void SetAnimetionTimeLine(vector<int> TimeLineIt, vector<string> TimeLineName,int Mirror)
+	void SetAnimetionTimeLine(vector<int>TimeLineIt, vector<string> TimeLineName,int Mirror,string Pattern)
 	{
 		this->Mirror = Mirror;
 		this->TimeLineIts = TimeLineIt;
 		this->TimeLineNames = TimeLineName;
+		this->Pattern = Pattern;
 	}
 	vector<int> GetTimeLineIt()
 	{
@@ -64,13 +65,44 @@ public:
 	{
 		return TimeLineNames;
 	}
-
 private:
 	vector<ID3D11ShaderResourceView**> pSRV;
 	vector<ID3D11SamplerState**> pSST;
 	ScratchImage TexList[1000];
 
 	vector<string> TexNameList;
+	pair<int, int> GetImageWH(string nameObject)
+	{
+		string namepng = nameObject + ".png";
+		std::wstring widestr = std::wstring(namepng.begin(), namepng.end());
+		const wchar_t* filename = widestr.c_str();
+
+		int IndexTex = 0;
+		if (TexNameList.size() == 0)
+		{
+			IndexTex = 0;
+		}
+		else
+		{
+			for (int i = 0; i < TexNameList.size(); i++)
+			{
+				if (TexNameList[i] == namepng)
+				{
+					IndexTex = i;
+					break;
+				}
+				else if (TexNameList[i] != namepng && i == TexNameList.size() - 1)
+				{
+					IndexTex = TexNameList.size();
+				}
+			}
+		}
+
+		int WidthImage = TexList[IndexTex].GetImages()->width;
+		int HeightImage = TexList[IndexTex].GetImages()->height;
+
+		return pair<int, int>(WidthImage, HeightImage);
+	}
 	void CreateTextureBuffer(string nameObject)
 	{
 		string namepng = nameObject + ".png";
@@ -351,6 +383,7 @@ private:
 	int Mirror = 0;
 	vector<int> TimeLineIts;
 	vector<string> TimeLineNames;
+	string Pattern;
 }d3dx;
 
 //ðåàëèçàöèÿ
@@ -383,9 +416,18 @@ void GraphicEngine::DrawObject(float x, float y, float z,float width, float heig
 		}
 		else
 		{
-		pair<float, string> DataAimation = GetAnimation(status, NameObj, &TimeLineIts, &TimeLineNames);
+		pair<float, string> DataAimation = GetAnimation(status, NameObj, &TimeLineIts, &TimeLineNames, Pattern);
 		PitchImage = DataAimation.first;
 		CreateTextureBuffer(DataAimation.second);
+
+		/*for (int i = 0; i < TimeLineNames.size(); i++)
+		{
+			if (TimeLineNames[i] != "noanimation")
+			{
+				auto ddd = GetImageWH(path + TimeLineNames[0][i]);
+			}
+		}*/
+
 		}
 
 	

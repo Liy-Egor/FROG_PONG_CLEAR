@@ -132,16 +132,20 @@ void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& 
 {
 	CSpeed.SpeedWalk = 10;
 	StatusAnimation.StatusAnim = StatusAnimate::IDLE;
+	StatusAnimation.PatternAnim = "no pattern";
+
     if (GetAsyncKeyState(VK_LEFT)) 
     {
 		StatusAnimation.StatusAnim = StatusAnimate::WALK;
 		StatusAnimation.Mirror = -1;
+		StatusAnimation.PatternAnim = "~playerwalk";
         Transform.Dx = -CSpeed.SpeedWalk;
     }
     if (GetAsyncKeyState(VK_RIGHT)) 
     {
 		StatusAnimation.StatusAnim = StatusAnimate::WALK;
 		StatusAnimation.Mirror = 1;
+		StatusAnimation.PatternAnim = "~playerwalk";
         Transform.Dx = CSpeed.SpeedWalk;
     }
     if (GetAsyncKeyState(VK_SPACE) && CJump.InJump == false && CJump.InJumpBot == false)
@@ -183,12 +187,14 @@ void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollid
                         {
 							StatusAnimation.StatusAnim = StatusAnimate::WALK;
 							StatusAnimation.Mirror = 1;
+							StatusAnimation.PatternAnim = "no pattern";
                             CCollider.Direction = 1;
                         }
                         if (CTransform.x + CTransform.Width >= platform.x + platform.Width)
                         {
 							StatusAnimation.StatusAnim = StatusAnimate::WALK;
 							StatusAnimation.Mirror = -1;
+							StatusAnimation.PatternAnim = "no pattern";
                             CCollider.Direction = -1;
                         }
                     }
@@ -302,6 +308,7 @@ void AppGame::Init()
 	LoadAnimationFiles(PLAYER"Animation");
 	LoadAnimationFiles(ENEMY"Animation");
 
+	LoadPatternAnmation();
 
 	MapSizeW = VLocation[0].GetPosition()->Width;
 	MapSizeH = VLocation[0].GetPosition()->Height;
@@ -316,7 +323,6 @@ void AppGame::Render()
 	{
 		if (Player->GetLocation() == i)
 		{
-
 			d3dx.DrawObject(
 				VLocation[Player->GetLocation()].GetPosition()->x,
 				VLocation[Player->GetLocation()].GetPosition()->y,
@@ -344,9 +350,7 @@ void AppGame::Render()
 			}
 			for (ATEnemy var : VLocation[i].VEnemy)
 			{
-
-				d3dx.SetAnimetionTimeLine(var.GetTimeLine()->TimeLineIt, var.GetTimeLine()->TimeLineName, var.GetStatusAnimation()->Mirror);
-
+				d3dx.SetAnimetionTimeLine(var.GetTimeLine()->TimeLineIt, var.GetTimeLine()->TimeLineName, var.GetStatusAnimation()->Mirror, var.GetStatusAnimation()->PatternAnim);
 				d3dx.DrawObject(
 					var.GetPosition()->x, var.GetPosition()->y, 1,
 					var.GetPosition()->Width, var.GetPosition()->Height,
@@ -356,7 +360,6 @@ void AppGame::Render()
 					var.GetNameObj()->Name,
 					var.GetStatusAnimation()->StatusAnim
 				);
-
 				var.GetTimeLine()->TimeLineIt = d3dx.GetTimeLineIt();
 				var.GetTimeLine()->TimeLineName = d3dx.GetTimeLineName();
 
@@ -405,7 +408,7 @@ void AppGame::Render()
 				var.GoEvent();
 			}
 
-			d3dx.SetAnimetionTimeLine(Player->GetTimeLine()->TimeLineIt, Player->GetTimeLine()->TimeLineName, Player->GetStatusAnimation()->Mirror);
+			d3dx.SetAnimetionTimeLine(Player->GetTimeLine()->TimeLineIt, Player->GetTimeLine()->TimeLineName, Player->GetStatusAnimation()->Mirror, Player->GetStatusAnimation()->PatternAnim);
 			d3dx.DrawObject(
 				Player->GetPosition()->x, Player->GetPosition()->y, 1,
 				Player->GetPosition()->Width, Player->GetPosition()->Height,
