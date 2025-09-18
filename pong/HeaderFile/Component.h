@@ -5,7 +5,7 @@
 namespace ECC
 {
   
-//Base Components
+//базовые компоненты
 struct CTransform
 {
     float x, y, Width, Height, Dx = 0., Dy = 0.;
