@@ -56,6 +56,7 @@ pair<float, string> GetAnimation(StatusAnimate Status, string NameObj, vector<in
 	if (digits <= NameStatus.size())
 	PitchPix = atof(NameStatus.c_str() + digits);
 
+
 	if (TimeLineIt->size() == 0 || TimeLineIt[0][0] <= 0)
 	{
 		if (Status == StatusAnimate::WALK)
