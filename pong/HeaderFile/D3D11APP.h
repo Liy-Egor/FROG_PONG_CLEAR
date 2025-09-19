@@ -379,7 +379,7 @@ private:
 	float LookAtY = 0;
 	float WidthImage = 0;
 	float HeightImage = 0;
-	float PitchImage = 0;
+	int SpeedImage = 0;
 	int Mirror = 0;
 	vector<int> TimeLineIts;
 	vector<string> TimeLineNames;
@@ -416,8 +416,8 @@ void GraphicEngine::DrawObject(float x, float y, float z,float width, float heig
 		}
 		else
 		{
-		pair<float, string> DataAimation = GetAnimation(status, NameObj, &TimeLineIts, &TimeLineNames, Pattern);
-		PitchImage = DataAimation.first;
+		pair<int, string> DataAimation = GetAnimation(status, NameObj, &TimeLineIts, &TimeLineNames, Pattern);
+		SpeedImage = DataAimation.first;
 		CreateTextureBuffer(DataAimation.second);
 
 		/*for (int i = 0; i < TimeLineNames.size(); i++)
@@ -440,7 +440,7 @@ void GraphicEngine::DrawObject(float x, float y, float z,float width, float heig
 		Iterators = (width / WidthImage) + 2 + ((width / WidthImage) - 1);
 		}
 
-			BuildListBuffer ListBuffer(x, y, z, width, height, ZAngle, LookAtX, LookAtY, Iterators, status, PitchImage);
+			BuildListBuffer ListBuffer(x, y, z, width, height, ZAngle, LookAtX, LookAtY, Iterators, status, SpeedImage);
 			ListBuffer.SetImageWH(WidthImage, HeightImage);
 			CreateMatrixBuffer(ListBuffer.GetMatrix(typeOBJ));
 			CreateVectorBuff(ListBuffer.GetVectorList(typeOBJ, &TimeLineIts,&TimeLineNames, Mirror));

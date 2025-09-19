@@ -17,6 +17,7 @@
 #include "DirectXTex.h"
 #include "Macros.h"
 #include <utility>
+#include <bitset>
 
 using namespace std;
 class Logger

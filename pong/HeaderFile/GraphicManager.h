@@ -35,24 +35,63 @@ private:
 	float x{}, y{}, z{}, u{}, v{};
 };
 
-pair<string, string> RebuildNameAnimation(string Status,int Pitch)
+int GetWidthImage(string NameFile)
 {
-	string status;
-	string mod;
-
-	if (Status.find("infinit") <= Status.size())
-		mod = "infinit";
-
-	if (Status.find("start") <= Status.size())
-		mod = "start";
-
-	if (Status.find("end") <= Status.size())
-		mod = "end";
-
-		status = Status.replace(Status.find(mod), mod.length(), "");
-		status = Status.replace(Status.find(to_string(Pitch)), to_string(Pitch).length(), "");
-
-	return pair<string, string>(status, mod);
+	ifstream file(NameFile, ios::binary | ios::in);
+	int width = 0;
+	char byte;
+	int count = 0;
+	int Pich = 4;
+	while (file.get(byte))
+	{
+		int BiteNums = (int)byte;
+		if (count >= 16)
+		{
+			if (count != 19)
+			{
+				width += BiteNums * pow(16, Pich);
+				Pich--;
+			}
+			else
+			{
+				width += BiteNums;
+				Pich = 4;
+				count = 0;
+				break;
+			}
+		}
+		count++;
+	}
+	return width;
+}
+int GetHeightImage(string NameFile)
+{
+	ifstream file(NameFile, ios::binary | ios::in);
+	int width = 0;
+	char byte;
+	int count = 0;
+	int Pich = 4;
+	while (file.get(byte))
+	{
+		int BiteNums = (int)byte;
+		if (count >= 20)
+		{
+			if (count != 23)
+			{
+				width += BiteNums * pow(16, Pich);
+				Pich--;
+			}
+			else
+			{
+				width += BiteNums;
+				Pich = 4;
+				count = 0;
+				break;
+			}
+		}
+		count++;
+	}
+	return width;
 }
 
 pair<float, string> GetAnimation(StatusAnimate Status, string NameObj, vector<int>* TimeLineIt, vector<string>* TimeLineName, string Pattern)
@@ -60,7 +99,7 @@ pair<float, string> GetAnimation(StatusAnimate Status, string NameObj, vector<in
 	string NameStatus = "";
 	string AddName = "";
 	string NameCut = NameObj + ".png";
-	float PitchPix = 0;
+	int SpeedImage = 0;
 	string path = "";
 
 	for (int i = 0; i < animations.CollectionAnimation[Status - 1].size(); i++)
@@ -75,10 +114,8 @@ pair<float, string> GetAnimation(StatusAnimate Status, string NameObj, vector<in
 
 	size_t digits = NameStatus.find_first_of("1234567890");
 	if (digits <= NameStatus.size())
-	PitchPix = atof(NameStatus.c_str() + digits);
+	SpeedImage = atoi(NameStatus.c_str() + digits);
 
-	auto Rebuildname = RebuildNameAnimation(NameStatus, PitchPix);
-	
 	if (NameObj == "player")
 		path = PLAYER ANI;
 
@@ -88,7 +125,8 @@ pair<float, string> GetAnimation(StatusAnimate Status, string NameObj, vector<in
 	if (Pattern == "no pattern")
 	{ //базовый случай резкий переход
 	TimeLineIt->resize(1);
-	return pair<float, string>(PitchPix, path + NameStatus + NameObj);
+	SpeedImage = 3;
+	return pair<int, string>(SpeedImage, path + NameStatus + NameObj);
 	}
 	else
 	{
@@ -115,20 +153,27 @@ pair<float, string> GetAnimation(StatusAnimate Status, string NameObj, vector<in
 		}
 
 		TimeLineIt->resize(animations.PatternAnimation.size()-3);
-
-	/*	for (int j = 0; j < TimeLineIt->size(); j++)
+		
+		for (int i = 0; i< TimeLineName[0].size();i++)
 		{
-			if(TimeLineIt[0][j] > 0)
-			{ 
-			 return pair<float, string>(PitchPix, path + TimeLineName[0][j]);
+			if (TimeLineName[0][i] != "noanimation")
+			{
+				int Width = GetWidthImage(path + TimeLineName[0][i] + ".png");
+				int Height = GetHeightImage(path + TimeLineName[0][i] + ".png");
+				TimeLineIt[0][i] = (Width / Height) * SpeedImage;
 			}
 			else
 			{
-			return pair<float, string>(PitchPix, path + NameStatus + NameObj);
+				TimeLineIt[0][i] = 0;
 			}
-		}*/
+		}
 
-		 return pair<float, string>(PitchPix, path + NameStatus + NameObj);
+
+		
+		//здесь доделать
+		return pair<int, string>(SpeedImage, path + NameStatus + NameObj);
+		//здесь доделать
+
 	}
 
 
@@ -137,7 +182,7 @@ pair<float, string> GetAnimation(StatusAnimate Status, string NameObj, vector<in
 class BuildListBuffer
 {
 public:
-	BuildListBuffer(float x, float y, float z, float width, float height,float ZAngle, float LookAtX, float LookAtY,int Iterator, StatusAnimate Status, float PitchImage)
+	BuildListBuffer(float x, float y, float z, float width, float height,float ZAngle, float LookAtX, float LookAtY,int Iterator, StatusAnimate Status, int SpeedImage)
 	{
 	 this -> xLeft = (window.width / 2 - x) / (window.width / 2);
 	 this -> xRight = (x + width - window.width / 2) / (window.width / 2);
@@ -152,7 +197,7 @@ public:
 	 this -> HeightObject = height;
 	 this->Iterator = Iterator;
 	 this->Status = Status;
-	 this->PitchImage = PitchImage;
+	 this->SpeedImage = SpeedImage;
 	};
 
 	~BuildListBuffer(){};
@@ -280,18 +325,21 @@ public:
 
 		 if (typeObject == TypeObject::BOX2DTEX && Status != StatusAnimate::DEFAULT)
 		 {
-			 int speed = 3;
-			
+
+			 //здесь доделать
 			 if (TimeLineIt[0][0] <= 0)
-				 TimeLineIt[0][0] = (WidthImage / PitchImage) * speed;
+				 TimeLineIt[0][0] = (WidthImage / HeightImage) * SpeedImage;
 
 			 TimeLineIt[0][0]--;
+			 //здесь доделать
 
-			 int NextFrame = speed - (TimeLineIt[0][0] % speed);
-			 int iterator = (((WidthImage / PitchImage)* speed) - TimeLineIt[0][0] - NextFrame) / speed;
 
-			 float PitchStart = (PitchImage * ((iterator * Mirror)-1)) / WidthImage;
-			 float PitchEnd = (PitchImage * (iterator * Mirror)) / WidthImage;
+
+			 int NextFrame = SpeedImage - (TimeLineIt[0][0] % SpeedImage);
+			 int iterator = (((WidthImage / HeightImage)* SpeedImage) - TimeLineIt[0][0] - NextFrame) / SpeedImage;
+
+			 float PitchStart = (HeightImage * ((iterator * Mirror)-1)) / WidthImage;
+			 float PitchEnd = (HeightImage * (iterator * Mirror)) / WidthImage;
 
 			 Vectors =
 			 {
@@ -387,7 +435,7 @@ private:
 	float WidthObject , HeightObject;
 	int   Iterator;
 	float WidthImage, HeightImage;
-	float PitchImage;
+	int SpeedImage;
 	StatusAnimate Status;
 };
 
