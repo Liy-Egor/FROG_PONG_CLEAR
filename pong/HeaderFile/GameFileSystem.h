@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include "ArcheType.h"
 #include <filesystem>
 string StrReplace(string* str, string namestr) {
@@ -187,7 +187,7 @@ void LoadPatternAnmation()
 	if (file.is_open())
 	{
 		int switchs = 0;
-		string str = "";
+		string str = "";  
 		while (!file.eof()) {
 		file >> str;
 
