@@ -130,26 +130,39 @@ void ProcessSound(CSound& CSound)
 
 void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation)
 {
-	CSpeed.SpeedWalk = 10;
+	CSpeed.SpeedWalk = 12;
+	if(CJump.InJump == false && CJump.InJumpBot == false)
+	{
 	StatusAnimation.StatusAnim = StatusAnimate::IDLE;
 	StatusAnimation.PatternAnim = "no pattern";
+	}
 
     if (GetAsyncKeyState(VK_LEFT)) 
     {
-		StatusAnimation.StatusAnim = StatusAnimate::WALK;
 		StatusAnimation.Mirror = -1;
-		StatusAnimation.PatternAnim = "~playerwalk";
+		if (CJump.InJump == false && CJump.InJumpBot == false)
+		{
+			StatusAnimation.StatusAnim = StatusAnimate::WALK;
+			StatusAnimation.PatternAnim = "no pattern";
+		}
         Transform.Dx = -CSpeed.SpeedWalk;
     }
     if (GetAsyncKeyState(VK_RIGHT)) 
     {
-		StatusAnimation.StatusAnim = StatusAnimate::WALK;
 		StatusAnimation.Mirror = 1;
-		StatusAnimation.PatternAnim = "~playerwalk";
+		if (CJump.InJump == false && CJump.InJumpBot == false)
+		{
+			StatusAnimation.StatusAnim = StatusAnimate::WALK;
+			StatusAnimation.PatternAnim = "no pattern";
+		}
         Transform.Dx = CSpeed.SpeedWalk;
     }
     if (GetAsyncKeyState(VK_SPACE) && CJump.InJump == false && CJump.InJumpBot == false)
     {
+		StatusAnimation.StatusAnim = StatusAnimate::JUMP;
+		StatusAnimation.Mirror = 1;
+		StatusAnimation.PatternAnim = "no pattern";
+
         CJump.Jump = 110;
         CJump.InJumpBot = true;
         CJump.InJump = true;
