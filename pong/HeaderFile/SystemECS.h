@@ -128,13 +128,35 @@ void ProcessSound(CSound& CSound)
     PlaySound(TEXT(CSound.SoundNameFile), NULL, SND_FILENAME | SND_ASYNC);
 }
 
-void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation)
+string PatternParser(StatusAnimate StatusAnimation, CAnimationTimeLine TimeLine)
+{
+	switch (StatusAnimation)
+	{
+		case IDLE:
+		{
+			return "no pattern";
+		}
+		case WALK:
+		{
+			return "~playerwalk";
+		}
+		case JUMP:
+		{
+			return "no pattern";
+		}
+
+	default:
+		return "no pattern";
+	}
+}
+
+void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation, CAnimationTimeLine& TimeLine)
 {
 	CSpeed.SpeedWalk = 12;
 	if(CJump.InJump == false && CJump.InJumpBot == false)
 	{
 	StatusAnimation.StatusAnim = StatusAnimate::IDLE;
-	StatusAnimation.PatternAnim = "no pattern";
+	StatusAnimation.PatternAnim = PatternParser(StatusAnimation.StatusAnim, TimeLine);
 	}
 
     if (GetAsyncKeyState(VK_LEFT)) 
@@ -143,7 +165,7 @@ void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& 
 		if (CJump.InJump == false && CJump.InJumpBot == false)
 		{
 			StatusAnimation.StatusAnim = StatusAnimate::WALK;
-			StatusAnimation.PatternAnim = "no pattern";
+			StatusAnimation.PatternAnim = PatternParser(StatusAnimation.StatusAnim, TimeLine);
 		}
         Transform.Dx = -CSpeed.SpeedWalk;
     }
@@ -153,7 +175,7 @@ void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& 
 		if (CJump.InJump == false && CJump.InJumpBot == false)
 		{
 			StatusAnimation.StatusAnim = StatusAnimate::WALK;
-			StatusAnimation.PatternAnim = "no pattern";
+			StatusAnimation.PatternAnim = PatternParser(StatusAnimation.StatusAnim, TimeLine);
 		}
         Transform.Dx = CSpeed.SpeedWalk;
     }
@@ -161,7 +183,7 @@ void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& 
     {
 		StatusAnimation.StatusAnim = StatusAnimate::JUMP;
 		StatusAnimation.Mirror = 1;
-		StatusAnimation.PatternAnim = "no pattern";
+		StatusAnimation.PatternAnim = PatternParser(StatusAnimation.StatusAnim, TimeLine);
 
         CJump.Jump = 110;
         CJump.InJumpBot = true;

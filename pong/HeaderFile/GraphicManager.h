@@ -93,6 +93,12 @@ int GetHeightImage(string NameFile)
 	}
 	return width;
 }
+int GetSpeed(string NameFile)
+{
+	size_t digits = NameFile.find_first_of("1234567890");
+	if (digits <= NameFile.size())
+	return  atoi(NameFile.c_str() + digits);
+}
 
 pair<float, string> GetAnimation(StatusAnimate Status, string NameObj, vector<int>* TimeLineIt, vector<string>* TimeLineName, string Pattern)
 {
@@ -112,9 +118,7 @@ pair<float, string> GetAnimation(StatusAnimate Status, string NameObj, vector<in
 		}
 	}
 
-	size_t digits = NameStatus.find_first_of("1234567890");
-	if (digits <= NameStatus.size())
-	SpeedImage = atoi(NameStatus.c_str() + digits);
+	SpeedImage = GetSpeed(NameStatus);
 
 	if (NameObj == "player")
 		path = PLAYER ANI;
@@ -125,58 +129,81 @@ pair<float, string> GetAnimation(StatusAnimate Status, string NameObj, vector<in
 	if (Pattern == "no pattern")
 	{ //базовый случай резкий переход
 	TimeLineIt->resize(1);
+	TimeLineName->resize(1);
+
+	if (TimeLineIt[0][0] <= 0)
+	{
+		int Width  = GetWidthImage (path + NameStatus + NameObj + ".png");
+		int Height = GetHeightImage(path + NameStatus + NameObj + ".png");
+		TimeLineIt[0][0] = (Width / Height) * SpeedImage;
+		TimeLineName[0][0] = NameStatus + NameObj;
+	}
 	SpeedImage = 3;
 	return pair<int, string>(SpeedImage, path + NameStatus + NameObj);
 	}
 	else
 	{
-		int switchs = 0;
-		TimeLineName->clear();
+		/// переменная которая понимает это первый раз проигрышь анимации или нет
+		bool refrash = false;
+		if (TimeLineIt->size() == 1)
+		{
+			TimeLineIt->clear();
+			TimeLineName->clear();
+		}
+
+		int Width = 0;
+		int Height = 0;
+		TimeLineIt->resize(2);
+		TimeLineName->resize(2);
+
+		/// запись и замена патерна на новый паттерн
 		for (int i = 0; i < animations.PatternAnimation.size(); i++)
 		{
-			if (animations.PatternAnimation[i] == Pattern || switchs == 1)
+			if (animations.PatternAnimation[i] == Pattern)
 			{
-				switchs = 1;
-				if (animations.PatternAnimation[i] != "<start>" && 
-					animations.PatternAnimation[i] != "<end>" && 
-					animations.PatternAnimation[i] != Pattern
+				if (TimeLineName[0][0] == animations.PatternAnimation[i + 2] &&
+					TimeLineName[0][1] == animations.PatternAnimation[i + 3]
 					)
 				{
-				TimeLineName->push_back(animations.PatternAnimation[i]);
+					refrash = true;
 				}
-				if (animations.PatternAnimation[i] == "<end>")
-				{
-					switchs = 0;
-					break;
-				}
+
+				TimeLineName[0][0] = animations.PatternAnimation[i+2];
+				TimeLineName[0][1] = animations.PatternAnimation[i+3];
+				break;
 			}
 		}
 
-		TimeLineIt->resize(animations.PatternAnimation.size()-3);
+		if (TimeLineIt[0][0] <= 0 && TimeLineIt[0][1] <= 0 && refrash == false)
+			{
+				SpeedImage = GetSpeed(TimeLineName[0][0]);
+				Width = GetWidthImage(path + TimeLineName[0][0] + ".png");
+				Height = GetHeightImage(path + TimeLineName[0][0] + ".png");
+				TimeLineIt[0][0] = (Width / Height) * SpeedImage;
+
+				SpeedImage = GetSpeed(TimeLineName[0][1]);
+				Width = GetWidthImage(path + TimeLineName[0][1] + ".png");
+				Height = GetHeightImage(path + TimeLineName[0][1] + ".png");
+				TimeLineIt[0][1] = (Width / Height) * SpeedImage;
+			}
+		else if (TimeLineIt[0][0] <= 0 && TimeLineIt[0][1] <= 0 && refrash == true)
+			{
+				SpeedImage = GetSpeed(TimeLineName[0][1]);
+				Width = GetWidthImage(path + TimeLineName[0][1] + ".png");
+				Height = GetHeightImage(path + TimeLineName[0][1] + ".png");
+				TimeLineIt[0][1] = (Width / Height) * SpeedImage;
+			}
 		
-		for (int i = 0; i< TimeLineName[0].size();i++)
+
+		if (TimeLineIt[0][0] > 0)
 		{
-			if (TimeLineName[0][i] != "noanimation")
-			{
-				int Width = GetWidthImage(path + TimeLineName[0][i] + ".png");
-				int Height = GetHeightImage(path + TimeLineName[0][i] + ".png");
-				TimeLineIt[0][i] = (Width / Height) * SpeedImage;
-			}
-			else
-			{
-				TimeLineIt[0][i] = 0;
-			}
+		return pair<int, string>(SpeedImage, path + TimeLineName[0][0]);
 		}
-
-
-		
-		//здесь доделать
-		return pair<int, string>(SpeedImage, path + NameStatus + NameObj);
-		//здесь доделать
-
+		else if (TimeLineIt[0][0] <= 0 && TimeLineIt[0][1] > 0)
+		{
+		return pair<int, string>(SpeedImage, path + TimeLineName[0][1]);
+		}
 	}
-
-
 }
 
 class BuildListBuffer
@@ -325,18 +352,22 @@ public:
 
 		 if (typeObject == TypeObject::BOX2DTEX && Status != StatusAnimate::DEFAULT)
 		 {
+			 int countNumber = TimeLineIt->size();
+			 int Line = 0;
 
-			 //здесь доделать
-			 if (TimeLineIt[0][0] <= 0)
-				 TimeLineIt[0][0] = (WidthImage / HeightImage) * SpeedImage;
+			 if (TimeLineIt[0][0] > 0)
+			 {
+				 TimeLineIt[0][0]--;
+				 Line = TimeLineIt[0][0];
+			 }
+			 else if (TimeLineIt[0][0] <= 0 && countNumber == 2)
+			 {
+				 TimeLineIt[0][1]--;
+				 Line = TimeLineIt[0][1];
+			 }
 
-			 TimeLineIt[0][0]--;
-			 //здесь доделать
-
-
-
-			 int NextFrame = SpeedImage - (TimeLineIt[0][0] % SpeedImage);
-			 int iterator = (((WidthImage / HeightImage)* SpeedImage) - TimeLineIt[0][0] - NextFrame) / SpeedImage;
+			 int NextFrame = SpeedImage - (Line % SpeedImage);
+			 int iterator = (((WidthImage / HeightImage)* SpeedImage) - Line - NextFrame) / SpeedImage;
 
 			 float PitchStart = (HeightImage * ((iterator * Mirror)-1)) / WidthImage;
 			 float PitchEnd = (HeightImage * (iterator * Mirror)) / WidthImage;

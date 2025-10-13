@@ -8,7 +8,7 @@ void CreateObject(CTransform& CTransform);
 void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump);
 void ProcessGravity(CJump& CJump, CTransform& Transform, CGravity& Gravity);
 void ProcessSound(CSound& CSound);
-void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation);
+void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation, CAnimationTimeLine& TimeLine);
 void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation);
 void AddCharacterModifier(
     CHealth& CHealth, CDefense& CDefense, CDamage& CDamage, CSpeed& CSpeed, CSpecialization& CSpecialization,
@@ -215,7 +215,7 @@ public:
     }
     void Start()
     {      
-       MovePlayer(*Jump, *Transform, *Speed, *Collider, *Gravity, *StatusAnimation);
+       MovePlayer(*Jump, *Transform, *Speed, *Collider, *Gravity, *StatusAnimation,*AnimationTimeLine);
        TracerCollide(*Collider, *Transform, *Jump);
        ProcessGravity(*Jump, *Transform, *Gravity);
     }

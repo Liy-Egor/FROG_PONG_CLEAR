@@ -419,15 +419,6 @@ void GraphicEngine::DrawObject(float x, float y, float z,float width, float heig
 		pair<int, string> DataAimation = GetAnimation(status, NameObj, &TimeLineIts, &TimeLineNames, Pattern);
 		SpeedImage = DataAimation.first;
 		CreateTextureBuffer(DataAimation.second);
-
-		/*for (int i = 0; i < TimeLineNames.size(); i++)
-		{
-			if (TimeLineNames[i] != "noanimation")
-			{
-				auto ddd = GetImageWH(path + TimeLineNames[0][i]);
-			}
-		}*/
-
 		}
 
 	

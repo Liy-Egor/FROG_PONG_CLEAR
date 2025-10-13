@@ -201,7 +201,6 @@ void LoadPatternAnmation()
 			}
 		}
 		}
-		animations.PatternAnimation.size();
 	}
 	file.close();
 }
