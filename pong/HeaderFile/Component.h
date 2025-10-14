@@ -31,6 +31,7 @@ struct CCollider
 {
    int LastTracePlatformNum = -1;
    int Direction = 1;
+   int DirectionCollide;
 };
 
 struct CNameObject

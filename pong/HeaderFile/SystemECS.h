@@ -80,10 +80,12 @@ void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump)
                     if (left < right)
                     {
                         Transform.x = walls->x - Transform.Width - 1;
+						CCollider.DirectionCollide = -1;
                     }
                     else
                     {
                         Transform.x = walls->x + walls->Width + 1;
+						CCollider.DirectionCollide = 1;
                     }
 
                     j++;
@@ -196,14 +198,14 @@ void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollid
                     if (CCollider.LastTracePlatformNum >= 0)
                     {
                         auto& platform = *VLocation[i].VWall[CCollider.LastTracePlatformNum].GetPosition();
-                        if (CTransform.x <= platform.x)
+                        if (CTransform.x <= platform.x || CCollider.DirectionCollide == 1)
                         {
 							StatusAnimation.StatusAnim = StatusAnimate::WALK;
 							StatusAnimation.Mirror = 1;
 							StatusAnimation.PatternAnim = "no pattern";
                             CCollider.Direction = 1;
                         }
-                        if (CTransform.x + CTransform.Width >= platform.x + platform.Width)
+                        if (CTransform.x + CTransform.Width >= platform.x + platform.Width || CCollider.DirectionCollide == -1)
                         {
 							StatusAnimation.StatusAnim = StatusAnimate::WALK;
 							StatusAnimation.Mirror = -1;
