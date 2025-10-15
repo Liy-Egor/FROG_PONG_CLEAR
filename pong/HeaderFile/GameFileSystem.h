@@ -173,13 +173,17 @@ void LoadAnimationFiles(const string PathFile)
 		{
 			animations.CollectionAnimation[(int)StatusAnimate::DEATH - 1].push_back(FileName);
 		}
-		else if (!FileName.find("attack"))
+		else if (!FileName.find("sword"))
 		{
-			animations.CollectionAnimation[(int)StatusAnimate::ATTACK - 1].push_back(FileName);
+			animations.CollectionAnimation[(int)StatusAnimate::SWORD - 1].push_back(FileName);
 		}
 		else if (!FileName.find("run"))
 		{
 			animations.CollectionAnimation[(int)StatusAnimate::RUN - 1].push_back(FileName);
+		}
+		else if (!FileName.find("attack"))
+		{
+			animations.CollectionAnimation[(int)StatusAnimate::ATTACK - 1].push_back(FileName);
 		}
 	}
 }

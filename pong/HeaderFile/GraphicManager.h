@@ -21,8 +21,13 @@ enum StatusAnimate
 	TURN,
 	JUMP,
 	DEATH,
-	ATTACK,
+	SWORD,
 	RUN,
+	ATTACK,
+
+
+
+
 
 	LastEnum
 };

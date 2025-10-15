@@ -130,7 +130,6 @@ void ProcessSound(CSound& CSound)
 
 void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation, CAnimationTimeLine& TimeLine)
 {		
-
 		if (GetAsyncKeyState(VK_SPACE) && CCollider.CollYfound && CJump.TimerKeySpace <= 0)
 		{
 			CJump.InJumpBot = true;
@@ -140,9 +139,9 @@ void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& 
 
 		CJump.TimerKeySpace--;
 		if (GetAsyncKeyState(VK_SPACE))
-	{
+		{
 		CJump.TimerKeySpace = 1;
-	}
+		}
 
 			/// бежим или идем
 		if (GetAsyncKeyState(0x41) || GetAsyncKeyState(0x44))
@@ -209,6 +208,22 @@ void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& 
 				else
 				{
 					StatusAnimation.PatternAnim = "no pattern";
+				}
+
+				if (GetAsyncKeyState(VK_LBUTTON))
+				{
+					StatusAnimation.StatusAnim = StatusAnimate::SWORD;
+					StatusAnimation.PatternAnim = "~playersword360";
+				}
+				if (GetAsyncKeyState(VK_RBUTTON))
+				{
+					StatusAnimation.StatusAnim = StatusAnimate::SWORD;
+					StatusAnimation.PatternAnim = "~playerswordhorizont";
+				}
+				if (GetAsyncKeyState(VK_MBUTTON))
+				{
+					StatusAnimation.StatusAnim = StatusAnimate::SWORD;
+					StatusAnimation.PatternAnim = "~playerswordmega";
 				}
 			}
 			else
