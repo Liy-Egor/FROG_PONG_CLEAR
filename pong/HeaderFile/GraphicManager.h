@@ -22,6 +22,7 @@ enum StatusAnimate
 	JUMP,
 	DEATH,
 	ATTACK,
+	RUN,
 
 	LastEnum
 };
@@ -47,6 +48,9 @@ int GetWidthImage(string NameFile)
 		int BiteNums = (int)byte;
 		if (count >= 16)
 		{
+			if (BiteNums < 0)
+				BiteNums = 256 + BiteNums;
+
 			if (count != 19)
 			{
 				width += BiteNums * pow(16, Pich);
@@ -76,6 +80,9 @@ int GetHeightImage(string NameFile)
 		int BiteNums = (int)byte;
 		if (count >= 20)
 		{
+			if (BiteNums < 0)
+				BiteNums = 256 + BiteNums;
+
 			if (count != 23)
 			{
 				width += BiteNums * pow(16, Pich);
@@ -107,7 +114,9 @@ pair<float, string> GetAnimation(StatusAnimate Status, string NameObj, vector<in
 	string NameCut = NameObj + ".png";
 	int SpeedImage = 0;
 	string path = "";
-
+	int Width = 0;
+	int Height = 0;
+	
 	for (int i = 0; i < animations.CollectionAnimation[Status - 1].size(); i++)
 	{
 		string Name = animations.CollectionAnimation[Status - 1][i];
@@ -118,19 +127,20 @@ pair<float, string> GetAnimation(StatusAnimate Status, string NameObj, vector<in
 		}
 	}
 
-	SpeedImage = GetSpeed(NameStatus);
-
 	if (NameObj == "player")
 		path = PLAYER ANI;
 
 	else if (NameObj == "enemy")
 		path = ENEMY ANI;
 	
-	if (Pattern == "no pattern")
+	if (Pattern == "no pattern" || Pattern == "")
 	{ //базовый случай резкий переход
-	TimeLineIt->resize(1);
-	TimeLineName->resize(1);
 
+	if (Pattern == "")
+		Pattern = "no pattern";
+
+	TimeLineIt->resize(1);
+	TimeLineName->resize(2);
 	if (TimeLineIt[0][0] <= 0)
 	{
 		int Width  = GetWidthImage (path + NameStatus + NameObj + ".png");
@@ -138,23 +148,32 @@ pair<float, string> GetAnimation(StatusAnimate Status, string NameObj, vector<in
 		TimeLineIt[0][0] = (Width / Height) * SpeedImage;
 		TimeLineName[0][0] = NameStatus + NameObj;
 	}
-	SpeedImage = 3;
+	SpeedImage = GetSpeed(NameStatus);
+	TimeLineName[0][1] = Pattern;
+
+	if (SpeedImage == 0)
+		SpeedImage = 3;
+
 	return pair<int, string>(SpeedImage, path + NameStatus + NameObj);
 	}
 	else
 	{
 		/// переменная которая понимает это первый раз проигрышь анимации или нет
 		bool refrash = false;
-		if (TimeLineIt->size() == 1)
+
+		if ( TimeLineIt->size() == 1)
+		{
+			TimeLineIt->clear();
+			TimeLineName->clear();
+		}
+		else if (TimeLineIt->size() == 2 && TimeLineName[0][2] != Pattern)
 		{
 			TimeLineIt->clear();
 			TimeLineName->clear();
 		}
 
-		int Width = 0;
-		int Height = 0;
-		TimeLineIt->resize(2);
-		TimeLineName->resize(2);
+			TimeLineName->resize(3);
+			TimeLineIt->resize(2);
 
 		/// запись и замена патерна на новый паттерн
 		for (int i = 0; i < animations.PatternAnimation.size(); i++)
@@ -173,7 +192,7 @@ pair<float, string> GetAnimation(StatusAnimate Status, string NameObj, vector<in
 				break;
 			}
 		}
-
+		
 		if (TimeLineIt[0][0] <= 0 && TimeLineIt[0][1] <= 0 && refrash == false)
 			{
 				SpeedImage = GetSpeed(TimeLineName[0][0]);
@@ -194,6 +213,10 @@ pair<float, string> GetAnimation(StatusAnimate Status, string NameObj, vector<in
 				TimeLineIt[0][1] = (Width / Height) * SpeedImage;
 			}
 		
+		TimeLineName[0][2] = Pattern;
+
+		if (SpeedImage == 0)
+			SpeedImage = 3;
 
 		if (TimeLineIt[0][0] > 0)
 		{
@@ -368,6 +391,12 @@ public:
 
 			 int NextFrame = SpeedImage - (Line % SpeedImage);
 			 int iterator = (((WidthImage / HeightImage)* SpeedImage) - Line - NextFrame) / SpeedImage;
+
+			 if (HeightImage <= 0 || WidthImage <= 0)
+			 {
+				 int f = 1;
+			 }
+
 
 			 float PitchStart = (HeightImage * ((iterator * Mirror)-1)) / WidthImage;
 			 float PitchEnd = (HeightImage * (iterator * Mirror)) / WidthImage;

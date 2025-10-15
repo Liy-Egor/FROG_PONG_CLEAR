@@ -8,7 +8,7 @@ void CreateObject(CTransform& CTransform);
 void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump);
 void ProcessGravity(CJump& CJump, CTransform& Transform, CGravity& Gravity);
 void ProcessSound(CSound& CSound);
-void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation, CAnimationTimeLine& TimeLine);
+void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation,CAnimationTimeLine& TimeLine);
 void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation);
 void AddCharacterModifier(
     CHealth& CHealth, CDefense& CDefense, CDamage& CDamage, CSpeed& CSpeed, CSpecialization& CSpecialization,
@@ -195,7 +195,7 @@ public:
 	{
 		NameObject->Name = "enemy";
 		AddCharacterModifier(*Health, *Defense, *Damage, *Speed, *Specialization, *Gender, *StatusBehavior, *TypeCharacter, *NameCharacter, *Rank,
-			"TypeDamage", "Status", "TypeÑh", "Gendr", "Frog", "Specialist", 0);
+			"TypeDamage", "Status", "TypeCh", "Gendr", "Frog", "Specialist", 0);
 	}
 	void Start()
 	{
@@ -222,7 +222,7 @@ public:
 
 }*Player;
 
-//êîíåö âñåõ àðõåòèïîâ
+
 class ATLocation : public BaseArcheType
 {
 public:
@@ -237,5 +237,5 @@ public:
     vector<ATEnemy> VEnemy;
 
 }*Location;
-vector<ATLocation> VLocation; // ïðè óäàëåíèè îò ñþäà òîæå íàäî áóäåò óäàëÿòü ýêçåìàëÿðû èíà÷å áóäåò óòå÷êà ïàìÿòè (íåáîëüøàÿ íî âñå æå)
+vector<ATLocation> VLocation; 
 

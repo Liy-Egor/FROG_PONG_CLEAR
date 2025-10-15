@@ -177,6 +177,10 @@ void LoadAnimationFiles(const string PathFile)
 		{
 			animations.CollectionAnimation[(int)StatusAnimate::ATTACK - 1].push_back(FileName);
 		}
+		else if (!FileName.find("run"))
+		{
+			animations.CollectionAnimation[(int)StatusAnimate::RUN - 1].push_back(FileName);
+		}
 	}
 }
 

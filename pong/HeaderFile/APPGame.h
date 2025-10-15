@@ -7,7 +7,6 @@ public:
 	AppGame(){};
 	void FrameGo()
 	{
-
 		MSG msg;
 		BOOL gbool = true;
 		Init();

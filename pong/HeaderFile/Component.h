@@ -19,7 +19,7 @@ struct CTexture
 
 struct CGravity
 {
-    float Gravity = 30;
+    float Gravity = 42;
 };
 
 struct CSound
@@ -31,6 +31,8 @@ struct CCollider
 {
    int LastTracePlatformNum = -1;
    int Direction = 1;
+   bool CollXfound ;
+   bool CollYfound ;
 };
 
 struct CNameObject
@@ -112,9 +114,11 @@ struct CNameCharacter
 
 struct CJump
 {
-    float Jump = 0.;
+    float Jump = 60;
     bool InJumpBot = false;
     bool InJump = false;
+	int TimerKeySpace = 0;
+	bool InSpaceKey = false;
 };
 
 struct CPortalPath

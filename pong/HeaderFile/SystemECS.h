@@ -31,13 +31,13 @@ bool CheckCollision(float x1, float y1, float w1, float h1,
 void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump)
 {
     CCollider.LastTracePlatformNum = -1;
-    bool CollXfound = false;
-    bool CollYfound = false;
+	CCollider.CollXfound = false;
+	CCollider.CollYfound = false;
 
     float Lenght = sqrt(pow(Transform.Dx, 2) + pow(Transform.Dy, 2));
     for (float i = 0; i < Lenght; i++)
     {
-        if (CollXfound && CollYfound) return;
+        if (CCollider.CollXfound && CCollider.CollYfound) return;
 
         for (int k = 0; k < 4; k++)
         {
@@ -72,10 +72,10 @@ void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump)
                 float minY = min(top, down);
                 CJump.InJump = false;
 
-                if (minX < minY && !CollXfound)
+                if (minX < minY && !CCollider.CollXfound)
                 {
                     Transform.Dx = 0;
-                    CollXfound = true;
+                    CCollider.CollXfound = true;
 
                     if (left < right)
                     {
@@ -89,10 +89,10 @@ void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump)
                     j++;
                 }
 
-                if (minX >= minY && !CollYfound)
+                if (minX >= minY && !CCollider.CollYfound)
                 {
                     Transform.Dy = 0;
-                    CollYfound = true;
+                    CCollider.CollYfound = true;
 
                     if (down < top)
                     {
@@ -112,13 +112,13 @@ void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump)
            }
         }
     }
-    if (!CollXfound) Transform.x += Transform.Dx;
-    if (!CollYfound) Transform.y += Transform.Dy;
+    if (!CCollider.CollXfound) Transform.x += Transform.Dx;
+    if (!CCollider.CollYfound) Transform.y += Transform.Dy;
 }
 
 void ProcessGravity(CJump& CJump, CTransform& Transform, CGravity& Gravity)
 {
-    CJump.Jump *= .9;
+    CJump.Jump *= 0.99;
     Transform.Dx *= .1;
     Transform.Dy = Gravity.Gravity - CJump.Jump;
 }
@@ -128,83 +128,96 @@ void ProcessSound(CSound& CSound)
     PlaySound(TEXT(CSound.SoundNameFile), NULL, SND_FILENAME | SND_ASYNC);
 }
 
-string PatternParser(StatusAnimate StatusAnimation, CAnimationTimeLine TimeLine)
-{
-	switch (StatusAnimation)
-	{
-		case IDLE:
-		{
-			return "no pattern";
-		}
-		case WALK:
-		{
-			return "~playerwalk";
-		}
-		case JUMP:
-		{
-			return "no pattern";
-		}
-
-	default:
-		return "no pattern";
-	}
-}
-
 void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation, CAnimationTimeLine& TimeLine)
-{
-	CSpeed.SpeedWalk = 12;
-	if(CJump.InJump == false && CJump.InJumpBot == false)
+{		
+
+		if (GetAsyncKeyState(VK_SPACE) && CCollider.CollYfound && CJump.TimerKeySpace <= 0)
+		{
+			CJump.InJumpBot = true;
+			CJump.InJump = true;
+			CJump.Jump = 60;
+		}
+
+		CJump.TimerKeySpace--;
+		if (GetAsyncKeyState(VK_SPACE))
 	{
-	StatusAnimation.StatusAnim = StatusAnimate::IDLE;
-	StatusAnimation.PatternAnim = PatternParser(StatusAnimation.StatusAnim, TimeLine);
+		CJump.TimerKeySpace = 1;
 	}
 
-    if (GetAsyncKeyState(VK_LEFT)) 
-    {
-		StatusAnimation.Mirror = -1;
-		if (CJump.InJump == false && CJump.InJumpBot == false)
+			/// бежим или идем
+		if (GetAsyncKeyState(0x41) || GetAsyncKeyState(0x44))
 		{
-			StatusAnimation.StatusAnim = StatusAnimate::WALK;
-			StatusAnimation.PatternAnim = PatternParser(StatusAnimation.StatusAnim, TimeLine);
+					string temp;
+				if (GetAsyncKeyState(0x41)) /// A
+					{
+						StatusAnimation.Mirror = -1;
+						Transform.Dx = -CSpeed.SpeedWalk;
+						temp = "~playerwalkL";
+					}
+				else if (GetAsyncKeyState(0x44)) /// D
+					{
+						StatusAnimation.Mirror = 1;
+						Transform.Dx = CSpeed.SpeedWalk;
+						temp = "~playerwalkR";
+					}
+				if (CCollider.CollYfound)
+				{
+					if (GetAsyncKeyState(VK_LSHIFT))
+					{	/// бег
+						CSpeed.SpeedWalk = 12;
+						StatusAnimation.StatusAnim = StatusAnimate::RUN;
+						StatusAnimation.PatternAnim = "~playerrun";
+					}
+					else
+					{	/// ходьба
+						CSpeed.SpeedWalk = 6;
+						StatusAnimation.StatusAnim = StatusAnimate::WALK;
+						if (StatusAnimation.PatternAnim == "~playerrun" || StatusAnimation.PatternAnim == "~playerwalkwalk")
+						{
+							StatusAnimation.PatternAnim = "~playerwalkwalk";
+						}
+						else
+						{
+							StatusAnimation.PatternAnim = temp;
+						}
+					}
+				}
+				else
+				{
+					StatusAnimation.StatusAnim = StatusAnimate::JUMP;
+					StatusAnimation.PatternAnim = "~playerjumpRun";
+				}
 		}
-        Transform.Dx = -CSpeed.SpeedWalk;
-    }
-    if (GetAsyncKeyState(VK_RIGHT)) 
-    {
-		StatusAnimation.Mirror = 1;
-		if (CJump.InJump == false && CJump.InJumpBot == false)
+		else
 		{
-			StatusAnimation.StatusAnim = StatusAnimate::WALK;
-			StatusAnimation.PatternAnim = PatternParser(StatusAnimation.StatusAnim, TimeLine);
+			/// стоим
+			if (CCollider.CollYfound)
+			{
+				StatusAnimation.StatusAnim = StatusAnimate::IDLE;
+				/// стоим
+				if (StatusAnimation.PatternAnim == "~playerwalkwalk" ||
+					StatusAnimation.PatternAnim == "~playerwalkL" ||
+					StatusAnimation.PatternAnim == "~playerwalkR" ||
+					StatusAnimation.PatternAnim == "~playerwalkidle" ||
+					StatusAnimation.PatternAnim == "~playerjumpidle" ||
+					StatusAnimation.PatternAnim == "~playerjumpRun" ||
+					StatusAnimation.PatternAnim == "~playerrun"
+					)
+				{
+					StatusAnimation.PatternAnim = "~playerwalkidle";
+				}
+				else
+				{
+					StatusAnimation.PatternAnim = "no pattern";
+				}
+			}
+			else
+			{
+				StatusAnimation.StatusAnim = StatusAnimate::JUMP;
+				StatusAnimation.PatternAnim = "~playerjumpidle";
+			}
 		}
-        Transform.Dx = CSpeed.SpeedWalk;
-    }
-    if (GetAsyncKeyState(VK_SPACE) && CJump.InJump == false && CJump.InJumpBot == false)
-    {
-		StatusAnimation.StatusAnim = StatusAnimate::JUMP;
-		StatusAnimation.Mirror = 1;
-		StatusAnimation.PatternAnim = PatternParser(StatusAnimation.StatusAnim, TimeLine);
-
-        CJump.Jump = 110;
-        CJump.InJumpBot = true;
-        CJump.InJump = true;
-    }
-
-    float cameraHalfWidth = (window.width / 2) / Transform.Scale;
-    float cameraHalfHeight = (window.height / 2) / Transform.Scale;
-
-    float targetX = Transform.x;
-    float targetY = Transform.y;
-
-    targetX = max(0 + cameraHalfWidth,
-        min(MapSizeW - cameraHalfWidth, targetX));
-    targetY = max(0 + cameraHalfHeight,
-        min(MapSizeH - cameraHalfHeight, targetY));
-
-    player_view.x = lerp(player_view.x, targetX, 0.1f);
-    player_view.y = lerp(player_view.y, targetY, 0.1f);
 }
-
 void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation)
 {
         CSpeed.SpeedWalk = 6;
@@ -220,16 +233,16 @@ void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollid
                         auto& platform = *VLocation[i].VWall[CCollider.LastTracePlatformNum].GetPosition();
                         if (CTransform.x <= platform.x)
                         {
-							StatusAnimation.StatusAnim = StatusAnimate::WALK;
 							StatusAnimation.Mirror = 1;
-							StatusAnimation.PatternAnim = "no pattern";
+							StatusAnimation.StatusAnim = StatusAnimate::WALK;
+							StatusAnimation.PatternAnim = "~enemywalkR";
                             CCollider.Direction = 1;
                         }
                         if (CTransform.x + CTransform.Width >= platform.x + platform.Width)
                         {
-							StatusAnimation.StatusAnim = StatusAnimate::WALK;
 							StatusAnimation.Mirror = -1;
-							StatusAnimation.PatternAnim = "no pattern";
+							StatusAnimation.StatusAnim = StatusAnimate::WALK;
+							StatusAnimation.PatternAnim = "~enemywalkL";
                             CCollider.Direction = -1;
                         }
                     }
@@ -358,6 +371,8 @@ void AppGame::Render()
 	{
 		if (Player->GetLocation() == i)
 		{
+			int size = 300;
+
 			d3dx.DrawObject(
 				VLocation[Player->GetLocation()].GetPosition()->x,
 				VLocation[Player->GetLocation()].GetPosition()->y,
@@ -385,10 +400,21 @@ void AppGame::Render()
 			}
 			for (ATEnemy var : VLocation[i].VEnemy)
 			{
-				d3dx.SetAnimetionTimeLine(var.GetTimeLine()->TimeLineIt, var.GetTimeLine()->TimeLineName, var.GetStatusAnimation()->Mirror, var.GetStatusAnimation()->PatternAnim);
+
 				d3dx.DrawObject(
 					var.GetPosition()->x, var.GetPosition()->y, 1,
 					var.GetPosition()->Width, var.GetPosition()->Height,
+					0,
+					var.GetRender()->TypeRender,
+					ENEMY"Enemy_static_Test",
+					var.GetNameObj()->Name,
+					StatusAnimate::DEFAULT
+				);
+
+				d3dx.SetAnimetionTimeLine(var.GetTimeLine()->TimeLineIt, var.GetTimeLine()->TimeLineName, var.GetStatusAnimation()->Mirror, var.GetStatusAnimation()->PatternAnim);
+				d3dx.DrawObject(
+					var.GetPosition()->x - size /2, var.GetPosition()->y - size / 1.2, 1,
+					var.GetPosition()->Width + size, var.GetPosition()->Height + size,
 					0,
 					var.GetRender()->TypeRender,
 					var.GetTexture()->Texture,
@@ -443,10 +469,20 @@ void AppGame::Render()
 				var.GoEvent();
 			}
 
-			d3dx.SetAnimetionTimeLine(Player->GetTimeLine()->TimeLineIt, Player->GetTimeLine()->TimeLineName, Player->GetStatusAnimation()->Mirror, Player->GetStatusAnimation()->PatternAnim);
 			d3dx.DrawObject(
 				Player->GetPosition()->x, Player->GetPosition()->y, 1,
 				Player->GetPosition()->Width, Player->GetPosition()->Height,
+				0,
+				Player->GetRender()->TypeRender,
+				PLAYER"Player_static_Test",
+				Player->GetNameObj()->Name,
+				StatusAnimate::DEFAULT
+			);
+
+			d3dx.SetAnimetionTimeLine(Player->GetTimeLine()->TimeLineIt, Player->GetTimeLine()->TimeLineName, Player->GetStatusAnimation()->Mirror, Player->GetStatusAnimation()->PatternAnim);
+			d3dx.DrawObject(
+				Player->GetPosition()->x	 - size /2, Player->GetPosition()->y      - size / 1.2, 1,
+				Player->GetPosition()->Width + size, Player->GetPosition()->Height + size,
 				0,
 				Player->GetRender()->TypeRender,
 				Player->GetTexture()->Texture,
