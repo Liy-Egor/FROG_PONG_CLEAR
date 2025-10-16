@@ -128,20 +128,89 @@ void ProcessSound(CSound& CSound)
     PlaySound(TEXT(CSound.SoundNameFile), NULL, SND_FILENAME | SND_ASYNC);
 }
 
-void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation, CAnimationTimeLine& TimeLine)
+void SingleTapInput(int KeyInput, int& ImputTimer)
+{
+	ImputTimer--;
+	if (GetAsyncKeyState(KeyInput))
+	{
+		ImputTimer = 1;
+	}
+}
+
+
+
+void AttackPlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation, CAnimationTimeLine& TimeLine, CImputTimer& ImputTimer)
+{
+	if (GetAsyncKeyState(VK_LBUTTON)&& ImputTimer.KeyLButton <= 0)
+	{
+		StatusAnimation.StatusAnim = StatusAnimate::SWORD;
+
+		if (ImputTimer.OrderBehavior <= 0)
+		{
+			ImputTimer.OrderBehavior = 100;
+			StatusAnimation.PatternAnim = "~playersword360";
+
+
+
+
+		}
+		else if (ImputTimer.OrderBehavior > 0 && ImputTimer.OrderBehavior <= 100)
+		{
+			ImputTimer.OrderBehavior = 300;
+			StatusAnimation.PatternAnim = "~playerswordhorizont";
+
+
+
+
+		}
+		else if (ImputTimer.OrderBehavior > 100 && ImputTimer.OrderBehavior <= 300)
+		{
+			ImputTimer.OrderBehavior = 0;
+			StatusAnimation.PatternAnim = "~playerswordmega";
+
+
+
+
+
+		}
+	}
+
+	SingleTapInput(VK_LBUTTON, ImputTimer.KeyLButton); /// команда которая не дает зажимать кнопку
+}
+
+void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation, CAnimationTimeLine& TimeLine, CImputTimer& ImputTimer)
 {		
-		if (GetAsyncKeyState(VK_SPACE) && CCollider.CollYfound && CJump.TimerKeySpace <= 0)
+		/// остановка процесса движения если мы бъем
+		if (StatusAnimation.PatternAnim == "~playersword360" || StatusAnimation.PatternAnim == "~playerswordhorizont" || StatusAnimation.PatternAnim == "~playerswordmega")
+		{
+			if (GetAsyncKeyState(0x41) && !CCollider.CollYfound) /// A
+			{
+				StatusAnimation.Mirror = -1;
+				Transform.Dx = -CSpeed.SpeedWalk;
+			}
+			else if (GetAsyncKeyState(0x44) && !CCollider.CollYfound) /// D
+			{
+				StatusAnimation.Mirror = 1;
+				Transform.Dx = CSpeed.SpeedWalk;
+			}
+			
+			if (TimeLine.TimeLineIt[0] == 0)
+			{
+				StatusAnimation.StatusAnim = StatusAnimate::IDLE;
+				StatusAnimation.PatternAnim = "no pattern";
+			}
+		}
+		else
+		{
+		ImputTimer.OrderBehavior--;
+		if (GetAsyncKeyState(VK_SPACE) && CCollider.CollYfound && ImputTimer.KeySpace <= 0)
 		{
 			CJump.InJumpBot = true;
 			CJump.InJump = true;
 			CJump.Jump = 60;
 		}
 
-		CJump.TimerKeySpace--;
-		if (GetAsyncKeyState(VK_SPACE))
-		{
-		CJump.TimerKeySpace = 1;
-		}
+		SingleTapInput(VK_SPACE, ImputTimer.KeySpace); /// команда которая не дает зажимать кнопку
 
 			/// бежим или идем
 		if (GetAsyncKeyState(0x41) || GetAsyncKeyState(0x44))
@@ -209,28 +278,13 @@ void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& 
 				{
 					StatusAnimation.PatternAnim = "no pattern";
 				}
-
-				if (GetAsyncKeyState(VK_LBUTTON))
-				{
-					StatusAnimation.StatusAnim = StatusAnimate::SWORD;
-					StatusAnimation.PatternAnim = "~playersword360";
-				}
-				if (GetAsyncKeyState(VK_RBUTTON))
-				{
-					StatusAnimation.StatusAnim = StatusAnimate::SWORD;
-					StatusAnimation.PatternAnim = "~playerswordhorizont";
-				}
-				if (GetAsyncKeyState(VK_MBUTTON))
-				{
-					StatusAnimation.StatusAnim = StatusAnimate::SWORD;
-					StatusAnimation.PatternAnim = "~playerswordmega";
-				}
 			}
 			else
 			{
 				StatusAnimation.StatusAnim = StatusAnimate::JUMP;
 				StatusAnimation.PatternAnim = "~playerjumpidle";
 			}
+		}
 		}
 }
 void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation)

@@ -8,8 +8,9 @@ void CreateObject(CTransform& CTransform);
 void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump);
 void ProcessGravity(CJump& CJump, CTransform& Transform, CGravity& Gravity);
 void ProcessSound(CSound& CSound);
-void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation,CAnimationTimeLine& TimeLine);
+void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation,CAnimationTimeLine& TimeLine, CImputTimer& ImputTimer);
 void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation);
+void AttackPlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation, CAnimationTimeLine& TimeLine, CImputTimer& ImputTimer);
 void AddCharacterModifier(
     CHealth& CHealth, CDefense& CDefense, CDamage& CDamage, CSpeed& CSpeed, CSpecialization& CSpecialization,
     CGender& CGender, CStatusBehavior& CStatusBehavior, CTypeCharacter& CTypeCharacter, CNameCharacter& CNameCharacter, CRank& CRank,
@@ -32,6 +33,7 @@ protected:
 	CTypeRender* TypeRenders = ECS.SetComponent<CTypeRender>(Entity);
 	CAnimationTimeLine* AnimationTimeLine = ECS.SetComponent<CAnimationTimeLine>(Entity);
 	CStatusAnimation* StatusAnimation = ECS.SetComponent<CStatusAnimation>(Entity);
+	CImputTimer* ImputTimer = ECS.SetComponent<CImputTimer>(Entity);
     int WhatLocation;
     
     BaseArcheType(string NameFile, float arr[], TypeObject TypeRend)
@@ -215,7 +217,8 @@ public:
     }
     void Start()
     {      
-       MovePlayer(*Jump, *Transform, *Speed, *Collider, *Gravity, *StatusAnimation,*AnimationTimeLine);
+       MovePlayer(*Jump, *Transform, *Speed, *Collider, *Gravity, *StatusAnimation,*AnimationTimeLine,*ImputTimer);
+	   AttackPlayer(*Jump, *Transform, *Speed, *Collider, *Gravity, *StatusAnimation, *AnimationTimeLine,*ImputTimer);
        TracerCollide(*Collider, *Transform, *Jump);
        ProcessGravity(*Jump, *Transform, *Gravity);
     }

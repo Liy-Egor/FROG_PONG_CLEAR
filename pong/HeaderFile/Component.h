@@ -59,7 +59,17 @@ struct CStatusAnimation
 	string PatternAnim = "no pattern";
 };
 
-//Ñharacter Components
+struct CImputTimer
+{
+	int OrderBehavior = 0;
+	int KeySpace = 0;
+	int KeyLButton = 0;
+	int KeyRButton = 0;
+	int KeyE = 0;
+	int KeyF = 0;
+};
+
+//Character Components
 struct CHealth
 {
     int Health = 100, MaxHealth = 100;
@@ -117,8 +127,6 @@ struct CJump
     float Jump = 60;
     bool InJumpBot = false;
     bool InJump = false;
-	int TimerKeySpace = 0;
-	bool InSpaceKey = false;
 };
 
 struct CPortalPath
