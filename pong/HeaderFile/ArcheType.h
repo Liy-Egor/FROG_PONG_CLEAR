@@ -10,7 +10,7 @@ void ProcessGravity(CJump& CJump, CTransform& Transform, CGravity& Gravity);
 void ProcessSound(CSound& CSound);
 void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation,CAnimationTimeLine& TimeLine, CImputTimer& ImputTimer);
 void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation);
-void AttackPlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation, CAnimationTimeLine& TimeLine, CImputTimer& ImputTimer);
+void ActivityPlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation, CAnimationTimeLine& TimeLine, CImputTimer& ImputTimer);
 void AddCharacterModifier(
     CHealth& CHealth, CDefense& CDefense, CDamage& CDamage, CSpeed& CSpeed, CSpecialization& CSpecialization,
     CGender& CGender, CStatusBehavior& CStatusBehavior, CTypeCharacter& CTypeCharacter, CNameCharacter& CNameCharacter, CRank& CRank,
@@ -218,7 +218,7 @@ public:
     void Start()
     {      
        MovePlayer(*Jump, *Transform, *Speed, *Collider, *Gravity, *StatusAnimation,*AnimationTimeLine,*ImputTimer);
-	   AttackPlayer(*Jump, *Transform, *Speed, *Collider, *Gravity, *StatusAnimation, *AnimationTimeLine,*ImputTimer);
+	   ActivityPlayer(*Jump, *Transform, *Speed, *Collider, *Gravity, *StatusAnimation, *AnimationTimeLine,*ImputTimer);
        TracerCollide(*Collider, *Transform, *Jump);
        ProcessGravity(*Jump, *Transform, *Gravity);
     }

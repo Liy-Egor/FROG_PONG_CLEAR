@@ -24,7 +24,7 @@ enum StatusAnimate
 	SWORD,
 	RUN,
 	ATTACK,
-
+	HEAL,
 
 
 

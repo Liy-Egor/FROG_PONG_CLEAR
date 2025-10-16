@@ -185,6 +185,10 @@ void LoadAnimationFiles(const string PathFile)
 		{
 			animations.CollectionAnimation[(int)StatusAnimate::ATTACK - 1].push_back(FileName);
 		}
+		else if (!FileName.find("heal"))
+		{
+			animations.CollectionAnimation[(int)StatusAnimate::HEAL - 1].push_back(FileName);
+		}
 	}
 }
 

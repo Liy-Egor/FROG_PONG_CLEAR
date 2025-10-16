@@ -1,3 +1,9 @@
+~playerhealing
+<start>
+heal3player
+idle3player
+<end>
+
 ~playerswordmega
 <start>
 swordmega3player

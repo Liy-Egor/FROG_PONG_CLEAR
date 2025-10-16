@@ -139,9 +139,9 @@ void SingleTapInput(int KeyInput, int& ImputTimer)
 
 
 
-void AttackPlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation, CAnimationTimeLine& TimeLine, CImputTimer& ImputTimer)
+void ActivityPlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation, CAnimationTimeLine& TimeLine, CImputTimer& ImputTimer)
 {
-	if (GetAsyncKeyState(VK_LBUTTON)&& ImputTimer.KeyLButton <= 0)
+	if (GetAsyncKeyState(VK_LBUTTON) && ImputTimer.KeyLButton <= 0)
 	{
 		StatusAnimation.StatusAnim = StatusAnimate::SWORD;
 
@@ -168,20 +168,36 @@ void AttackPlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider
 		}
 	}
 
-	SingleTapInput(VK_LBUTTON, ImputTimer.KeyLButton); /// команда которая не дает зажимать кнопку
+	if (GetAsyncKeyState('F') && CCollider.CollYfound && ImputTimer.KeyF <= 0)
+	{
+		StatusAnimation.StatusAnim = StatusAnimate::HEAL;
+		StatusAnimation.PatternAnim = "~playerhealing";
+		ImputTimer.OrderBehavior = 347;
+	}
+
+
+
+
+
+	/// команда которая не дает зажимать кнопку
+	SingleTapInput('F', ImputTimer.KeyF); 
+	SingleTapInput(VK_LBUTTON, ImputTimer.KeyLButton);
 }
 
 void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation, CAnimationTimeLine& TimeLine, CImputTimer& ImputTimer)
 {		
 		/// остановка процесса движения если мы бъем
-		if (StatusAnimation.PatternAnim == "~playersword360" || StatusAnimation.PatternAnim == "~playerswordhorizont" || StatusAnimation.PatternAnim == "~playerswordmega")
+		if (StatusAnimation.PatternAnim == "~playersword360" || 
+			StatusAnimation.PatternAnim == "~playerswordhorizont" || 
+			StatusAnimation.PatternAnim == "~playerswordmega" || 
+			StatusAnimation.PatternAnim == "~playerhealing")
 		{
-			if (GetAsyncKeyState(0x41) && !CCollider.CollYfound) /// A
+			if (GetAsyncKeyState('A') && !CCollider.CollYfound) /// A
 			{
 				StatusAnimation.Mirror = -1;
 				Transform.Dx = -CSpeed.SpeedWalk;
 			}
-			else if (GetAsyncKeyState(0x44) && !CCollider.CollYfound) /// D
+			else if (GetAsyncKeyState('D') && !CCollider.CollYfound) /// D
 			{
 				StatusAnimation.Mirror = 1;
 				Transform.Dx = CSpeed.SpeedWalk;
@@ -206,16 +222,16 @@ void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& 
 		SingleTapInput(VK_SPACE, ImputTimer.KeySpace); /// команда которая не дает зажимать кнопку
 
 			/// бежим или идем
-		if (GetAsyncKeyState(0x41) || GetAsyncKeyState(0x44))
+		if (GetAsyncKeyState('A') || GetAsyncKeyState('D'))
 		{
 					string temp;
-				if (GetAsyncKeyState(0x41)) /// A
+					if (GetAsyncKeyState('A'))
 					{
 						StatusAnimation.Mirror = -1;
 						Transform.Dx = -CSpeed.SpeedWalk;
 						temp = "~playerwalkL";
 					}
-				else if (GetAsyncKeyState(0x44)) /// D
+				else if (GetAsyncKeyState('D'))
 					{
 						StatusAnimation.Mirror = 1;
 						Transform.Dx = CSpeed.SpeedWalk;
@@ -463,7 +479,7 @@ void AppGame::Render()
 			for (ATEnemy var : VLocation[i].VEnemy)
 			{
 
-				d3dx.DrawObject(
+			/*	d3dx.DrawObject(
 					var.GetPosition()->x, var.GetPosition()->y, 1,
 					var.GetPosition()->Width, var.GetPosition()->Height,
 					0,
@@ -471,7 +487,7 @@ void AppGame::Render()
 					ENEMY"Enemy_static_Test",
 					var.GetNameObj()->Name,
 					StatusAnimate::DEFAULT
-				);
+				);*/
 
 				d3dx.SetAnimetionTimeLine(var.GetTimeLine()->TimeLineIt, var.GetTimeLine()->TimeLineName, var.GetStatusAnimation()->Mirror, var.GetStatusAnimation()->PatternAnim);
 				d3dx.DrawObject(
@@ -531,7 +547,7 @@ void AppGame::Render()
 				var.GoEvent();
 			}
 
-			d3dx.DrawObject(
+			/*d3dx.DrawObject(
 				Player->GetPosition()->x, Player->GetPosition()->y, 1,
 				Player->GetPosition()->Width, Player->GetPosition()->Height,
 				0,
@@ -539,7 +555,7 @@ void AppGame::Render()
 				PLAYER"Player_static_Test",
 				Player->GetNameObj()->Name,
 				StatusAnimate::DEFAULT
-			);
+			);*/
 
 			d3dx.SetAnimetionTimeLine(Player->GetTimeLine()->TimeLineIt, Player->GetTimeLine()->TimeLineName, Player->GetStatusAnimation()->Mirror, Player->GetStatusAnimation()->PatternAnim);
 			d3dx.DrawObject(
