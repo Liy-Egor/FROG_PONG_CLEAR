@@ -82,7 +82,10 @@ public:
 	{
 		return chrono::duration<float>(chrono::steady_clock::now() - Begin).count();
 	}
-
+	void Reset()
+	{
+		Begin = chrono::steady_clock::now();
+	}
 private:
 	chrono::steady_clock::time_point Begin;
 }Timer;

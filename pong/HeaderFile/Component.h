@@ -2,6 +2,14 @@
 #include"PrimaryProcess.h"
 #include"GraphicManager.h"
 
+enum ActionState
+{
+	PATROLLING,
+	CHASING,
+	COMBAT,
+	DETECTED
+};
+
 namespace ECC
 {
   
@@ -31,8 +39,20 @@ struct CCollider
 {
    int LastTracePlatformNum = -1;
    int Direction = 1;
-   bool CollXfound ;
-   bool CollYfound ;
+   bool CollXfound;
+   bool CollYfound;
+   int DirectionCollide;
+};
+
+struct CAction
+{
+	float DetectionRange = 150;
+	float AttackRange = 50;
+};
+
+struct CActionState
+{
+	ActionState State = ActionState::PATROLLING;
 };
 
 struct CNameObject

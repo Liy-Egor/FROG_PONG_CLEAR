@@ -9,7 +9,7 @@ void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump);
 void ProcessGravity(CJump& CJump, CTransform& Transform, CGravity& Gravity);
 void ProcessSound(CSound& CSound);
 void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation,CAnimationTimeLine& TimeLine, CImputTimer& ImputTimer);
-void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation);
+void MoveCharacter(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation,CActionState& ActionState, CAction& Action, ChronoTimer& DetectionTimer);
 void ActivityPlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation, CAnimationTimeLine& TimeLine, CImputTimer& ImputTimer);
 void AddCharacterModifier(
     CHealth& CHealth, CDefense& CDefense, CDamage& CDamage, CSpeed& CSpeed, CSpecialization& CSpecialization,
@@ -192,6 +192,8 @@ private:
 	CGender* Gender = ECS.SetComponent<CGender>(Entity);
 	CSpecialization* Specialization = ECS.SetComponent<CSpecialization>(Entity);
 	CRank* Rank = ECS.SetComponent<CRank>(Entity);
+	CActionState* ActionState = ECS.SetComponent<CActionState>(Entity);
+	CAction* Action = ECS.SetComponent<CAction>(Entity);
 public:
 	ATEnemy(string NameFile, float arr[], TypeObject TypeRend) : BasePerson(NameFile, arr, TypeRend)
 	{
@@ -201,7 +203,7 @@ public:
 	}
 	void Start()
 	{
-		MoveCharacter(*Jump, *Transform, *Speed, *Collider, *Gravity, *StatusAnimation);
+		MoveCharacter(*Jump, *Transform, *Speed, *Collider, *Gravity, *StatusAnimation, *ActionState, *Action, Timer);
 		TracerCollide(*Collider, *Transform, *Jump);
 		ProcessGravity(*Jump, *Transform, *Gravity);
 	}

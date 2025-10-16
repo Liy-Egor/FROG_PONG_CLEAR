@@ -54,7 +54,6 @@ void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump)
             };
             float pixel_x = Bbox[k * 2];
             float pixel_y = Bbox[k * 2 + 1];
-            SetPixel(window.context, (pixel_x - player_view.x) * 2 + window.width / 2, (pixel_y - player_view.y) * 2 + window.height / 2, RGB(255, 255, 255));
 
             auto walls = VLocation[Player->GetLocation()].VWall[j].GetPosition();
             if ((pixel_x >= walls->x &&
@@ -80,10 +79,12 @@ void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump)
                     if (left < right)
                     {
                         Transform.x = walls->x - Transform.Width - 1;
+						CCollider.DirectionCollide = -1;
                     }
                     else
                     {
                         Transform.x = walls->x + walls->Width + 1;
+						CCollider.DirectionCollide = 1;
                     }
 
                     j++;
@@ -137,7 +138,26 @@ void SingleTapInput(int KeyInput, int& ImputTimer)
 	}
 }
 
+bool IsPlayerInRange(CTransform& enemyTransform, float range)
+{
+	CTransform* playerTransform = Player->GetPosition();
+	float enemyCenterX = enemyTransform.x + enemyTransform.Width / 2;
+	float enemyCenterY = enemyTransform.y + enemyTransform.Height / 2;
 
+	float playerCenterX = playerTransform->x + playerTransform->Width / 2;
+	float playerCenterY = playerTransform->y + playerTransform->Height / 2;
+
+	float dx = playerCenterX - enemyCenterX;
+	float dy = playerCenterY - enemyCenterY;
+	float distance = sqrt(dx * dx + dy * dy);
+	return distance <= range;
+}
+
+void Attack(CTransform& Transform, CStatusAnimation& StatusAnimation)
+{
+	StatusAnimation.StatusAnim = StatusAnimate::ATTACK;
+	StatusAnimation.PatternAnim = "no pattern";
+}
 
 void ActivityPlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation, CAnimationTimeLine& TimeLine, CImputTimer& ImputTimer)
 {
@@ -309,39 +329,183 @@ void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& 
 		}
 		}
 }
-void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation)
-{
-        CSpeed.SpeedWalk = 6;
+//void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation, CActionState& ActionState, CAction& Action, ChronoTimer& DetectionTimer)
+//{
+//        CSpeed.SpeedWalk = 6;
+//
+//        for (int i = 0; i < VLocation.size(); i++)
+//        {
+//            if (Player->GetLocation() == i)
+//            {
+//                for (int j = 0; j < VLocation[i].VWall.size();j++)
+//                { 
+//                    if (CCollider.LastTracePlatformNum >= 0)
+//                    {
+//                        auto& platform = *VLocation[i].VWall[CCollider.LastTracePlatformNum].GetPosition();
+//                        if (CTransform.x <= platform.x)
+//                        {
+//							StatusAnimation.Mirror = 1;
+//							StatusAnimation.StatusAnim = StatusAnimate::WALK;
+//							StatusAnimation.PatternAnim = "~enemywalkR";
+//                            CCollider.Direction = 1;
+//                        }
+//                        if (CTransform.x + CTransform.Width >= platform.x + platform.Width)
+//                        {
+//							StatusAnimation.Mirror = -1;
+//							StatusAnimation.StatusAnim = StatusAnimate::WALK;
+//							StatusAnimation.PatternAnim = "~enemywalkL";
+//                            CCollider.Direction = -1;
+//                        }
+//                    }
+//                }
+//            }
+//                        CTransform.Dx = CCollider.Direction * CSpeed.SpeedWalk;
+//        }
+//}
 
-        for (int i = 0; i < VLocation.size(); i++)
-        {
-            if (Player->GetLocation() == i)
-            {
-                for (int j = 0; j < VLocation[i].VWall.size();j++)
-                { 
-                    if (CCollider.LastTracePlatformNum >= 0)
-                    {
-                        auto& platform = *VLocation[i].VWall[CCollider.LastTracePlatformNum].GetPosition();
-                        if (CTransform.x <= platform.x)
-                        {
+
+void MoveCharacter(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation,
+	CActionState& ActionState, CAction& Action, ChronoTimer& DetectionTimer)
+{
+	CSpeed.SpeedWalk = 6;
+	CTransform* TPlayer = Player->GetPosition();
+	switch (ActionState.State)
+	{
+	case ActionState::PATROLLING:
+
+		if (IsPlayerInRange(Transform, Action.DetectionRange))
+		{
+			ActionState.State = ActionState::DETECTED;
+			DetectionTimer.Reset();
+		}
+		break;
+	case ActionState::DETECTED:
+
+		if (DetectionTimer.TimePeak() >= 1)
+		{
+			ActionState.State = ActionState::CHASING;
+		}
+		else if (!IsPlayerInRange(Transform, Action.DetectionRange))
+		{
+			ActionState.State = ActionState::PATROLLING;
+		}
+		break;
+
+	case ActionState::CHASING:
+
+		if (IsPlayerInRange(Transform, Action.AttackRange))
+		{
+			ActionState.State = ActionState::COMBAT;
+		}
+		else if (!IsPlayerInRange(Transform, Action.DetectionRange))
+		{
+			ActionState.State = ActionState::PATROLLING;
+		}
+		break;
+
+	case  ActionState::COMBAT:
+		if (!IsPlayerInRange(Transform, Action.AttackRange))
+		{
+			ActionState.State = ActionState::CHASING;
+		}
+		break;
+	}
+
+	switch (ActionState.State)
+	{
+	case ActionState::PATROLLING:
+
+		Transform.Dx = CCollider.Direction * CSpeed.SpeedWalk;
+		for (int i = 0; i < VLocation.size(); i++)
+		{
+			if (Player->GetLocation() == i)
+			{
+				for (int j = 0; j < VLocation[i].VWall.size(); j++)
+				{
+					if (CCollider.LastTracePlatformNum >= 0)
+					{
+						auto& platform = *VLocation[i].VWall[CCollider.LastTracePlatformNum].GetPosition();
+						if (Transform.x <= platform.x || CCollider.DirectionCollide == 1)
+						{
+							StatusAnimation.StatusAnim = StatusAnimate::WALK;
 							StatusAnimation.Mirror = 1;
-							StatusAnimation.StatusAnim = StatusAnimate::WALK;
 							StatusAnimation.PatternAnim = "~enemywalkR";
-                            CCollider.Direction = 1;
-                        }
-                        if (CTransform.x + CTransform.Width >= platform.x + platform.Width)
-                        {
-							StatusAnimation.Mirror = -1;
+							CCollider.Direction = 1;
+						}
+						if (Transform.x + Transform.Width >= platform.x + platform.Width || CCollider.DirectionCollide == -1)
+						{
 							StatusAnimation.StatusAnim = StatusAnimate::WALK;
+							StatusAnimation.Mirror = -1;
 							StatusAnimation.PatternAnim = "~enemywalkL";
-                            CCollider.Direction = -1;
-                        }
-                    }
-                }
-            }
-                        CTransform.Dx = CCollider.Direction * CSpeed.SpeedWalk;
-        }
+							CCollider.Direction = -1;
+						}
+					}
+				}
+			}
+		}
+		break;
+	case ActionState::DETECTED:
+
+		Transform.Dx = 0;
+		if (Transform.x < TPlayer->x) // игрок справа
+		{
+			StatusAnimation.Mirror = 1;
+		}
+		else // игрок слева
+		{
+			StatusAnimation.Mirror = -1;
+		}
+
+		break;
+
+	case ActionState::CHASING:
+
+		if (Transform.x < TPlayer->x) // игрок справа
+		{
+			StatusAnimation.StatusAnim = StatusAnimate::WALK;
+			StatusAnimation.Mirror = 1;
+			StatusAnimation.PatternAnim = "~enemywalkR";
+			CCollider.Direction = 1;
+			Transform.Dx = CCollider.Direction * CSpeed.SpeedWalk;
+		}
+		else if (Transform.x > TPlayer->x) // игрок слева
+		{
+			StatusAnimation.StatusAnim = StatusAnimate::WALK;
+			StatusAnimation.Mirror = -1;
+			StatusAnimation.PatternAnim = "~enemywalkL";
+			CCollider.Direction = -1;
+			Transform.Dx = CCollider.Direction * CSpeed.SpeedWalk;
+		}
+		break;
+
+	case ActionState::COMBAT:
+
+		if (Transform.x < TPlayer->x)
+		{
+			StatusAnimation.Mirror = 1;
+			Transform.Dx = 0;
+			//тут анимация удара
+			if (/*половина анимации && */IsPlayerInRange(Transform, Action.AttackRange))
+			{
+				//не совсем понятно как здесь уменьшить компонент здоровья игрока
+
+			}
+		}
+		else
+		{
+			StatusAnimation.Mirror = -1;
+			Transform.Dx = 0;
+			//тут анимация удара
+			if (/*половина анимации && */IsPlayerInRange(Transform, Action.AttackRange))
+			{
+				//не совсем понятно как здесь уменьшить компонент здоровья игрока
+
+			}
+		}
+		break;
+	}
 }
+
 
 void AddCharacterModifier(
     CHealth& CHealth, CDefense& CDefense, CDamage& CDamage, CSpeed& CSpeed, CSpecialization& CSpecialization,
