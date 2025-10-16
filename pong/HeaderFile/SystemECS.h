@@ -152,11 +152,16 @@ void ActivityPlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollid
 			ImputTimer.OrderBehavior = 100;
 			StatusAnimation.PatternAnim = "~playersword360";
 			
+			//// удары
+
+
+
 		}
 		else if (ImputTimer.OrderBehavior > 0 && ImputTimer.OrderBehavior <= 100)
 		{
 			ImputTimer.OrderBehavior = 300;
 			StatusAnimation.PatternAnim = "~playerswordhorizont";
+			//// удары
 
 
 		}
@@ -164,6 +169,9 @@ void ActivityPlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollid
 		{
 			ImputTimer.OrderBehavior = 0;
 			StatusAnimation.PatternAnim = "~playerswordmega";
+			//// удары
+
+
 
 		}
 	}
@@ -194,7 +202,7 @@ void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& 
 		{
 			if (fullamination == 0)
 				fullamination = TimeLine.TimeLineIt[0] /2;
-
+			//// наносится удар???
 
 
 			if (GetAsyncKeyState('A') && !CCollider.CollYfound) /// A
