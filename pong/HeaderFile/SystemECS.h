@@ -1,6 +1,5 @@
 #pragma once
 #include "GameFileSystem.h"
-
 using namespace ECC;
 
 void LoadTransform(CTransform& CTransform, float arr[])
@@ -250,7 +249,115 @@ void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& 
 //                        
 //        }
 //}
+bool IsPlayerInRange(CTransform& enemyTransform, float range)
+{
+	CTransform* playerTransform = Player->GetPosition();
+	float x = playerTransform->x - enemyTransform.x;
+	float y = playerTransform->y - enemyTransform.y;
+	float distance = sqrt(x * x + y * y);
+	return distance <= range;
+}
 
+void Attack(CTransform& Transform, CStatusAnimation& StatusAnimation)
+{
+	StatusAnimation.StatusAnim = StatusAnimate::ATTACK;
+	StatusAnimation.PatternAnim = "no pattern";
+}
+
+void MoveCharacter(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation,
+	CActionState& ActionState, CAction& Action)
+{
+	CTransform* TPlayer = Player->GetPosition();
+	CSpeed.SpeedWalk = 2;
+
+	if (ActionState.State == ActionState::PATROLLING && IsPlayerInRange(Transform, Action.DetectionRange))
+	{
+		ActionState.State = ActionState::CHASING;
+	}
+	else if (ActionState.State == ActionState::CHASING && IsPlayerInRange(Transform, Action.AttackRange))
+	{
+		ActionState.State = ActionState::COMBAT;
+	}
+	else if (ActionState.State == ActionState::COMBAT && !IsPlayerInRange(Transform, Action.AttackRange))
+	{
+		ActionState.State = ActionState::CHASING;
+	}
+	else if (ActionState.State == ActionState::CHASING && !IsPlayerInRange(Transform, Action.DetectionRange))
+	{
+		ActionState.State = ActionState::PATROLLING;
+	}
+
+	switch (ActionState.State)
+	{
+	case ActionState::PATROLLING:
+
+		Transform.Dx = CCollider.Direction * CSpeed.SpeedWalk;
+		for (int i = 0; i < VLocation.size(); i++)
+		{
+			if (Player->GetLocation() == i)
+			{
+				for (int j = 0; j < VLocation[i].VWall.size(); j++)
+				{
+					if (CCollider.LastTracePlatformNum >= 0)
+					{
+						auto& platform = *VLocation[i].VWall[CCollider.LastTracePlatformNum].GetPosition();
+						if (Transform.x <= platform.x || CCollider.DirectionCollide == 1)
+						{
+							StatusAnimation.StatusAnim = StatusAnimate::WALK;
+							StatusAnimation.Mirror = 1;
+							StatusAnimation.PatternAnim = "no pattern";
+							CCollider.Direction = 1;
+						}
+						if (Transform.x + Transform.Width >= platform.x + platform.Width || CCollider.DirectionCollide == -1)
+						{
+							StatusAnimation.StatusAnim = StatusAnimate::WALK;
+							StatusAnimation.Mirror = -1;
+							StatusAnimation.PatternAnim = "no pattern";
+							CCollider.Direction = -1;
+						}
+					}
+				}
+			}
+		}
+		break;
+
+	case ActionState::CHASING:
+
+	    if (Transform.x < TPlayer->x) // игрок справа
+	    {
+	    	StatusAnimation.StatusAnim = StatusAnimate::WALK;
+	    	StatusAnimation.Mirror = 1;
+	    	StatusAnimation.PatternAnim = "no pattern";
+	    	CCollider.Direction = 1;
+	    	Transform.Dx = CCollider.Direction * CSpeed.SpeedWalk;
+	    }
+	    else if (Transform.x > TPlayer->x) // игрок слева
+	    {
+	    	StatusAnimation.StatusAnim = StatusAnimate::WALK;
+	    	StatusAnimation.Mirror = -1;
+	    	StatusAnimation.PatternAnim = "no pattern";
+	    	CCollider.Direction = -1;
+	    	Transform.Dx = CCollider.Direction * CSpeed.SpeedWalk;
+	    }
+		
+		break;
+
+	case ActionState::COMBAT:
+
+		Transform.Dx = 0;
+
+		if (Transform.x < TPlayer->x)
+		{
+			StatusAnimation.Mirror = 1;
+		}
+		else
+		{
+			StatusAnimation.Mirror = -1;
+		}
+
+		break;
+	}
+}
 void AddCharacterModifier(
     CHealth& CHealth, CDefense& CDefense, CDamage& CDamage, CSpeed& CSpeed, CSpecialization& CSpecialization,
     CGender& CGender, CStatusBehavior& CStatusBehavior, CTypeCharacter& CTypeCharacter, CNameCharacter& CNameCharacter, CRank& CRank,
