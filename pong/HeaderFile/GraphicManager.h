@@ -3,7 +3,6 @@
 
 using namespace DirectX;
 using namespace Microsoft::WRL;
-
 enum TypeObject
 {
 	BOX2DTEX,

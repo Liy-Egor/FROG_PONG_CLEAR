@@ -1,7 +1,12 @@
 #pragma once
 #include"PrimaryProcess.h"
 #include"GraphicManager.h"
-
+enum ActionState
+{
+	PATROLLING,
+	CHASING,
+	COMBAT
+};
 namespace ECC
 {
   
@@ -49,6 +54,17 @@ struct CAnimationTimeLine
 {
 	vector<int> TimeLineIt;
 	vector<string> TimeLineName;
+};
+
+struct CActionState
+{
+	ActionState State = ActionState::CHASING;
+};
+
+struct CAction
+{
+	float DetectionRange = 100;
+	float AttackRange = 30;
 };
 
 struct CStatusAnimation

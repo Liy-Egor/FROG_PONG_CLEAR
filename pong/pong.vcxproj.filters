@@ -71,6 +71,9 @@
     <ClInclude Include="HeaderFile\APPGame.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="EnemyAction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\2DTEX\TexVertexShader.hlsl">

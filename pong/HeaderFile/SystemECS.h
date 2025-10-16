@@ -28,22 +28,22 @@ bool CheckCollision(float x1, float y1, float w1, float h1,
         y1 + h1 > y2;
 }
 
-bool FoundPlayer(CTransform& TEnemy)
-{
-	CTransform* TPlayer = Player->GetPosition();;
-	int x1 = TEnemy.x;
-	int y1 = TEnemy.y;
-	int w1 = TEnemy.Width + 200;
-	int h1 = TEnemy.Height + 10;
-	int x2 = TPlayer->x;
-	int y2 = TPlayer->y;
-	int w2 = TPlayer->Width;
-	int h2 = TPlayer->Height;
-	return x1 < x2 + w2 &&
-		x1 + w1 > x2 &&
-		y1 < y2 + h2 &&
-		y1 + h1 > y2;
-}
+//bool FoundPlayer(CTransform& TEnemy)
+//{
+//	CTransform* TPlayer = Player->GetPosition();;
+//	int x1 = TEnemy.x;
+//	int y1 = TEnemy.y;
+//	int w1 = TEnemy.Width + 200;
+//	int h1 = TEnemy.Height + 10;
+//	int x2 = TPlayer->x;
+//	int y2 = TPlayer->y;
+//	int w2 = TPlayer->Width;
+//	int h2 = TPlayer->Height;
+//	return x1 < x2 + w2 &&
+//		x1 + w1 > x2 &&
+//		y1 < y2 + h2 &&
+//		y1 + h1 > y2;
+//}
 
 void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump)
 {
@@ -71,7 +71,7 @@ void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump)
             };
             float pixel_x = Bbox[k * 2];
             float pixel_y = Bbox[k * 2 + 1];
-            SetPixel(window.context, (pixel_x - player_view.x) * 2 + window.width / 2, (pixel_y - player_view.y) * 2 + window.height / 2, RGB(255, 255, 255));
+            SetPixel(window.context, (pixel_x - player_view.x) * 2 + window.width / 2., (pixel_y - player_view.y) * 2 + window.height / 2., RGB(255, 255, 255));
 
             auto walls = VLocation[Player->GetLocation()].VWall[j].GetPosition();
             if ((pixel_x >= walls->x &&
@@ -187,8 +187,8 @@ void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& 
         CJump.InJump = true;
     }
 
-    float cameraHalfWidth = (window.width / 2) / Transform.Scale;
-    float cameraHalfHeight = (window.height / 2) / Transform.Scale;
+    float cameraHalfWidth = (window.width / 2.) / Transform.Scale;
+    float cameraHalfHeight = (window.height / 2.) / Transform.Scale;
 
     float targetX = Transform.x;
     float targetY = Transform.y;
@@ -202,54 +202,54 @@ void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& 
     player_view.y = lerp(player_view.y, targetY, 0.1f);
 }
 
-void MoveCharacter(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation)
-{
-	    CTransform* TPlayer = Player->GetPosition();
-        CSpeed.SpeedWalk = 2;
-		Transform.Dx = CCollider.Direction * CSpeed.SpeedWalk;
-        for (int i = 0; i < VLocation.size(); i++)
-        {
-            if (Player->GetLocation() == i)
-            {
-                for (int j = 0; j < VLocation[i].VWall.size();j++)
-                { 
-                    if (CCollider.LastTracePlatformNum >= 0)
-                    {
-                        auto& platform = *VLocation[i].VWall[CCollider.LastTracePlatformNum].GetPosition();
-                        if (Transform.x <= platform.x || CCollider.DirectionCollide == 1)
-                        {
-							StatusAnimation.StatusAnim = StatusAnimate::WALK;
-							StatusAnimation.Mirror = 1;
-							StatusAnimation.PatternAnim = "no pattern";
-                            CCollider.Direction = 1;
-                        }
-                        if (Transform.x + Transform.Width >= platform.x + platform.Width || CCollider.DirectionCollide == -1)
-                        {
-							StatusAnimation.StatusAnim = StatusAnimate::WALK;
-							StatusAnimation.Mirror = -1;
-							StatusAnimation.PatternAnim = "no pattern";
-                            CCollider.Direction = -1;
-                        }
-						if (FoundPlayer(Transform) && Transform.x <= TPlayer->x)
-						{
-							StatusAnimation.StatusAnim = StatusAnimate::WALK;
-							StatusAnimation.Mirror = 1;
-							StatusAnimation.PatternAnim = "no pattern";
-							CCollider.Direction = 1;
-						}
-						if (FoundPlayer(Transform) && Transform.x >= TPlayer->x)
-						{
-							StatusAnimation.StatusAnim = StatusAnimate::WALK;
-							StatusAnimation.Mirror = -1;
-							StatusAnimation.PatternAnim = "no pattern";
-							CCollider.Direction = -1;
-						}
-                    }
-                }
-            }
-                        
-        }
-}
+//void MoveCharacter(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation)
+//{
+//	    CTransform* TPlayer = Player->GetPosition();
+//        CSpeed.SpeedWalk = 2;
+//		Transform.Dx = CCollider.Direction * CSpeed.SpeedWalk;
+//        for (int i = 0; i < VLocation.size(); i++)
+//        {
+//            if (Player->GetLocation() == i)
+//            {
+//                for (int j = 0; j < VLocation[i].VWall.size();j++)
+//                { 
+//                    if (CCollider.LastTracePlatformNum >= 0)
+//                    {
+//                        auto& platform = *VLocation[i].VWall[CCollider.LastTracePlatformNum].GetPosition();
+//                        if (Transform.x <= platform.x || CCollider.DirectionCollide == 1)
+//                        {
+//							StatusAnimation.StatusAnim = StatusAnimate::WALK;
+//							StatusAnimation.Mirror = 1;
+//							StatusAnimation.PatternAnim = "no pattern";
+//                            CCollider.Direction = 1;
+//                        }
+//                        if (Transform.x + Transform.Width >= platform.x + platform.Width || CCollider.DirectionCollide == -1)
+//                        {
+//							StatusAnimation.StatusAnim = StatusAnimate::WALK;
+//							StatusAnimation.Mirror = -1;
+//							StatusAnimation.PatternAnim = "no pattern";
+//                            CCollider.Direction = -1;
+//                        }
+//						if (FoundPlayer(Transform) && Transform.x <= TPlayer->x)
+//						{
+//							StatusAnimation.StatusAnim = StatusAnimate::WALK;
+//							StatusAnimation.Mirror = 1;
+//							StatusAnimation.PatternAnim = "no pattern";
+//							CCollider.Direction = 1;
+//						}
+//						if (FoundPlayer(Transform) && Transform.x >= TPlayer->x)
+//						{
+//							StatusAnimation.StatusAnim = StatusAnimate::WALK;
+//							StatusAnimation.Mirror = -1;
+//							StatusAnimation.PatternAnim = "no pattern";
+//							CCollider.Direction = -1;
+//						}
+//                    }
+//                }
+//            }
+//                        
+//        }
+//}
 
 void AddCharacterModifier(
     CHealth& CHealth, CDefense& CDefense, CDamage& CDamage, CSpeed& CSpeed, CSpecialization& CSpecialization,

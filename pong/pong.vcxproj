@@ -271,6 +271,7 @@
     <Media Include="..\Debug\music.mp3" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="EnemyAction.h" />
     <ClInclude Include="HeaderFile\APPGame.h" />
     <ClInclude Include="HeaderFile\ArcheType.h" />
     <ClInclude Include="HeaderFile\BaseStructures.h" />
