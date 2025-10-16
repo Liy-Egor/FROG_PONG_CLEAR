@@ -276,8 +276,6 @@ void MoveCharacter(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollide
 		{
 			ActionState.State = ActionState::DETECTED;
 			DetectionTimer.Reset();
-		    Transform.Dx = 0;
-			
 		}
 		break;
 	case ActionState::DETECTED:
@@ -381,8 +379,8 @@ void MoveCharacter(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollide
 
 	case ActionState::COMBAT:
 
-		CCollider.Direction = 0;
-		Transform.y += 10;
+		//CCollider.Direction = 0;
+		//Transform.y += 10;
 		if (Transform.x < TPlayer->x)
 		{
 			StatusAnimation.Mirror = 1;

@@ -64,8 +64,8 @@ struct CActionState
 
 struct CAction
 {
-	float DetectionRange = 100;
-	float AttackRange = 30;
+	float DetectionRange = 150;
+	float AttackRange = 50;
 };
 
 struct CStatusAnimation
