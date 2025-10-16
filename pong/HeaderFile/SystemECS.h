@@ -265,26 +265,51 @@ void Attack(CTransform& Transform, CStatusAnimation& StatusAnimation)
 }
 
 void MoveCharacter(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation,
-	CActionState& ActionState, CAction& Action)
+	CActionState& ActionState, CAction& Action, ChronoTimer& DetectionTimer)
 {
 	CTransform* TPlayer = Player->GetPosition();
-	CSpeed.SpeedWalk = 2;
+	switch (ActionState.State)
+	{
+	case ActionState::PATROLLING:
 
-	if (ActionState.State == ActionState::PATROLLING && IsPlayerInRange(Transform, Action.DetectionRange))
-	{
-		ActionState.State = ActionState::CHASING;
-	}
-	else if (ActionState.State == ActionState::CHASING && IsPlayerInRange(Transform, Action.AttackRange))
-	{
-		ActionState.State = ActionState::COMBAT;
-	}
-	else if (ActionState.State == ActionState::COMBAT && !IsPlayerInRange(Transform, Action.AttackRange))
-	{
-		ActionState.State = ActionState::CHASING;
-	}
-	else if (ActionState.State == ActionState::CHASING && !IsPlayerInRange(Transform, Action.DetectionRange))
-	{
-		ActionState.State = ActionState::PATROLLING;
+		if (IsPlayerInRange(Transform, Action.DetectionRange))
+		{
+			ActionState.State = ActionState::DETECTED;
+			DetectionTimer.Reset();
+		    Transform.Dx = 0;
+			
+		}
+		break;
+	case ActionState::DETECTED:
+
+		if (DetectionTimer.TimePeak() >= 1)
+		{
+			ActionState.State = ActionState::CHASING;
+		}
+		else if (!IsPlayerInRange(Transform, Action.DetectionRange))
+		{
+			ActionState.State = ActionState::PATROLLING;
+		}
+		break;
+
+	case ActionState::CHASING:
+
+		if (IsPlayerInRange(Transform, Action.AttackRange))
+		{
+			ActionState.State = ActionState::COMBAT;
+		}
+		else if (!IsPlayerInRange(Transform, Action.DetectionRange))
+		{
+			ActionState.State = ActionState::PATROLLING;
+		}
+		break;
+
+	case  ActionState::COMBAT:
+		if (!IsPlayerInRange(Transform, Action.AttackRange))
+		{
+			ActionState.State = ActionState::CHASING;
+		}
+		break;
 	}
 
 	switch (ActionState.State)
@@ -320,6 +345,19 @@ void MoveCharacter(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollide
 			}
 		}
 		break;
+	case ActionState::DETECTED:
+
+		Transform.Dx = 0;
+		if (Transform.x < TPlayer->x) // игрок справа
+		{
+			StatusAnimation.Mirror = 1;
+		}
+		else // игрок слева
+		{
+			StatusAnimation.Mirror = -1;
+		}
+		
+		break;
 
 	case ActionState::CHASING:
 
@@ -339,13 +377,12 @@ void MoveCharacter(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollide
 	    	CCollider.Direction = -1;
 	    	Transform.Dx = CCollider.Direction * CSpeed.SpeedWalk;
 	    }
-		
 		break;
 
 	case ActionState::COMBAT:
 
-		Transform.Dx = 0;
-
+		CCollider.Direction = 0;
+		Transform.y += 10;
 		if (Transform.x < TPlayer->x)
 		{
 			StatusAnimation.Mirror = 1;

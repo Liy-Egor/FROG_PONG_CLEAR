@@ -5,7 +5,8 @@ enum ActionState
 {
 	PATROLLING,
 	CHASING,
-	COMBAT
+	COMBAT,
+	DETECTED
 };
 namespace ECC
 {
@@ -58,7 +59,7 @@ struct CAnimationTimeLine
 
 struct CActionState
 {
-	ActionState State = ActionState::CHASING;
+	ActionState State = ActionState::PATROLLING;
 };
 
 struct CAction
@@ -94,7 +95,7 @@ struct CDefense
 
 struct CSpeed
 {
-    int SpeedAttack = 10, SpeedWalk = 15;
+    int SpeedAttack = 10, SpeedWalk = 1;
 };
 
 struct CRank
