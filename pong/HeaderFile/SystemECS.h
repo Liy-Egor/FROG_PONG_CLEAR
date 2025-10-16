@@ -252,9 +252,15 @@ void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& 
 bool IsPlayerInRange(CTransform& enemyTransform, float range)
 {
 	CTransform* playerTransform = Player->GetPosition();
-	float x = playerTransform->x - enemyTransform.x;
-	float y = playerTransform->y - enemyTransform.y;
-	float distance = sqrt(x * x + y * y);
+	float enemyCenterX = enemyTransform.x + enemyTransform.Width / 2;
+	float enemyCenterY = enemyTransform.y + enemyTransform.Height / 2;
+
+	float playerCenterX = playerTransform->x + playerTransform->Width / 2;
+	float playerCenterY = playerTransform->y + playerTransform->Height / 2;
+
+	float dx = playerCenterX - enemyCenterX;
+	float dy = playerCenterY - enemyCenterY;
+	float distance = sqrt(dx * dx + dy * dy);
 	return distance <= range;
 }
 
@@ -379,17 +385,28 @@ void MoveCharacter(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollide
 
 	case ActionState::COMBAT:
 
-		//CCollider.Direction = 0;
-		//Transform.y += 10;
 		if (Transform.x < TPlayer->x)
 		{
 			StatusAnimation.Mirror = 1;
+			Transform.Dx = 0;
+			//тут анимация удара
+			if (/*половина анимации && */IsPlayerInRange(Transform, Action.AttackRange))
+			{
+				//не совсем понятно как здесь уменьшить компонент здоровья игрока
+
+			}
 		}
 		else
 		{
 			StatusAnimation.Mirror = -1;
-		}
+			Transform.Dx = 0;
+			//тут анимация удара
+			if (/*половина анимации && */IsPlayerInRange(Transform, Action.AttackRange))
+			{
+				//не совсем понятно как здесь уменьшить компонент здоровья игрока
 
+			}
+		}
 		break;
 	}
 }
