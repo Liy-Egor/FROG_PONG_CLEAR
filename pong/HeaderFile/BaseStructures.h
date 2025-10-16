@@ -67,6 +67,7 @@ struct
 
 int MapSizeW = window.width;
 int MapSizeH = window.height;
+int fullamination = 0;
 
 bool PlayerPlay = false;
 
