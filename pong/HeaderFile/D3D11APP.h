@@ -303,7 +303,9 @@ private:
 		const wchar_t* PSNameFilecso = L"";
 		if (TypeObject::BOX2DTEX == typeOBJ || 
 			TypeObject::BOX2DTEXSEEMLESS == typeOBJ ||
-			TypeObject::BOX2DTEXSEEMLESS_LMR == typeOBJ
+			TypeObject::BOX2DTEXSEEMLESS_LMR == typeOBJ ||
+			TypeObject::UI == typeOBJ ||
+			TypeObject::UIX == typeOBJ
 			)
 		{
 			VSNameFilecso = SHTEX"TexVertexShader.cso";
@@ -422,7 +424,7 @@ void GraphicEngine::DrawObject(float x, float y, float z,float width, float heig
 		}
 
 	
-		if (typeOBJ == TypeObject::BOX2DTEX || typeOBJ == TypeObject::BOX2DTEXSEEMLESS)
+		if (typeOBJ == TypeObject::BOX2DTEX || typeOBJ == TypeObject::BOX2DTEXSEEMLESS || typeOBJ == TypeObject::UI || typeOBJ == TypeObject::UIX)
 		{
 			Iterators = 1;
 		}

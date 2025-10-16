@@ -151,8 +151,6 @@ void AttackPlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider
 			StatusAnimation.PatternAnim = "~playersword360";
 
 
-
-
 		}
 		else if (ImputTimer.OrderBehavior > 0 && ImputTimer.OrderBehavior <= 100)
 		{
@@ -160,16 +158,11 @@ void AttackPlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider
 			StatusAnimation.PatternAnim = "~playerswordhorizont";
 
 
-
-
 		}
 		else if (ImputTimer.OrderBehavior > 100 && ImputTimer.OrderBehavior <= 300)
 		{
 			ImputTimer.OrderBehavior = 0;
 			StatusAnimation.PatternAnim = "~playerswordmega";
-
-
-
 
 
 		}
@@ -567,9 +560,37 @@ void AppGame::Render()
 		}
 	}
 	
-	d3dx.SetCameraTarget(Player->GetPosition()->x, Player->GetPosition()->y);
+	d3dx.SetCameraTarget(Player->GetPosition()->x, Player->GetPosition()->y); /// камера 
+
+
+	/// ветка git Misha_new_enemy
+	/// отрисовка интерфейса на экране (пример)
+	///******************************************** /// heder file ECS / SystemECS.h
+	/// Отрисовка хил бара (пустой бар)
+	///
+	/// монипулируя этими элементами можно изменять размер интерфейсов или перемещать их
+	int Xui = Player->GetPosition()->x - window.width  / 2; /// верхний левый угол x
+	int Yui = Player->GetPosition()->y - window.height / 2; /// верхний левый угол y
+	int WidthImage = 144 * 3; /// ширина объекта по размеру его картинки
+	int HeightImage = 44 * 3; /// высота объекта по размеру его картинки
+
+	d3dx.DrawObject(
+		Xui + 300,	                ///позиция объекта на экране x (корректируем объект на экране по x)
+		Yui + window.height - 300,	///позиция объекта на экране y (корректируем объект на экране по y)
+		1,		                    /// позиция по Z (всегда ставим 1)
+		WidthImage,	                ///ширина объекта Width
+		HeightImage,			    ///ширина объекта Height
+		0,					        /// поворта объекта по z (всегда ставим 0 потому что нечего поворачивать)
+		UI,					        /// здесь выбираем тип объекта для интерфейса это объекты (UI или UIX) - пока что разницы между ними нету
+		GUI"HealthBar",		        /// здесь указываем нашу картинку которая находится по пути ..\pong\Texture2D\UI   (картинки формата .png)
+		"HealthBar",		        /// здесь можно указать имя объекта (любое осмысленное имя)
+		StatusAnimate::DEFAULT      /// здесь указываем DEFAULT (потому что это не анимация)
+	);
+	///********************************************
+
 	
-	d3dx.Present(true);
+
+	d3dx.Present(true); 
 }
 
 void AppGame::UpdateApp(MSG* msg)

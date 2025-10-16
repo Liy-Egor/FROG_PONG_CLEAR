@@ -259,7 +259,7 @@ public:
 
 	vector<VEC3> GetVectorList(TypeObject typeObject, vector<int>* TimeLineIt, vector<string>* TimeLineName, int Mirror)
 	{
-		 if (typeObject == TypeObject::BOX2DTEX && Status == StatusAnimate::DEFAULT)
+		 if		 (typeObject == TypeObject::BOX2DTEX && Status == StatusAnimate::DEFAULT)
 		{
 			Vectors =
 			{
@@ -270,6 +270,28 @@ public:
 			};
 			return Vectors;
 		}
+		 else if (typeObject == TypeObject::UI && Status == StatusAnimate::DEFAULT)
+		 {
+			 Vectors =
+			 {
+				 { -xLeft,-yBottom,zFront,  0.0f,1.0f },
+				 { -xLeft,yTop,zFront,      0.0f,0.0f },
+				 { xRight,yTop,zFront,      1.0f,0.0f },
+				 { xRight,-yBottom,zFront,  1.0f,1.0f },
+			 };
+			 return Vectors;
+		 }
+		 else if (typeObject == TypeObject::UIX && Status == StatusAnimate::DEFAULT)
+		 {
+			 Vectors =
+			 {
+				 { -xLeft,-yBottom,zFront,  0.0f,1.0f },
+				 { -xLeft,yTop,zFront,      0.0f,0.0f },
+				 { xRight,yTop,zFront,      1.0f,0.0f },
+				 { xRight,-yBottom,zFront,  1.0f,1.0f },
+			 };
+			 return Vectors;
+		 }
 		 else if (typeObject == TypeObject::BOX2DTEXSEEMLESS && Status == StatusAnimate::DEFAULT)
 	   {
 		   float CountSeemX = WidthObject / WidthImage;
@@ -296,15 +318,6 @@ public:
 		   {
 			   if (i == 0)
 			   {
-				   /*  Vectors =
-					 {
-						 { -xLeft,-yBottom,zFront,0.0f,1.0f },
-						 { -xLeft,yTop,zFront,0.0f,0.0f },
-						 { -xRStep1,yTop,zFront,StepX / WidthImage,0.0f },
-						 { -xRStep1,-yBottom,zFront,StepX / WidthImage,1.0f },
-					 };
-					 return Vectors;*/
-
 				   Vectors.push_back({ -xLeft,-yBottom,zFront,0.0f,1.0f });
 				   Vectors.push_back({ -xLeft,yTop,zFront,0.0f,0.0f });
 				   Vectors.push_back({ -xRStep1,yTop,zFront,StepX / WidthImage,0.0f });
@@ -318,15 +331,6 @@ public:
 
 				   float xLStep2 = xRStep1 - offsetL2;
 				   float xRStep2 = xRStep4 - offsetR2;
-
-				   /*Vectors =
-				   {
-					   { -xLStep2,-yBottom,zFront,     StepX / WidthImage,1.0f },
-					   { -xLStep2,yTop,zFront,         StepX / WidthImage,0.0f },
-					   { xRStep2,yTop,zFront,      1 - StepX / WidthImage,0.0f },
-					   { xRStep2,-yBottom,zFront,  1 - StepX / WidthImage,1.0f },
-				   };
-				   return Vectors;*/
 
 				   Vectors.push_back({ -xLStep2,-yBottom,zFront,     StepX / WidthImage,1.0f });
 				   Vectors.push_back({ -xLStep2,yTop,zFront,         StepX / WidthImage,0.0f });
@@ -343,15 +347,6 @@ public:
 				   float ImageWL = 0.5 - (StepX / (WidthImage - StepX * 2));
 				   float ImageWR = 0.5 + (StepX / (WidthImage - StepX * 2));
 
-				   /* Vectors =
-					{
-						{ xLStep3,-yBottom,zFront,     ImageWL,1.0f },
-						{ xLStep3,yTop,zFront,         ImageWL,0.0f },
-						{ xRStep3,yTop,zFront,		  ImageWR,0.0f },
-						{ xRStep3,-yBottom,zFront,     ImageWR,1.0f },
-					};
-					return Vectors;*/
-
 				   Vectors.push_back({ xLStep3,-yBottom,zFront,     ImageWL,1.0f });
 				   Vectors.push_back({ xLStep3,yTop,zFront,         ImageWL,0.0f });
 				   Vectors.push_back({ xRStep3,yTop,zFront,		  ImageWR,0.0f });
@@ -359,15 +354,6 @@ public:
 			   }
 			   else if (i == WidthObject / WidthImage + ((WidthObject / WidthImage)))
 			   {
-				   //Vectors =
-				   //{
-					  // { xRStep4,-yBottom,zFront,				 1 - StepX / WidthImage,1.0f },
-					  // { xRStep4,yTop,zFront,					 1 - StepX / WidthImage,0.0f  },
-					  // { xRight ,				yTop,zFront,	 1.0,0.0f },
-					  // { xRight ,				-yBottom,zFront, 1.0,1.0f },
-				   //};
-				   //return Vectors;
-
 				   Vectors.push_back({ xRStep4,-yBottom,zFront,				 1 - StepX / WidthImage,1.0f });
 				   Vectors.push_back({ xRStep4,yTop,zFront,					 1 - StepX / WidthImage,0.0f });
 				   Vectors.push_back({ xRight ,				yTop,zFront,	 1.0,0.0f });
@@ -424,7 +410,9 @@ public:
 		float PropScreen = (float)window.height / (float)window.width;
 		if (typeObject == TypeObject::BOX2DTEX || 
 			typeObject == TypeObject::BOX2DTEXSEEMLESS ||
-			typeObject == TypeObject::BOX2DTEXSEEMLESS_LMR
+			typeObject == TypeObject::BOX2DTEXSEEMLESS_LMR || 
+			typeObject == TypeObject::UI || 
+			typeObject == TypeObject::UIX
 			)
 		{
 			XMFLOAT3 CameraPos = { CameraPosX,-CameraPosY,-0.5f };
@@ -446,7 +434,7 @@ public:
 
 	vector<unsigned short> GetIndex(TypeObject typeObject)
 	{
-		if (typeObject == TypeObject::BOX2DTEX || typeObject == TypeObject::BOX2DTEXSEEMLESS || typeObject == TypeObject::BOX2DTEXSEEMLESS_LMR)
+		if (typeObject == TypeObject::BOX2DTEX || typeObject == TypeObject::BOX2DTEXSEEMLESS || typeObject == TypeObject::BOX2DTEXSEEMLESS_LMR || typeObject == TypeObject::UI || typeObject == TypeObject::UIX)
 		{
 			Index.clear();
 			for (int i = 0; i < Iterator; i++)
@@ -469,7 +457,9 @@ public:
 		
 		if (typeObject == TypeObject::BOX2DTEX || 
 			typeObject == TypeObject::BOX2DTEXSEEMLESS ||
-			typeObject == TypeObject::BOX2DTEXSEEMLESS_LMR
+			typeObject == TypeObject::BOX2DTEXSEEMLESS_LMR ||
+			typeObject == TypeObject::UI ||
+			typeObject == TypeObject::UIX
 			)
 		{
 			ELEMENT_DESC =
