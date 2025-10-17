@@ -191,6 +191,10 @@ void ActivityPlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollid
 		StatusAnimation.StatusAnim = StatusAnimate::HEAL;
 		StatusAnimation.PatternAnim = "~playerhealing";
 		ImputTimer.OrderBehavior = 347;
+
+		Player->GetHealth()->Health += 25;
+		if (Player->GetHealth()->Health > Player->GetHealth()->MaxHealth)
+			Player->GetHealth()->Health = Player->GetHealth()->MaxHealth;
 	}
 
 	/// команда которая не дает зажимать кнопку
