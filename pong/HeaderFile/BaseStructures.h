@@ -82,12 +82,21 @@ public:
 	{
 		return chrono::duration<float>(chrono::steady_clock::now() - Begin).count();
 	}
+	float TimePeakPlayer()
+	{
+		return chrono::duration<float>(chrono::steady_clock::now() - BeginPlayer).count();
+	}
 	void Reset()
 	{
 		Begin = chrono::steady_clock::now();
 	}
+	void ResetPlayer()
+	{
+		BeginPlayer = chrono::steady_clock::now();
+	}
 private:
 	chrono::steady_clock::time_point Begin;
+	chrono::steady_clock::time_point BeginPlayer;
 }Timer;
 
 static LRESULT CALLBACK WindowProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)

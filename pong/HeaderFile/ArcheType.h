@@ -9,8 +9,8 @@ void TracerCollide(CCollider& CCollider, CTransform& Transform, CJump& CJump);
 void ProcessGravity(CJump& CJump, CTransform& Transform, CGravity& Gravity);
 void ProcessSound(CSound& CSound);
 void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation,CAnimationTimeLine& TimeLine, CImputTimer& ImputTimer);
-void MoveCharacter(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation,CActionState& ActionState, CAction& Action, ChronoTimer& DetectionTimer);
-void ActivityPlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation, CAnimationTimeLine& TimeLine, CImputTimer& ImputTimer);
+void MoveCharacter(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation,CActionState& ActionState, CAction& Action, ChronoTimer& DetectionTimer, CAnimationTimeLine& TimeLine,CDamage& Damage);
+void ActivityPlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation, CAnimationTimeLine& TimeLine, CImputTimer& ImputTimer, ChronoTimer& DetectionTimer);
 void AddCharacterModifier(
     CHealth& CHealth, CDefense& CDefense, CDamage& CDamage, CSpeed& CSpeed, CSpecialization& CSpecialization,
     CGender& CGender, CStatusBehavior& CStatusBehavior, CTypeCharacter& CTypeCharacter, CNameCharacter& CNameCharacter, CRank& CRank,
@@ -195,6 +195,11 @@ private:
 	CActionState* ActionState = ECS.SetComponent<CActionState>(Entity);
 	CAction* Action = ECS.SetComponent<CAction>(Entity);
 public:
+	CAction* GetAction()
+	{
+		return ECS.GetComponent<CAction>(Entity, Action);
+	}
+
 	ATEnemy(string NameFile, float arr[], TypeObject TypeRend) : BasePerson(NameFile, arr, TypeRend)
 	{
 		NameObject->Name = "enemy";
@@ -203,10 +208,18 @@ public:
 	}
 	void Start()
 	{
-		MoveCharacter(*Jump, *Transform, *Speed, *Collider, *Gravity, *StatusAnimation, *ActionState, *Action, Timer);
+		MoveCharacter(*Jump, *Transform, *Speed, *Collider, *Gravity, *StatusAnimation, *ActionState, *Action, Timer,*AnimationTimeLine,*Damage);
 		TracerCollide(*Collider, *Transform, *Jump);
 		ProcessGravity(*Jump, *Transform, *Gravity);
 	}
+
+	~ATEnemy() {
+		if (Health->Health <= 0)
+		{
+			DeleteAT();
+		}
+	};
+
 }*Enemy;
 
 class ATPlayer : public BasePerson
@@ -220,7 +233,7 @@ public:
     void Start()
     {      
        MovePlayer(*Jump, *Transform, *Speed, *Collider, *Gravity, *StatusAnimation,*AnimationTimeLine,*ImputTimer);
-	   ActivityPlayer(*Jump, *Transform, *Speed, *Collider, *Gravity, *StatusAnimation, *AnimationTimeLine,*ImputTimer);
+	   ActivityPlayer(*Jump, *Transform, *Speed, *Collider, *Gravity, *StatusAnimation, *AnimationTimeLine,*ImputTimer,Timer);
        TracerCollide(*Collider, *Transform, *Jump);
        ProcessGravity(*Jump, *Transform, *Gravity);
     }
@@ -235,11 +248,11 @@ public:
     {
         NameObject->Name = "Level";
     }
-    vector<ATWall> VWall;
+    vector<ATWall>		VWall;
     vector<ATHealFlack> VHealFlack;
-    vector<ATSpike> VSpike;
-    vector<ATPortal> VPortal;
-    vector<ATEnemy> VEnemy;
+    vector<ATSpike>		VSpike;
+    vector<ATPortal>	VPortal;
+    vector<ATEnemy>		VEnemy;
 
 }*Location;
 vector<ATLocation> VLocation; 

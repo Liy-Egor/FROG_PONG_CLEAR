@@ -46,8 +46,8 @@ struct CCollider
 
 struct CAction
 {
-	float DetectionRange = 150;
-	float AttackRange = 50;
+	float DetectionRange = 400; /// дистация обнаружения 
+	float AttackRange = 160;	/// дистанция на котором противник или ты можешь нанести урон
 };
 
 struct CActionState
@@ -70,6 +70,8 @@ struct CAnimationTimeLine
 {
 	vector<int> TimeLineIt;
 	vector<string> TimeLineName;
+	int FullFrame1 = 0;
+	int FullFrame2 = 0;
 };
 
 struct CStatusAnimation
@@ -97,7 +99,7 @@ struct CHealth
 
 struct CDamage
 {
-    int Damage = 10;
+    int Damage = 25;
     const char* TypeDamage;
 };
 

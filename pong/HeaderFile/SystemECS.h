@@ -141,7 +141,7 @@ void SingleTapInput(int KeyInput, int& ImputTimer)
 bool IsPlayerInRange(CTransform& enemyTransform, float range)
 {
 	CTransform* playerTransform = Player->GetPosition();
-	float enemyCenterX = enemyTransform.x + enemyTransform.Width / 2;
+	float enemyCenterX = enemyTransform.x + enemyTransform.Width  / 2;
 	float enemyCenterY = enemyTransform.y + enemyTransform.Height / 2;
 
 	float playerCenterX = playerTransform->x + playerTransform->Width / 2;
@@ -153,46 +153,36 @@ bool IsPlayerInRange(CTransform& enemyTransform, float range)
 	return distance <= range;
 }
 
-void Attack(CTransform& Transform, CStatusAnimation& StatusAnimation)
-{
-	StatusAnimation.StatusAnim = StatusAnimate::ATTACK;
-	StatusAnimation.PatternAnim = "no pattern";
-}
-
-void ActivityPlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation, CAnimationTimeLine& TimeLine, CImputTimer& ImputTimer)
+void ActivityPlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation, CAnimationTimeLine& TimeLine, CImputTimer& ImputTimer, ChronoTimer& DetectionTimer)
 {
 
-	
 	if (GetAsyncKeyState(VK_LBUTTON) && ImputTimer.KeyLButton <= 0)
 	{
 		StatusAnimation.StatusAnim = StatusAnimate::SWORD;
 
-		if (ImputTimer.OrderBehavior <= 0)
+		if (ImputTimer.OrderBehavior <= 0 && DetectionTimer.TimePeakPlayer() >= 0.5)
 		{
 			ImputTimer.OrderBehavior = 100;
 			StatusAnimation.PatternAnim = "~playersword360";
-			
 			//// удары
 
-
-
+			DetectionTimer.ResetPlayer();
 		}
-		else if (ImputTimer.OrderBehavior > 0 && ImputTimer.OrderBehavior <= 100)
+		else if (ImputTimer.OrderBehavior > 0 && ImputTimer.OrderBehavior <= 100 && DetectionTimer.TimePeakPlayer() >= 0.5)
 		{
 			ImputTimer.OrderBehavior = 300;
 			StatusAnimation.PatternAnim = "~playerswordhorizont";
 			//// удары
 
-
+			DetectionTimer.ResetPlayer();
 		}
-		else if (ImputTimer.OrderBehavior > 100 && ImputTimer.OrderBehavior <= 300)
+		else if (ImputTimer.OrderBehavior > 100 && ImputTimer.OrderBehavior <= 300 && DetectionTimer.TimePeakPlayer() >= 0.5)
 		{
 			ImputTimer.OrderBehavior = 0;
 			StatusAnimation.PatternAnim = "~playerswordmega";
 			//// удары
 
-
-
+			DetectionTimer.ResetPlayer();
 		}
 	}
 
@@ -202,10 +192,6 @@ void ActivityPlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollid
 		StatusAnimation.PatternAnim = "~playerhealing";
 		ImputTimer.OrderBehavior = 347;
 	}
-
-
-
-
 
 	/// команда которая не дает зажимать кнопку
 	SingleTapInput('F', ImputTimer.KeyF); 
@@ -220,10 +206,39 @@ void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& 
 			StatusAnimation.PatternAnim == "~playerswordmega" || 
 			StatusAnimation.PatternAnim == "~playerhealing")
 		{
-			if (fullamination == 0)
-				fullamination = TimeLine.TimeLineIt[0] /2;
-			//// наносится удар???
+			if (TimeLine.FullFrame1 == 0)
+				TimeLine.FullFrame1 = TimeLine.TimeLineIt[0] / 2;
 
+			if (TimeLine.TimeLineIt[0] == TimeLine.FullFrame1)
+			{
+				if (StatusAnimation.PatternAnim == "~playersword360" || StatusAnimation.PatternAnim == "~playerswordhorizont" || StatusAnimation.PatternAnim == "~playerswordmega")
+				{
+					for (ATEnemy var : VLocation[Player->GetLocation()].VEnemy)
+					{
+						CTransform* enemyTransform = var.GetPosition();
+						if (IsPlayerInRange(*enemyTransform, var.GetAction()->AttackRange))
+						{
+							var.GetHealth()->Health = 0; /// они пока умирают с 1 удара
+
+							if (var.GetHealth()->Health == 0)
+							{
+								for (int i = 0; i < VLocation[Player->GetLocation()].VEnemy.size(); i++)
+								{
+									if (VLocation[Player->GetLocation()].VEnemy[i].GetNameObj()->Number == var.GetNameObj()->Number)
+									{
+										vector<ATEnemy>::iterator it;
+										it = VLocation[Player->GetLocation()].VEnemy.begin() + i;
+										VLocation[Player->GetLocation()].VEnemy.erase(it);
+										break;
+									}
+								}
+							} 
+							/// удаление из списка локаций
+
+						}
+					}
+				}
+			}
 
 			if (GetAsyncKeyState('A') && !CCollider.CollYfound) /// A
 			{
@@ -240,6 +255,7 @@ void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& 
 			{
 				StatusAnimation.StatusAnim = StatusAnimate::IDLE;
 				StatusAnimation.PatternAnim = "no pattern";
+				TimeLine.FullFrame1 = 0;
 			}
 		}
 		else
@@ -329,43 +345,9 @@ void MovePlayer(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& 
 		}
 		}
 }
-//void MoveCharacter(CJump& CJump, CTransform& CTransform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation, CActionState& ActionState, CAction& Action, ChronoTimer& DetectionTimer)
-//{
-//        CSpeed.SpeedWalk = 6;
-//
-//        for (int i = 0; i < VLocation.size(); i++)
-//        {
-//            if (Player->GetLocation() == i)
-//            {
-//                for (int j = 0; j < VLocation[i].VWall.size();j++)
-//                { 
-//                    if (CCollider.LastTracePlatformNum >= 0)
-//                    {
-//                        auto& platform = *VLocation[i].VWall[CCollider.LastTracePlatformNum].GetPosition();
-//                        if (CTransform.x <= platform.x)
-//                        {
-//							StatusAnimation.Mirror = 1;
-//							StatusAnimation.StatusAnim = StatusAnimate::WALK;
-//							StatusAnimation.PatternAnim = "~enemywalkR";
-//                            CCollider.Direction = 1;
-//                        }
-//                        if (CTransform.x + CTransform.Width >= platform.x + platform.Width)
-//                        {
-//							StatusAnimation.Mirror = -1;
-//							StatusAnimation.StatusAnim = StatusAnimate::WALK;
-//							StatusAnimation.PatternAnim = "~enemywalkL";
-//                            CCollider.Direction = -1;
-//                        }
-//                    }
-//                }
-//            }
-//                        CTransform.Dx = CCollider.Direction * CSpeed.SpeedWalk;
-//        }
-//}
-
 
 void MoveCharacter(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollider& CCollider, CGravity& Gravity, CStatusAnimation& StatusAnimation,
-	CActionState& ActionState, CAction& Action, ChronoTimer& DetectionTimer)
+	CActionState& ActionState, CAction& Action, ChronoTimer& DetectionTimer, CAnimationTimeLine& TimeLine, CDamage& Damage)
 {
 	CSpeed.SpeedWalk = 6;
 	CTransform* TPlayer = Player->GetPosition();
@@ -373,7 +355,7 @@ void MoveCharacter(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollide
 	{
 	case ActionState::PATROLLING:
 
-		if (IsPlayerInRange(Transform, Action.DetectionRange))
+		if (IsPlayerInRange(Transform, Action.DetectionRange ))
 		{
 			ActionState.State = ActionState::DETECTED;
 			DetectionTimer.Reset();
@@ -381,7 +363,7 @@ void MoveCharacter(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollide
 		break;
 	case ActionState::DETECTED:
 
-		if (DetectionTimer.TimePeak() >= 1)
+		if (DetectionTimer.TimePeak() >= 0.2)
 		{
 			ActionState.State = ActionState::CHASING;
 		}
@@ -404,9 +386,12 @@ void MoveCharacter(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollide
 		break;
 
 	case  ActionState::COMBAT:
-		if (!IsPlayerInRange(Transform, Action.AttackRange))
+		if (!IsPlayerInRange(Transform, Action.AttackRange + 20)) /// + 20 пикселей фора для игрока (окно когда враг промахивается, но враг не бежит за игроком)
 		{
 			ActionState.State = ActionState::CHASING;
+			StatusAnimation.PatternAnim = "~enemywalkR";
+			TimeLine.FullFrame1 = 0;
+			TimeLine.FullFrame2 = 0;
 		}
 		break;
 	}
@@ -460,7 +445,7 @@ void MoveCharacter(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollide
 
 	case ActionState::CHASING:
 
-		if (Transform.x < TPlayer->x) // игрок справа
+		if (Transform.x < TPlayer->x && StatusAnimation.PatternAnim != "~enemyattack") // игрок справа
 		{
 			StatusAnimation.StatusAnim = StatusAnimate::WALK;
 			StatusAnimation.Mirror = 1;
@@ -468,7 +453,7 @@ void MoveCharacter(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollide
 			CCollider.Direction = 1;
 			Transform.Dx = CCollider.Direction * CSpeed.SpeedWalk;
 		}
-		else if (Transform.x > TPlayer->x) // игрок слева
+		else if (Transform.x > TPlayer->x && StatusAnimation.PatternAnim != "~enemyattack") // игрок слева
 		{
 			StatusAnimation.StatusAnim = StatusAnimate::WALK;
 			StatusAnimation.Mirror = -1;
@@ -484,28 +469,51 @@ void MoveCharacter(CJump& CJump, CTransform& Transform, CSpeed& CSpeed, CCollide
 		{
 			StatusAnimation.Mirror = 1;
 			Transform.Dx = 0;
-			//тут анимация удара
-			if (/*половина анимации && */IsPlayerInRange(Transform, Action.AttackRange))
+			if (TimeLine.TimeLineName[2] != "~enemyattack" && IsPlayerInRange(Transform, Action.AttackRange ))
 			{
-				//не совсем понятно как здесь уменьшить компонент здоровья игрока
+				StatusAnimation.StatusAnim = StatusAnimate::ATTACK;
+				StatusAnimation.PatternAnim = "~enemyattack";
+			}
+			else if (TimeLine.TimeLineName[2] == "~enemyattack" && IsPlayerInRange(Transform, Action.AttackRange ))
+			{
+				if (TimeLine.FullFrame1 == 0)
+				{
+					TimeLine.FullFrame1 = TimeLine.TimeLineIt[0] / 2;
+					TimeLine.FullFrame2 = TimeLine.TimeLineIt[1] / 2;
+				}
 
+				if (TimeLine.FullFrame1 == TimeLine.TimeLineIt[0] || TimeLine.FullFrame2 == TimeLine.TimeLineIt[1])
+				{
+					Player->GetHealth()->Health -= Damage.Damage;
+				}
 			}
 		}
 		else
 		{
 			StatusAnimation.Mirror = -1;
 			Transform.Dx = 0;
-			//тут анимация удара
-			if (/*половина анимации && */IsPlayerInRange(Transform, Action.AttackRange))
+			if (TimeLine.TimeLineName[2] != "~enemyattack" && IsPlayerInRange(Transform, Action.AttackRange ) )
 			{
-				//не совсем понятно как здесь уменьшить компонент здоровья игрока
+				StatusAnimation.StatusAnim = StatusAnimate::ATTACK;
+				StatusAnimation.PatternAnim = "~enemyattack";
+			}
+			else if (TimeLine.TimeLineName[2] == "~enemyattack" && IsPlayerInRange(Transform, Action.AttackRange ))
+			{
+				if (TimeLine.FullFrame1 == 0)
+				{
+					TimeLine.FullFrame1 = TimeLine.TimeLineIt[0] / 2;
+					TimeLine.FullFrame2 = TimeLine.TimeLineIt[1] / 2;
+				}
 
+				if (TimeLine.FullFrame1 == TimeLine.TimeLineIt[0] || TimeLine.FullFrame2 == TimeLine.TimeLineIt[1])
+				{
+					Player->GetHealth()->Health -= Damage.Damage;
+				}
 			}
 		}
 		break;
 	}
 }
-
 
 void AddCharacterModifier(
     CHealth& CHealth, CDefense& CDefense, CDamage& CDamage, CSpeed& CSpeed, CSpecialization& CSpecialization,
@@ -779,6 +787,22 @@ void AppGame::Render()
 		"HealthBar",		        /// здесь можно указать имя объекта (любое осмысленное имя)
 		StatusAnimate::DEFAULT      /// здесь указываем DEFAULT (потому что это не анимация)
 	);
+
+	float hp = (float)Player->GetHealth()->Health / (float)Player->GetHealth()->MaxHealth;
+	int WidthImageDinamicHp = (float)(144 * 3) * hp;
+	d3dx.DrawObject(
+		Xui + 300,	                ///позиция объекта на экране x (корректируем объект на экране по x)
+		Yui + window.height - 300,	///позиция объекта на экране y (корректируем объект на экране по y)
+		1,		                    /// позиция по Z (всегда ставим 1)
+		WidthImageDinamicHp,	                ///ширина объекта Width
+		HeightImage,			    ///ширина объекта Height
+		0,					        /// поворта объекта по z (всегда ставим 0 потому что нечего поворачивать)
+		UI,					        /// здесь выбираем тип объекта для интерфейса это объекты (UI или UIX) - пока что разницы между ними нету
+		GUI"HealthBar_HpLine",		        /// здесь указываем нашу картинку которая находится по пути ..\pong\Texture2D\UI   (картинки формата .png)
+		"HealthBar_HpLine",		        /// здесь можно указать имя объекта (любое осмысленное имя)
+		StatusAnimate::DEFAULT      /// здесь указываем DEFAULT (потому что это не анимация)
+	);
+
 	///********************************************
 
 	
@@ -789,6 +813,10 @@ void AppGame::Render()
 void AppGame::UpdateApp(MSG* msg)
 {
 	if (GetAsyncKeyState(VK_ESCAPE))
+	{
+		msg->message = WM_QUIT;
+	}
+	if (Player->GetHealth()->Health <= 0)
 	{
 		msg->message = WM_QUIT;
 	}
